@@ -10,10 +10,8 @@
     ],
 
     "page_action": {
-        "default_title": "Wörterbuch",
-        "default_popup": "woerterbuch.html"
+        "default_title": "Wörterbuch"
     },
-
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
