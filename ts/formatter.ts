@@ -1,7 +1,14 @@
+function printHeader(name: string) {
+    if (settings.collapse[_.camelCase(name)])
+        console.groupCollapsed(name);
+    else
+        console.group(name);
+}
+
 function printSection(entry: LanguageEntry, name: string) {
     const fieldName = _.camelCase(name);
     if (entry[fieldName]) {
-        console.group(name);
+        printHeader(name);
         console.log(entry[fieldName].body);
         console.groupEnd();
     }
@@ -13,7 +20,7 @@ function printLanguageEntry(entry: LanguageEntry) {
 
     // if an entry has more than 1 etymology, the pronouciation section will be moved forward
     if (entry.etymology.length === 1) {
-        console.group("Etymology");
+        printHeader("Etymology")
         console.log(entry.etymology[0].body);
         console.groupEnd();
 
@@ -25,7 +32,7 @@ function printLanguageEntry(entry: LanguageEntry) {
 
         let index = 0;
         for (let etymology of entry.etymology) {
-            console.group("Etymology " + (index + 1).toString());
+            printHeader("Etymology " + (index + 1).toString());
             console.log(entry.etymology[index].body);
             console.groupEnd();
             index += 1;
@@ -36,7 +43,10 @@ function printLanguageEntry(entry: LanguageEntry) {
     // Part of speech
     let index = 0;
     for (let pos of entry.partOfSpeech) {
-        console.group(pos.header);
+        if (settings.collapse.partOfSpeech)
+            console.groupCollapsed(pos.header);
+        else
+            console.group(pos.header);
         console.log(pos.body);
         console.groupEnd();
         index += 1;

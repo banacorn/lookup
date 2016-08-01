@@ -1,6 +1,19 @@
 var settings = {
     language: "German",
     displayAllLanguages: false,
+    collapse: {
+        alternativeForms: false,
+        etymology: false,
+        pronunciation: false,
+        partOfSpeech: false,
+        derivedTerms: false,
+        relatedTerms: false,
+        descendants: false,
+        translations: true,
+        seeAlso: false,
+        references: true,
+        externalLinks: true
+    }
 };
 chrome.storage.sync.get(settings, function (items) {
     settings = items;

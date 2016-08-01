@@ -2,6 +2,19 @@
 var settings = {
     language: "German",
     displayAllLanguages: false,
+    collapse: {
+        alternativeForms: false,
+        etymology: false,
+        pronunciation: false,
+        partOfSpeech: false,
+        derivedTerms: false,
+        relatedTerms: false,
+        descendants: false,
+        translations: true,
+        seeAlso: false,
+        references: true,
+        externalLinks: true
+    }
 }
 
 // initialize settings
@@ -28,12 +41,6 @@ chrome.runtime.onConnect.addListener((port) => {
             console.info("https://en.wiktionary.org/wiki/" + response.word);
             const result = parseEntry(response);
             printEntry(result);
-            // if (result) {
-            //     console.info("https://en.wiktionary.org/wiki/" + response.word);
-            //     printSections(result)
-            // } else {
-            //     console.warn("Not found");
-            // }
         } else {
             console.warn("Not found");
         }

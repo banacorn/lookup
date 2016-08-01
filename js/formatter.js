@@ -1,7 +1,13 @@
+function printHeader(name) {
+    if (settings.collapse[_.camelCase(name)])
+        console.groupCollapsed(name);
+    else
+        console.group(name);
+}
 function printSection(entry, name) {
     var fieldName = _.camelCase(name);
     if (entry[fieldName]) {
-        console.group(name);
+        printHeader(name);
         console.log(entry[fieldName].body);
         console.groupEnd();
     }
@@ -9,7 +15,7 @@ function printSection(entry, name) {
 function printLanguageEntry(entry) {
     printSection(entry, "Alternative forms");
     if (entry.etymology.length === 1) {
-        console.group("Etymology");
+        printHeader("Etymology");
         console.log(entry.etymology[0].body);
         console.groupEnd();
         printSection(entry, "Pronunciation");
@@ -19,7 +25,7 @@ function printLanguageEntry(entry) {
         var index_1 = 0;
         for (var _i = 0, _a = entry.etymology; _i < _a.length; _i++) {
             var etymology = _a[_i];
-            console.group("Etymology " + (index_1 + 1).toString());
+            printHeader("Etymology " + (index_1 + 1).toString());
             console.log(entry.etymology[index_1].body);
             console.groupEnd();
             index_1 += 1;
@@ -28,7 +34,10 @@ function printLanguageEntry(entry) {
     var index = 0;
     for (var _b = 0, _c = entry.partOfSpeech; _b < _c.length; _b++) {
         var pos = _c[_b];
-        console.group(pos.header);
+        if (settings.collapse.partOfSpeech)
+            console.groupCollapsed(pos.header);
+        else
+            console.group(pos.header);
         console.log(pos.body);
         console.groupEnd();
         index += 1;
