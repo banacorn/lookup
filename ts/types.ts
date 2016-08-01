@@ -36,3 +36,9 @@ type LanguageEntry = {
     references?: any,
     externalLinks?: any
 }
+
+type IPA = {
+    lang: Language,
+    transcriptions: string[]
+}
+type Pronunciation = IPA;

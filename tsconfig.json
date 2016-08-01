@@ -21,6 +21,7 @@
         "ts/content.ts",
         "ts/f.ts",
         "ts/parser.ts",
+        "ts/parser/pronunciation.ts",
         "ts/types.ts",
         "typings/globals/lodash/index.d.ts",
         "typings/index.d.ts"

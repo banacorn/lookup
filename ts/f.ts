@@ -18,7 +18,7 @@ function printLanguageEntry(entry: LanguageEntry) {
 
     printSection(entry, "Alternative forms");
 
-    // if an entry has more than 1 etymology, the pronouciation section will be moved forward
+    // if an entry has more than 1 etymology, the pronunciation section will be moved forward
     if (entry.etymology.length === 1) {
         printHeader("Etymology")
         console.log(entry.etymology[0].body);
