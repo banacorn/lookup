@@ -25,13 +25,34 @@ function printHeader(name) {
         console.group(name);
 }
 function printSection(section) {
-    if (section.body.trim())
-        console.log(section.body);
+    printParagraph(section.body);
     for (var _i = 0, _a = section.subs; _i < _a.length; _i++) {
         var sub = _a[_i];
         printHeader(sub.header);
         printSection(sub);
         console.groupEnd();
+    }
+}
+function printParagraph(paragraph) {
+    paragraph.forEach(printLine);
+}
+function printLine(line) {
+    switch (line.type) {
+        case "p":
+            console.log(line.text);
+            break;
+        case "li":
+            console.log("•", line.text);
+            break;
+        case "dd":
+            console.log("#", line.text);
+            break;
+        case "eg":
+            console.log("    ", line.text);
+            break;
+        case "egt":
+            console.log("        ", line.text);
+            break;
     }
 }
 function printEntry(entry) {

@@ -7,20 +7,20 @@ function parseSection(header: string, text: RawText): Section {
         if (regexs.length === 0) {
             return {
                 header: header,
-                body: text,
+                body: parseParagraph(text),
                 subs: []
             };
         } else {
             let result = {
                 header: header,
-                body: text,
+                body: parseParagraph(text),
                 subs: []
             };
             let splittedChunks = text.split(regexs[0]);
             let index = 0;
             for (let chunk of splittedChunks) {
                 if (index === 0) {
-                    result.body = chunk;
+                    result.body = parseParagraph(chunk);
                 }
                 if (index % 2 === 1) {
                     result.subs.push(collectSections(chunk, splittedChunks[index + 1], _.tail(regexs)));
@@ -31,6 +31,36 @@ function parseSection(header: string, text: RawText): Section {
         }
     }
     return collectSections(header, text, [h2regex, h3regex, h4regex]);
+}
+
+function parseParagraph(text: RawText): Paragraph {
+    return text.split("\n").map((line) => {
+        if (_.startsWith(line, "*"))
+            return <Line>{
+                type: "li",
+                text: line.substring(2)
+            };
+        if (_.startsWith(line, "#::"))
+            return <Line>{
+                type: "egt",
+                text: line.substring(4)
+            };
+        if (_.startsWith(line, "#:"))
+            return <Line>{
+                type: "eg",
+                text: line.substring(3)
+            };
+        if (_.startsWith(line, "#"))
+            return <Line>{
+                type: "dd",
+                text: line.substring(2)
+            };
+
+        return <Line>{
+            type: "p",
+            text: line
+        };
+    });
 }
 
 function split(text: RawText, regex: RegExp): {
@@ -56,8 +86,4 @@ function split(text: RawText, regex: RegExp): {
         index++;
     }
     return result;
-}
-
-function parseEntry(response: RawResponse): Entry {
-    return parseSection(response.word, response.text)
 }

@@ -6,14 +6,14 @@ function parseSection(header, text) {
         if (regexs.length === 0) {
             return {
                 header: header,
-                body: text,
+                body: parseParagraph(text),
                 subs: []
             };
         }
         else {
             var result = {
                 header: header,
-                body: text,
+                body: parseParagraph(text),
                 subs: []
             };
             var splittedChunks = text.split(regexs[0]);
@@ -21,7 +21,7 @@ function parseSection(header, text) {
             for (var _i = 0, splittedChunks_1 = splittedChunks; _i < splittedChunks_1.length; _i++) {
                 var chunk = splittedChunks_1[_i];
                 if (index === 0) {
-                    result.body = chunk;
+                    result.body = parseParagraph(chunk);
                 }
                 if (index % 2 === 1) {
                     result.subs.push(collectSections(chunk, splittedChunks[index + 1], _.tail(regexs)));
@@ -32,6 +32,34 @@ function parseSection(header, text) {
         }
     }
     return collectSections(header, text, [h2regex, h3regex, h4regex]);
+}
+function parseParagraph(text) {
+    return text.split("\n").map(function (line) {
+        if (_.startsWith(line, "*"))
+            return {
+                type: "li",
+                text: line.substring(2)
+            };
+        if (_.startsWith(line, "#::"))
+            return {
+                type: "egt",
+                text: line.substring(4)
+            };
+        if (_.startsWith(line, "#:"))
+            return {
+                type: "eg",
+                text: line.substring(3)
+            };
+        if (_.startsWith(line, "#"))
+            return {
+                type: "dd",
+                text: line.substring(2)
+            };
+        return {
+            type: "p",
+            text: line
+        };
+    });
 }
 function split(text, regex) {
     var splitted = text.split(regex);
@@ -54,7 +82,4 @@ function split(text, regex) {
         index++;
     }
     return result;
-}
-function parseEntry(response) {
-    return parseSection(response.word, response.text);
 }

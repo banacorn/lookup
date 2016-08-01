@@ -41,7 +41,7 @@ chrome.runtime.onConnect.addListener(function (port) {
         console.clear();
         if (response) {
             console.info("https://en.wiktionary.org/wiki/" + response.word);
-            var result = parseEntry(response);
+            var result = parseSection(response.word, response.text);
             printEntry(result);
         }
         else {

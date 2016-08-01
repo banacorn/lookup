@@ -35,18 +35,8 @@ function printHeader(name: string) {
         console.group(name);
 }
 
-// function printSection(entry: LanguageSection, name: string) {
-//     const fieldName = _.camelCase(name);
-//     if (entry[fieldName]) {
-//         printHeader(name);
-//         console.log(entry[fieldName].body);
-//         console.groupEnd();
-//     }
-// }
-
 function printSection(section: Section) {
-    if (section.body.trim())
-        console.log(section.body)
+    printParagraph(section.body)
     for (let sub of section.subs) {
         printHeader(sub.header);
         printSection(sub);
@@ -54,7 +44,31 @@ function printSection(section: Section) {
     }
 }
 
-function printEntry(entry: Entry) {
+function printParagraph(paragraph: Paragraph) {
+    paragraph.forEach(printLine);
+}
+
+function printLine(line: Line) {
+    switch (line.type) {
+        case "p":
+            console.log(line.text);
+            break;
+        case "li":
+            console.log("•", line.text);
+            break;
+        case "dd":
+            console.log("#", line.text);
+            break;
+        case "eg":
+            console.log("    ", line.text);
+            break;
+        case "egt":
+            console.log("        ", line.text);
+            break;
+    }
+}
+
+function printEntry(entry: Section) {
     // if there's such entry
     if (entry) {
 

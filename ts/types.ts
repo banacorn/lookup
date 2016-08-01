@@ -8,9 +8,16 @@ type RawResponse = {
 
 type Section = {
     header: string,
-    body: RawText,
+    body: Paragraph,
     subs: Section[]
 }
 
-type Entry = Section;
-type Language = string;
+type Paragraph = Line[];
+type Line = {
+    type: "p"
+        | "li"      // * list items
+        | "dd"      // # definition description
+        | "eg"      // #: example
+        | "egt",    // #:: example translation,
+    text: string
+}
