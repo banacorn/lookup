@@ -31,6 +31,8 @@ function printLanguageEntry(entry) {
             index_1 += 1;
         }
     }
+    printSection(entry, "Homophones");
+    printSection(entry, "Rhymes");
     var index = 0;
     for (var _b = 0, _c = entry.partOfSpeech; _b < _c.length; _b++) {
         var pos = _c[_b];

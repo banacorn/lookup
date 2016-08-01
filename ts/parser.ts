@@ -77,13 +77,15 @@ function parseLanguageEntry(section: Section): LanguageEntry {
             // Romanization
             "Romanization"
         ], obj.header);
-        
+
     });
     return {
         language:           section.header,
         alternativeForms:   _.find(sections.sections, { header: "Alternative forms" }),
         etymology:          etymologies,
         pronunciation:      _.find(sections.sections, { header: "Pronunciation" }),
+        homophones:         _.find(sections.sections, { header: "Homophones" }),
+        rhymes:             _.find(sections.sections, { header: "Rhymes" }),
         partOfSpeech:       posHeaders,
         derivedTerms:       _.find(sections.sections, { header: "Derived terms" }),
         relatedTerms:       _.find(sections.sections, { header: "Related terms" }),

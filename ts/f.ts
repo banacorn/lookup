@@ -39,6 +39,8 @@ function printLanguageEntry(entry: LanguageEntry) {
         }
     }
 
+    printSection(entry, "Homophones");
+    printSection(entry, "Rhymes");
 
     // Part of speech
     let index = 0;
@@ -51,7 +53,6 @@ function printLanguageEntry(entry: LanguageEntry) {
         console.groupEnd();
         index += 1;
     }
-
 
     printSection(entry, "Derived terms");
     printSection(entry, "Related terms");

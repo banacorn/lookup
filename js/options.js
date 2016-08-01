@@ -6,6 +6,8 @@ var settings = {
         alternativeForms: false,
         etymology: false,
         pronunciation: false,
+        homophones: true,
+        rhymes: true,
         partOfSpeech: false,
         derivedTerms: false,
         relatedTerms: false,
@@ -24,6 +26,8 @@ var collapseInput = {
     alternativeForms: document.querySelector("#collapse-alternative-forms"),
     etymology: document.querySelector("#collapse-etymology"),
     pronunciation: document.querySelector("#collapse-pronunciation"),
+    homophones: document.querySelector("#collapse-homophones"),
+    rhymes: document.querySelector("#collapse-rhymes"),
     partOfSpeech: document.querySelector("#collapse-part-of-speech"),
     derivedTerms: document.querySelector("#collapse-derived-terms"),
     relatedTerms: document.querySelector("#collapse-related-terms"),
@@ -66,23 +70,15 @@ document.addEventListener('DOMContentLoaded', restoreSettings);
 
 // functions
 function saveSettings() {
+    var collapseSettings = {};
+    for (name in collapseInput) {
+        collapseSettings[name] = collapseInput[name].checked;
+    }
+
     chrome.storage.sync.set({
         language: languageInput.value,
         displayAllLanguages: displayAllLanguagesInput.checked,
-        collapse: {
-            alternativeForms: collapseInput.alternativeForms.checked,
-            etymology: collapseInput.etymology.checked,
-            pronunciation: collapseInput.pronunciation.checked,
-            partOfSpeech: collapseInput.partOfSpeech.checked,
-            derivedTerms: collapseInput.derivedTerms.checked,
-            relatedTerms: collapseInput.relatedTerms.checked,
-            descendants: collapseInput.descendants.checked,
-            translations: collapseInput.translations.checked,
-            seeAlso: collapseInput.seeAlso.checked,
-            references: collapseInput.references.checked,
-            externalLinks: collapseInput.externalLinks.checked
-
-        }
+        collapse: collapseSettings
     });
 }
 

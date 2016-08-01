@@ -6,6 +6,8 @@ var settings = {
         alternativeForms: false,
         etymology: false,
         pronunciation: false,
+        homophones: true,
+        rhymes: true,
         partOfSpeech: false,
         derivedTerms: false,
         relatedTerms: false,

@@ -24,7 +24,9 @@ type LanguageEntry = {
     language: Language,
     alternativeForms?: any,
     etymology?: any[],
-    pronunciation?: any
+    pronunciation?: any,
+    homophones?: any,
+    rhymes?: any,
     partOfSpeech: Section[],
     derivedTerms?: any,
     relatedTerms?: any,
