@@ -19,6 +19,7 @@
     "files": [
         "src/background.ts",
         "src/content.ts",
+        "src/formatter.ts",
         "src/parser.ts",
         "src/types.ts"
     ],

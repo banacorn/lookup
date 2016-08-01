@@ -1,6 +1,6 @@
 declare var chrome: any;
 
-function detectGerman(tabId, changeInfo, callback) {
+function detectGerman(tabId: number, changeInfo, callback: () => void) {
     if (changeInfo && changeInfo.status === "complete") {
         chrome.tabs.detectLanguage(tabId, (language) => {
             if (language === "de") {
@@ -13,7 +13,7 @@ function detectGerman(tabId, changeInfo, callback) {
 }
 
 // ajax get
-function get(word, callback) {
+function get(word: Word, callback: (RawText) => void) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "https://en.wiktionary.org/w/index.php?title=" + word + "&action=raw", true);
     xhr.onreadystatechange = function() {
@@ -24,15 +24,15 @@ function get(word, callback) {
     xhr.send();
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener((tabId: number, changeInfo, tab) => {
 
     detectGerman(tabId, changeInfo, () => {
         var port = chrome.tabs.connect(tabId, {name: "woerterbuch"});
 
-        port.onMessage.addListener((message) => {
-            get(message, (response) => {
+        port.onMessage.addListener((word: Word) => {
+            get(word, (response) => {
                 port.postMessage({
-                    word: message,
+                    word: word,
                     text: response
                 });
             });

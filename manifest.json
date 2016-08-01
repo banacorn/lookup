@@ -15,7 +15,7 @@
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
-        "js": ["lib/parser.js", "lib/content.js"]
+        "js": ["lib/parser.js", "lib/formatter.js", "lib/content.js"]
     }],
     "background": {
         "scripts": ["lib/background.js"],

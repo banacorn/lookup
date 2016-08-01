@@ -28,17 +28,18 @@ chrome.runtime.onConnect.addListener((port) => {
         }
     }, false);
 
-    port.onMessage.addListener((reply) => {
+    port.onMessage.addListener((response: RawResponse) => {
         // clear old results
         console.clear();
-        if (reply) {
-            var result = parseWiktionary(reply.text);
-            if (result) {
-                console.info("https://en.wiktionary.org/wiki/" + reply.word);
-                printSections(result)
-            } else {
-                console.warn("Not found");
-            }
+        if (response) {
+            const result = parseEntry(response);
+            printEntry(result);
+            // if (result) {
+            //     console.info("https://en.wiktionary.org/wiki/" + response.word);
+            //     printSections(result)
+            // } else {
+            //     console.warn("Not found");
+            // }
         } else {
             console.warn("Not found");
         }
