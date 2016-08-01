@@ -1,4 +1,4 @@
-var parseSection = (text) => {
+function parseSection(text) {
     // the tail you've met in Haskell
     var tail = (list) => {
         var result = [];
@@ -8,7 +8,7 @@ var parseSection = (text) => {
         return result;
     }
 
-    var collectSections = (text, regexs) => {
+    function collectSections(text: RawText, regexs: RegExp[]): any {
         if (regexs.length === 0) {
             return {
                 paragraph: text,
@@ -20,13 +20,16 @@ var parseSection = (text) => {
                 sections: {}
             };
             var splitted = text.split(regexs[0]);
-            for (var [index, value] of splitted.entries()) {
+
+            let index = 0;
+            for (var value of splitted) {
                 if (index === 0) {
                     obj.paragraph = splitted[0];
                 }
                 if (index % 2 === 1) {
                     obj.sections[value] = collectSections(splitted[index + 1], tail(regexs));
                 }
+                index++;
             }
             return obj;
         }
@@ -39,9 +42,8 @@ var parseSection = (text) => {
     return collectSections(text, [h2regex, h3regex, h4regex]);
 }
 
-var parseWiktionary = function(text) {
+function parseWiktionary(text) {
     var sections = parseSection(text);
-
     if (sections.sections.German) {
         return sections.sections.German
     }

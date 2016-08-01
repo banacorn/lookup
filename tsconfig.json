@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "outDir": "lib",
+        "experimentalDecorators": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "typings/main.d.ts",
+        "!node_modules/**"
+    ],
+    "files": [
+        "src/background.ts",
+        "src/content.ts",
+        "src/parser.ts",
+        "src/types.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

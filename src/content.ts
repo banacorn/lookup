@@ -1,4 +1,4 @@
-var printSections = (result) => {
+function printSections(result): any {
     if (typeof result === "string") {
         console.log(result)
     } else {
@@ -8,7 +8,7 @@ var printSections = (result) => {
         }
 
         // print sub-sections
-        for (header in result.sections) {
+        for (const header in result.sections) {
             console.group(header)
             printSections(result.sections[header]);
             console.groupEnd()

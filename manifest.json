@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
 
-    "name": "Wörterbuch",
-    "description": "Wörterbuch",
+    "name": "Lookup",
+    "description": "Lookup articles in wiktionary",
     "version": "1.0",
     "permissions": [
         "activeTab",
@@ -10,15 +10,15 @@
     ],
 
     "page_action": {
-        "default_title": "Wörterbuch"
+        "default_title": "Lookup"
     },
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
-        "js": ["parser.js", "content.js"]
+        "js": ["lib/parser.js", "lib/content.js"]
     }],
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["lib/background.js"],
         "persistent": false
     }
 }
