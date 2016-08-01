@@ -37,7 +37,7 @@ function printParagraph(paragraph) {
     paragraph.forEach(printLine);
 }
 function printLine(line) {
-    switch (line.type) {
+    switch (line.kind) {
         case "p":
             console.log(line.text);
             break;

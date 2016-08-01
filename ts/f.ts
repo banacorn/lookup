@@ -49,7 +49,7 @@ function printParagraph(paragraph: Paragraph) {
 }
 
 function printLine(line: Line) {
-    switch (line.type) {
+    switch (line.kind) {
         case "p":
             console.log(line.text);
             break;

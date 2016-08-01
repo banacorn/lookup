@@ -37,27 +37,27 @@ function parseParagraph(text: RawText): Paragraph {
     return text.split("\n").map((line) => {
         if (_.startsWith(line, "*"))
             return <Line>{
-                type: "li",
+                kind: "li",
                 text: line.substring(2)
             };
         if (_.startsWith(line, "#::"))
             return <Line>{
-                type: "egt",
+                kind: "egt",
                 text: line.substring(4)
             };
         if (_.startsWith(line, "#:"))
             return <Line>{
-                type: "eg",
+                kind: "eg",
                 text: line.substring(3)
             };
         if (_.startsWith(line, "#"))
             return <Line>{
-                type: "dd",
+                kind: "dd",
                 text: line.substring(2)
             };
 
         return <Line>{
-            type: "p",
+            kind: "p",
             text: line
         };
     });
