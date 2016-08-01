@@ -19,7 +19,7 @@
     "files": [
         "ts/background.ts",
         "ts/content.ts",
-        "ts/formatter.ts",
+        "ts/f.ts",
         "ts/parser.ts",
         "ts/types.ts",
         "typings/globals/lodash/index.d.ts",

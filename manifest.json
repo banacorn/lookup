@@ -16,7 +16,7 @@
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
-        "js": ["js/parser.js", "js/formatter.js", "js/content.js", "js/lodash.min.js"]
+        "js": ["js/parser.js", "js/f.js", "js/content.js", "js/lodash.min.js"]
     }],
     "background": {
         "scripts": ["js/background.js"],
