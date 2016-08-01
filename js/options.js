@@ -9,17 +9,23 @@ var languageInput = document.querySelector("#language");
 var displayAllLanguagesInput = document.querySelector("#display-all-languages");
 
 // listeners
-languageInput.addEventListener("change", function (event) {
+function languageInputListener() {
     saveSettings();
-});
-displayAllLanguagesInput.addEventListener("change", function (event) {
+}
+
+function displayAllLanguagesInputListener() {
     if (displayAllLanguagesInput.checked) {
         languageInput.setAttribute("disabled", "disabled");
     } else {
         languageInput.removeAttribute("disabled");
     }
     saveSettings();
-});
+}
+
+
+
+languageInput.addEventListener("change", languageInputListener);
+displayAllLanguagesInput.addEventListener("change", displayAllLanguagesInputListener);
 document.addEventListener('DOMContentLoaded', restoreSettings);
 
 // functions
@@ -36,5 +42,8 @@ function restoreSettings() {
 
         languageInput.value = settings.language;
         displayAllLanguagesInput.checked = settings.displayAllLanguages;
+
+        languageInputListener();
+        displayAllLanguagesInputListener();
     })
 }
