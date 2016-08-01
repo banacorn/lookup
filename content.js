@@ -42,10 +42,9 @@ var sectionize = (text) => {
 var parseWiktionary = function(text) {
     var sections = sectionize(text);
 
-    var germanSection = sections.sections.German;
-    // console.log(germanSection)
-    // return sections
-    return germanSection
+    if (sections.sections.German) {
+        return sections.sections.German
+    }
 }
 
 
@@ -53,7 +52,6 @@ var printSections = (result) => {
     if (typeof result === "string") {
         console.log(result)
     } else {
-
         // print paragraph
         if (result.paragraph) {
             console.log(result.paragraph)
@@ -84,9 +82,13 @@ chrome.runtime.onConnect.addListener((port) => {
         // clear old results
         console.clear();
         if (reply) {
-            var result = parseWiktionary(reply);
-            console.log("https://en.wiktionary.org/wiki/" + reply.word);
-            printSections(result)
+            var result = parseWiktionary(reply.text);
+            if (result) {
+                console.log("https://en.wiktionary.org/wiki/" + reply.word);
+                printSections(result)
+            } else {
+                console.warn("Not found");
+            }
         } else {
             console.warn("Not found");
         }

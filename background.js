@@ -26,13 +26,14 @@ var get = (word, callback) => {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
     detectGerman(tabId, changeInfo, () => {
-        console.log("opened");
         var port = chrome.tabs.connect(tabId, {name: "woerterbuch"});
 
         port.onMessage.addListener((message) => {
-            console.log(message);
             get(message, (response) => {
-                port.postMessage(response);
+                port.postMessage({
+                    word: message,
+                    text: response
+                });
             });
         });
     });
