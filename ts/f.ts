@@ -54,58 +54,6 @@ function printSection(section: Section) {
     }
 }
 
-// function printLanguageEntry(entry: Section) {
-//
-//     printSection(entry);
-
-    // printSection(entry, "Alternative forms");
-    //
-    // // if an entry has more than 1 etymology, the pronunciation section will be moved forward
-    // if (entry.etymology.length === 1) {
-    //     printHeader("Etymology")
-    //     console.log(entry.etymology[0].body);
-    //     console.groupEnd();
-    //
-    //     printSection(entry, "Pronunciation");
-    //
-    // } else {
-    //
-    //     printSection(entry, "Pronunciation");
-    //
-    //     let index = 0;
-    //     for (let etymology of entry.etymology) {
-    //         printHeader("Etymology " + (index + 1).toString());
-    //         console.log(entry.etymology[index].body);
-    //         console.groupEnd();
-    //         index += 1;
-    //     }
-    // }
-    //
-    // printSection(entry, "Homophones");
-    // printSection(entry, "Rhymes");
-    //
-    // // Part of speech
-    // let index = 0;
-    // for (let pos of entry.partOfSpeech) {
-    //     if (settings.collapse.partOfSpeech)
-    //         console.groupCollapsed(pos.header);
-    //     else
-    //         console.group(pos.header);
-    //     console.log(pos.body);
-    //     console.groupEnd();
-    //     index += 1;
-    // }
-    //
-    // printSection(entry, "Derived terms");
-    // printSection(entry, "Related terms");
-    // printSection(entry, "Descendants");
-    // printSection(entry, "Translations");
-    // printSection(entry, "See Also");
-    // printSection(entry, "References");
-    // printSection(entry, "External Links");
-// }
-
-
 function printEntry(entry: Entry) {
     // if there's such entry
     if (entry) {
