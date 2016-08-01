@@ -1,22 +1,15 @@
-function printSections(result): any {
-    if (typeof result === "string") {
-        console.log(result)
-    } else {
-        // print paragraph
-        if (result.paragraph) {
-            console.log(result.paragraph)
-        }
-
-        // print sub-sections
-        for (const header in result.sections) {
-            console.group(header)
-            printSections(result.sections[header]);
-            console.groupEnd()
-        }
-    }
+// default state
+var settings = {
+    language: "German",
+    displayAllLanguages: false,
 }
 
+// initialize settings
+chrome.storage.sync.get(settings, (items) => {
+    settings = items;
+})
 
+// listeners
 chrome.runtime.onConnect.addListener((port) => {
 
     // listens to text selection events
@@ -44,4 +37,12 @@ chrome.runtime.onConnect.addListener((port) => {
             console.warn("Not found");
         }
     });
+});
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === "sync") {
+        for (var key in changes) {
+            settings[key] = changes[key].newValue;
+        }
+    }
 });

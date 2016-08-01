@@ -6,7 +6,8 @@
     "version": "1.0",
     "permissions": [
         "activeTab",
-        "tabs"
+        "tabs",
+        "storage"
     ],
 
     "page_action": {
@@ -15,10 +16,15 @@
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
-        "js": ["lib/parser.js", "lib/formatter.js", "lib/content.js"]
+        "js": ["js/parser.js", "js/formatter.js", "js/content.js", "js/lodash.core.js"]
     }],
     "background": {
-        "scripts": ["lib/background.js"],
+        "scripts": ["js/background.js"],
         "persistent": false
+    },
+
+
+    "options_ui": {
+        "page": "html/options.html"
     }
 }

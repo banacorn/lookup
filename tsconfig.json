@@ -4,7 +4,7 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": false,
-        "outDir": "lib",
+        "outDir": "js",
         "experimentalDecorators": true
     },
     "exclude": [
@@ -17,11 +17,13 @@
         "!node_modules/**"
     ],
     "files": [
-        "src/background.ts",
-        "src/content.ts",
-        "src/formatter.ts",
-        "src/parser.ts",
-        "src/types.ts"
+        "ts/background.ts",
+        "ts/content.ts",
+        "ts/formatter.ts",
+        "ts/parser.ts",
+        "ts/types.ts",
+        "typings/globals/lodash/index.d.ts",
+        "typings/index.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

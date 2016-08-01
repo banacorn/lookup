@@ -24,11 +24,10 @@ function get(word: Word, callback: (RawText) => void) {
     xhr.send();
 }
 
+// listeners
 chrome.tabs.onUpdated.addListener((tabId: number, changeInfo, tab) => {
-
     detectGerman(tabId, changeInfo, () => {
         var port = chrome.tabs.connect(tabId, {name: "woerterbuch"});
-
         port.onMessage.addListener((word: Word) => {
             get(word, (response) => {
                 port.postMessage({

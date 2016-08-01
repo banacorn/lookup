@@ -1,18 +1,10 @@
-function printSections(result) {
-    if (typeof result === "string") {
-        console.log(result);
-    }
-    else {
-        if (result.paragraph) {
-            console.log(result.paragraph);
-        }
-        for (var header in result.sections) {
-            console.group(header);
-            printSections(result.sections[header]);
-            console.groupEnd();
-        }
-    }
-}
+var settings = {
+    language: "German",
+    displayAllLanguages: false,
+};
+chrome.storage.sync.get(settings, function (items) {
+    settings = items;
+});
 chrome.runtime.onConnect.addListener(function (port) {
     document.addEventListener("mouseup", function () {
         var word = window.getSelection().toString().trim();
@@ -30,4 +22,11 @@ chrome.runtime.onConnect.addListener(function (port) {
             console.warn("Not found");
         }
     });
+});
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (namespace === "sync") {
+        for (var key in changes) {
+            settings[key] = changes[key].newValue;
+        }
+    }
 });
