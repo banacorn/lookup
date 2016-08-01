@@ -41,7 +41,23 @@ function parseSection(text) {
     var h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
     return collectSections(text, [h2regex, h3regex, h4regex]);
 }
-function parseEntryLanguage() {
+function parseLanguageEntry(section) {
+    var sections = split(section.body, h3regex);
+    console.log(sections);
+    return {
+        language: section.header,
+        alternativeForms: _.find(sections.sections, { header: "Alternative forms" }),
+        etymology: _.find(sections.sections, { header: "Etymology" }),
+        pronouciation: _.find(sections.sections, { header: "Pronunciation" }),
+        partOfSpeech: "hey",
+        derivedTerms: _.find(sections.sections, { header: "Derived terms" }),
+        relatedTerms: _.find(sections.sections, { header: "Related terms" }),
+        descendants: _.find(sections.sections, { header: "Descendants" }),
+        translations: _.find(sections.sections, { header: "Translations" }),
+        seeAlso: _.find(sections.sections, { header: "See also" }),
+        references: _.find(sections.sections, { header: "References" }),
+        externalLinks: _.find(sections.sections, { header: "External links" })
+    };
 }
 function split(text, regex) {
     var splitted = text.split(regex);
@@ -58,7 +74,7 @@ function split(text, regex) {
         if (index % 2 === 1) {
             result.sections.push({
                 header: header,
-                content: splitted[index + 1]
+                body: splitted[index + 1]
             });
         }
         index++;
@@ -70,6 +86,6 @@ function parseEntry(response) {
     return {
         word: response.word,
         seeAlso: result.paragraph,
-        languages: result.sections
+        languages: result.sections.map(parseLanguageEntry)
     };
 }

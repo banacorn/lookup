@@ -8,18 +8,31 @@ type RawResponse = {
 
 type Section = {
     header: string,
-    content: RawText
+    body: RawText
 }
 
 type Entry = {
     word: Word,
     seeAlso?: string
-    languages: Section[]
+    languages: LanguageEntry[]
 }
 
-type EntryLanguage = {
+type Language = string;
+
+type LanguageEntry = {
     // alternativeForms?: any[]
+    language: Language,
+    alternativeForms?: any,
     etymology?: any
     pronouciation?: any
-    partOfSpeech: any
+    partOfSpeech: any,
+    derivedTerms?: any,
+    relatedTerms?: any,
+    descendants?: any,
+    translations?: any,
+    seeAlso?: any,
+    references?: any,
+    externalLinks?: any
 }
+
+// type Pronunciation =
