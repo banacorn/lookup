@@ -44,10 +44,11 @@ function parseSection(text) {
 function parseLanguageEntry(section) {
     var sections = split(section.body, h3regex);
     console.log(sections);
+    var etymologies = _.filter(sections.sections, function (obj) { return _.startsWith(obj.header, "Etymology"); });
     return {
         language: section.header,
         alternativeForms: _.find(sections.sections, { header: "Alternative forms" }),
-        etymology: _.find(sections.sections, { header: "Etymology" }),
+        etymology: etymologies,
         pronouciation: _.find(sections.sections, { header: "Pronunciation" }),
         partOfSpeech: "hey",
         derivedTerms: _.find(sections.sections, { header: "Derived terms" }),

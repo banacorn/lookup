@@ -23,7 +23,7 @@ type LanguageEntry = {
     // alternativeForms?: any[]
     language: Language,
     alternativeForms?: any,
-    etymology?: any
+    etymology?: any[],
     pronouciation?: any
     partOfSpeech: any,
     derivedTerms?: any,

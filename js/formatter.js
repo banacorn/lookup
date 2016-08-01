@@ -4,10 +4,19 @@ function printLanguageEntry(entry) {
         console.log(entry.alternativeForms.body);
         console.groupEnd();
     }
-    if (entry.etymology) {
+    if (entry.etymology.length === 1) {
         console.group("Etymology");
-        console.log(entry.etymology.body);
+        console.log(entry.etymology[0].body);
         console.groupEnd();
+    }
+    else {
+        var index = 0;
+        for (var etymology in entry.etymology) {
+            console.group("Etymology " + (index + 1).toString());
+            console.log(entry.etymology[index].body);
+            console.groupEnd();
+            index += 1;
+        }
     }
     if (entry.pronouciation) {
         console.group("Pronunciation");

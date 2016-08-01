@@ -6,10 +6,18 @@ function printLanguageEntry(entry: LanguageEntry) {
         console.groupEnd();
     }
 
-    if (entry.etymology) {
+    if (entry.etymology.length === 1) {
         console.group("Etymology");
-        console.log(entry.etymology.body);
+        console.log(entry.etymology[0].body);
         console.groupEnd();
+    } else {
+        let index = 0;
+        for (let etymology in entry.etymology) {
+            console.group("Etymology " + (index + 1).toString());
+            console.log(entry.etymology[index].body);
+            console.groupEnd();
+            index += 1;
+        }
     }
 
     if (entry.pronouciation) {
@@ -68,13 +76,13 @@ function printEntry(entry: Entry) {
         // display all languages
         if (settings.displayAllLanguages) {
             console.log(entry.seeAlso);
-            for (var language of entry.languages) {
+            for (let language of entry.languages) {
                 console.group(language.language);
                 printLanguageEntry(language);
                 console.groupEnd();
             }
         } else {
-            var languageEntry = _.find(entry.languages, { language: settings.language });
+            const languageEntry = _.find(entry.languages, { language: settings.language });
             if (languageEntry) {
                 printLanguageEntry(languageEntry);
             } else {
