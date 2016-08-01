@@ -24,8 +24,8 @@ type LanguageEntry = {
     language: Language,
     alternativeForms?: any,
     etymology?: any[],
-    pronouciation?: any
-    partOfSpeech: any,
+    pronunciation?: any
+    partOfSpeech: Section[],
     derivedTerms?: any,
     relatedTerms?: any,
     descendants?: any,
@@ -34,5 +34,3 @@ type LanguageEntry = {
     references?: any,
     externalLinks?: any
 }
-
-// type Pronunciation =

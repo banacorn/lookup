@@ -43,14 +43,29 @@ function parseSection(text) {
 }
 function parseLanguageEntry(section) {
     var sections = split(section.body, h3regex);
-    console.log(sections);
-    var etymologies = _.filter(sections.sections, function (obj) { return _.startsWith(obj.header, "Etymology"); });
+    var etymologies = sections.sections.filter(function (obj) { return _.startsWith(obj.header, "Etymology"); });
+    var posHeaders = sections.sections.filter(function (obj) {
+        return _.includes([
+            "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
+            "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
+            "Interjection", "Noun", "Numeral", "Participle", "Particle",
+            "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
+            "Circumfix", "Combining form", "Infix", "Interfix", "Prefix",
+            "Root", "Suffix",
+            "Diacritical mark", "Letter", "Ligature", "Number",
+            "Punctuation mark", "Syllable", "Symbol",
+            "Phrase", "Proverb", "Prepositional phrase",
+            "Han character", "Hanzi", "Kanji", "Hanja",
+            "Brivla", "Cmavo", "Gismu", "Lujvo", "Rafsi",
+            "Romanization"
+        ], obj.header);
+    });
     return {
         language: section.header,
         alternativeForms: _.find(sections.sections, { header: "Alternative forms" }),
         etymology: etymologies,
-        pronouciation: _.find(sections.sections, { header: "Pronunciation" }),
-        partOfSpeech: "hey",
+        pronunciation: _.find(sections.sections, { header: "Pronunciation" }),
+        partOfSpeech: posHeaders,
         derivedTerms: _.find(sections.sections, { header: "Derived terms" }),
         relatedTerms: _.find(sections.sections, { header: "Related terms" }),
         descendants: _.find(sections.sections, { header: "Descendants" }),

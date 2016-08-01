@@ -46,17 +46,45 @@ function parseSection(text: RawText) {
     return collectSections(text, [h2regex, h3regex, h4regex]);
 }
 
+
 function parseLanguageEntry(section: Section): LanguageEntry {
     const sections = split(section.body, h3regex);
-    // _.find(entry.languages, { header: "Noun" });
-    console.log(sections);
-    const etymologies = _.filter(sections.sections, (obj) => _.startsWith(obj.header, "Etymology"));
+
+    // find all header starts with "Etymology" (for there may be plenty of them)
+    const etymologies = sections.sections.filter((obj) => _.startsWith(obj.header, "Etymology"));
+
+    // find all POS headers
+    // https://en.wiktionary.org/wiki/Wiktionary:Entry_layout#Part_of_speech
+    const posHeaders = sections.sections.filter((obj) => {
+        return _.includes([
+            // Parts of speech:
+            "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
+            "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
+            "Interjection", "Noun", "Numeral", "Participle", "Particle",
+            "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
+            // Morphemes:
+            "Circumfix", "Combining form", "Infix", "Interfix", "Prefix",
+            "Root", "Suffix",
+            // Symbols and characters:
+            "Diacritical mark", "Letter", "Ligature", "Number",
+            "Punctuation mark", "Syllable", "Symbol",
+            // Phrases
+            "Phrase", "Proverb", "Prepositional phrase",
+            // Han characters and language-specific varieties:
+            "Han character", "Hanzi", "Kanji", "Hanja",
+            // Lojban-specific parts of speech
+            "Brivla", "Cmavo", "Gismu", "Lujvo", "Rafsi",
+            // Romanization
+            "Romanization"
+        ], obj.header);
+        
+    });
     return {
         language:           section.header,
         alternativeForms:   _.find(sections.sections, { header: "Alternative forms" }),
         etymology:          etymologies,
-        pronouciation:      _.find(sections.sections, { header: "Pronunciation" }),
-        partOfSpeech: "hey",
+        pronunciation:      _.find(sections.sections, { header: "Pronunciation" }),
+        partOfSpeech:       posHeaders,
         derivedTerms:       _.find(sections.sections, { header: "Derived terms" }),
         relatedTerms:       _.find(sections.sections, { header: "Related terms" }),
         descendants:        _.find(sections.sections, { header: "Descendants" }),

@@ -1,63 +1,45 @@
-function printLanguageEntry(entry) {
-    if (entry.alternativeForms) {
-        console.group("Alternative forms");
-        console.log(entry.alternativeForms.body);
+function printSection(entry, name) {
+    var fieldName = _.camelCase(name);
+    if (entry[fieldName]) {
+        console.group(name);
+        console.log(entry[fieldName].body);
         console.groupEnd();
     }
+}
+function printLanguageEntry(entry) {
+    printSection(entry, "Alternative forms");
     if (entry.etymology.length === 1) {
         console.group("Etymology");
         console.log(entry.etymology[0].body);
         console.groupEnd();
+        printSection(entry, "Pronunciation");
     }
     else {
-        var index = 0;
-        for (var etymology in entry.etymology) {
-            console.group("Etymology " + (index + 1).toString());
-            console.log(entry.etymology[index].body);
+        printSection(entry, "Pronunciation");
+        var index_1 = 0;
+        for (var _i = 0, _a = entry.etymology; _i < _a.length; _i++) {
+            var etymology = _a[_i];
+            console.group("Etymology " + (index_1 + 1).toString());
+            console.log(entry.etymology[index_1].body);
             console.groupEnd();
-            index += 1;
+            index_1 += 1;
         }
     }
-    if (entry.pronouciation) {
-        console.group("Pronunciation");
-        console.log(entry.pronouciation.body);
+    var index = 0;
+    for (var _b = 0, _c = entry.partOfSpeech; _b < _c.length; _b++) {
+        var pos = _c[_b];
+        console.group(pos.header);
+        console.log(pos.body);
         console.groupEnd();
+        index += 1;
     }
-    if (entry.derivedTerms) {
-        console.group("Derived terms");
-        console.log(entry.derivedTerms.body);
-        console.groupEnd();
-    }
-    if (entry.relatedTerms) {
-        console.group("Related terms");
-        console.log(entry.relatedTerms.body);
-        console.groupEnd();
-    }
-    if (entry.descendants) {
-        console.group("Descendants");
-        console.log(entry.descendants.body);
-        console.groupEnd();
-    }
-    if (entry.translations) {
-        console.group("Translations");
-        console.log(entry.translations.body);
-        console.groupEnd();
-    }
-    if (entry.seeAlso) {
-        console.group("See Also");
-        console.log(entry.seeAlso.body);
-        console.groupEnd();
-    }
-    if (entry.references) {
-        console.group("References");
-        console.log(entry.references.body);
-        console.groupEnd();
-    }
-    if (entry.externalLinks) {
-        console.group("External Links");
-        console.log(entry.externalLinks.body);
-        console.groupEnd();
-    }
+    printSection(entry, "Derived terms");
+    printSection(entry, "Related terms");
+    printSection(entry, "Descendants");
+    printSection(entry, "Translations");
+    printSection(entry, "See Also");
+    printSection(entry, "References");
+    printSection(entry, "External Links");
 }
 function printEntry(entry) {
     if (entry) {
