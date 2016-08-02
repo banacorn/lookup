@@ -1,0 +1,24 @@
+{
+  "name": "lookup",
+  "homepage": "https://github.com/banacorn/lookup",
+  "authors": [
+    "Tîng-Giān Luā <banacorn@gmail.com>"
+  ],
+  "description": "an chrome extension",
+  "main": "",
+  "keywords": [
+    "dictionary"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js"
+  }
+}
