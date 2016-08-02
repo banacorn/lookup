@@ -1,3 +1,14 @@
+function appendFmt(a, b) {
+    return {
+        text: a.text + b.text,
+        style: a.style.concat(b.style)
+    };
+}
+function printFmt(fmt) {
+    if (fmt.text.trim()) {
+        console.log.apply(console, [fmt.text].concat(fmt.style));
+    }
+}
 function isPartOfSpeech(name) {
     return _.includes([
         "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
@@ -25,7 +36,7 @@ function printHeader(name) {
         console.group(name);
 }
 function printSection(section) {
-    printParagraph(section.body);
+    printFmt(fmtSection(section));
     for (var _i = 0, _a = section.subs; _i < _a.length; _i++) {
         var sub = _a[_i];
         printHeader(sub.header);
@@ -33,27 +44,33 @@ function printSection(section) {
         console.groupEnd();
     }
 }
-function printParagraph(paragraph) {
-    paragraph.forEach(printLine);
+function fmtSection(section) {
+    var fmt = {
+        text: "",
+        style: []
+    };
+    section.body.forEach(function (paragraph) {
+        fmt = appendFmt(fmt, fmtParagraph(paragraph));
+        fmt.text += "\n";
+    });
+    return fmt;
 }
-function printLine(line) {
-    switch (line.kind) {
-        case "p":
-            console.log(line.text);
-            break;
-        case "li":
-            console.log("•", line.text);
-            break;
-        case "dd":
-            console.log("#", line.text);
-            break;
-        case "eg":
-            console.log("    ", line.text);
-            break;
-        case "egt":
-            console.log("        ", line.text);
-            break;
-    }
+function fmtParagraph(paragraph) {
+    var fmt = {
+        text: "",
+        style: []
+    };
+    paragraph.forEach(function (line) {
+        fmt = appendFmt(fmt, fmtLine(line));
+        fmt.text += "\n";
+    });
+    return fmt;
+}
+function fmtLine(line) {
+    return {
+        text: line,
+        style: []
+    };
 }
 function printEntry(entry) {
     if (entry) {

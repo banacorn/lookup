@@ -8,30 +8,31 @@ type RawResponse = {
 
 type Section = {
     header: string,
-    body: Paragraph,
+    body: Paragraph[],
     subs: Section[]
 }
 
 type Paragraph = Line[];
-type Line = {
-    kind: "p"
-        | "li"      // * list items
-        | "dd"      // # definition description
-        | "eg"      // #: example
-        | "egt",    // #:: example translation,
-    text: string
-}
 
-type InlineKind = "span"
-                | "a"       // link
-                | "i"       // italic
-                | "b"       // bold
-                | "q"       // quote
-                | "t"       // template
+type Line = RawText;
+// type Line = {
+//     kind: "p"
+//         | "li"      // * list items
+//         | "dd"      // # definition description
+//         | "eg"      // #: example
+//         | "egt",    // #:: example translation,
+//     text: Inline[]
+// }
+
+// type InlineKind = "span"
+//                 | "a"       // link
+//                 | "i"       // italic
+//                 | "b"       // bold
+//                 | "t"       // template
 type Inline = InlineSimple | Link | Template;
 
 type InlineSimple = {
-    kind: "span" | "i" | "b" | "q",
+    kind: "span" | "i" | "b",
     text: string
 }
 
@@ -46,4 +47,9 @@ type Template = {
     name: string,
     params: string[],
     named: {}
+}
+
+type Fmt = {
+    text: string,
+    style: string[]
 }

@@ -1,3 +1,17 @@
+function appendFmt(a: Fmt, b: Fmt) {
+    return {
+        text: a.text + b.text,
+        style: a.style.concat(b.style)
+    }
+}
+
+function printFmt(fmt: Fmt) {
+    if (fmt.text.trim()) {
+        console.log.apply(console, [fmt.text].concat(fmt.style));
+    }
+}
+
+
 function isPartOfSpeech(name: string): boolean {
     return _.includes([
             // Parts of speech:
@@ -36,7 +50,7 @@ function printHeader(name: string) {
 }
 
 function printSection(section: Section) {
-    printParagraph(section.body)
+    printFmt(fmtSection(section));
     for (let sub of section.subs) {
         printHeader(sub.header);
         printSection(sub);
@@ -44,29 +58,92 @@ function printSection(section: Section) {
     }
 }
 
-function printParagraph(paragraph: Paragraph) {
-    paragraph.forEach(printLine);
+function fmtSection(section: Section): Fmt {
+    let fmt = {
+        text: "",
+        style: []
+    }
+    section.body.forEach((paragraph) => {
+        fmt = appendFmt(fmt, fmtParagraph(paragraph));
+        fmt.text += "\n";
+    });
+    return fmt;
 }
 
-function printLine(line: Line) {
-    switch (line.kind) {
-        case "p":
-            console.log(line.text);
-            break;
-        case "li":
-            console.log("•", line.text);
-            break;
-        case "dd":
-            console.log("#", line.text);
-            break;
-        case "eg":
-            console.log("    ", line.text);
-            break;
-        case "egt":
-            console.log("        ", line.text);
-            break;
+function fmtParagraph(paragraph: Paragraph): Fmt {
+    let fmt = {
+        text: "",
+        style: []
+    }
+    paragraph.forEach((line) => {
+        fmt = appendFmt(fmt, fmtLine(line));
+        fmt.text += "\n";
+    });
+    return fmt;
+}
+function fmtLine(line: Line): Fmt {
+    return {
+        text: line,
+        style: []
     }
 }
+
+// function formatLine(line: Line): Fmt {
+//
+//     let prefix = "";
+//     switch (line.kind) {
+//         case "li":
+//             prefix = "• "
+//             break;
+//         case "dd":
+//             prefix = "# "
+//             break;
+//         case "eg":
+//             prefix = "    "
+//             break;
+//         case "egt":
+//             prefix = "        "
+//             break;
+//     }
+//
+//     const fmt = formatInline(line.text);
+//     return appendFmt(
+//         { text: prefix, style: []},
+//         fmt
+//     );
+// }
+//
+//
+// function formatInline(items: Inline[]): Fmt {
+//     let text = "";
+//     let style = [];
+//     items.forEach((item) => {
+//         switch (item.kind) {
+//             case "span":
+//                 text += item.text;
+//                 break;
+//             case "i":
+//                 text += `%c${item.text}`;
+//                 style.push("font-style: italic");
+//                 break;
+//             case "b":
+//                 text += `%c${item.text}`;
+//                 style.push("font-style: bold");
+//                 break;
+//             case "a":
+//                 text += `%c${item.text}`;
+//                 style.push("text-decoration: underline");
+//                 break;
+//             case "t":
+//                 text += `{{${item.name}}}`;
+//                 break;
+//         }
+//     });
+//     return {
+//         text: text,
+//         style: style
+//     }
+// }
 
 function printEntry(entry: Section) {
     // if there's such entry
