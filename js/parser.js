@@ -6,7 +6,7 @@ var linkRegex = /\[\[([^\]\|]+)|(?:\|([^\]]+))?\]\]/;
 var italicRegex = /''([^.]+)''/;
 var boldRegex = /'''([^.]+)'''/;
 var templateShellRegex = /\{\{([^\}]+)\}\}/;
-var inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''([^']+)'''|''([^']+)'')/;
+var inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''(.+)'''|''([^'].+[^'])''[^']?)/;
 function parseSection(header, text) {
     function collectSections(header, text, regexs) {
         if (regexs.length === 0) {
@@ -57,44 +57,70 @@ function parseParagraphs(text) {
         paragraphs.push(paragraph);
     return paragraphs;
 }
-function parseLink(text) {
-    var result = text.match(linkRegex);
-    if (result) {
-        return {
-            kind: "a",
-            text: result[1],
-            rename: result[2]
-        };
+function parseInline(text) {
+    var inlines = [];
+    var remaining = text;
+    console.log(text);
+    while (remaining.length > 0) {
+        var result = remaining.match(inlineRegex);
+        if (result) {
+            var spaces = result[1];
+            var cut = spaces + result[0];
+            if (result[2]) {
+                inlines.push({
+                    kind: "t",
+                    name: cut
+                });
+            }
+            else if (result[3]) {
+                inlines.push({
+                    kind: "a",
+                    text: cut
+                });
+            }
+            else if (result[4]) {
+                inlines.push({
+                    kind: "i",
+                    text: cut
+                });
+            }
+            else if (result[5]) {
+                inlines.push({
+                    kind: "b",
+                    text: cut
+                });
+            }
+            remaining = remaining.substr(cut.length);
+        }
+        else {
+            var indexLink = remaining.indexOf("[[");
+            var indexTemplate = remaining.indexOf("{{");
+            var indexItalic = remaining.indexOf("''");
+            var indices = [indexLink, indexTemplate, indexItalic];
+            if (_.every(indices, function (x) { return x === -1; })) {
+                console.log("indices: " + indices);
+                inlines.push({
+                    kind: "span",
+                    text: remaining
+                });
+                remaining = "";
+            }
+            else {
+                var min = _.min(indices.filter(function (x) { return x >= 0; }));
+                if (min === 0) {
+                    console.log("min " + min + ", indices: " + indices);
+                    console.log("text: [" + remaining + "]");
+                    min = 1;
+                }
+                inlines.push({
+                    kind: "span",
+                    text: remaining.substr(0, min)
+                });
+                remaining = remaining.substr(min);
+            }
+        }
     }
-}
-function parseItalic(text) {
-    var result = text.match(italicRegex);
-    if (result) {
-        return {
-            kind: "i",
-            text: result[1]
-        };
-    }
-}
-function parseBold(text) {
-    var result = text.match(boldRegex);
-    if (result) {
-        return {
-            kind: "b",
-            text: result[1]
-        };
-    }
-}
-function parseTemplate(text) {
-    var result = text.match(templateShellRegex);
-    if (result) {
-        return {
-            kind: "t",
-            name: "test",
-            params: [],
-            named: {}
-        };
-    }
+    return inlines;
 }
 function split(text, regex) {
     var splitted = text.split(regex);

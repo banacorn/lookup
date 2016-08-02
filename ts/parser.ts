@@ -6,7 +6,7 @@ const linkRegex = /\[\[([^\]\|]+)|(?:\|([^\]]+))?\]\]/;
 const italicRegex = /''([^.]+)''/;
 const boldRegex = /'''([^.]+)'''/;
 const templateShellRegex = /\{\{([^\}]+)\}\}/;
-const inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''([^']+)'''|''([^']+)'')/;
+const inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''(.+)'''|''([^'].+[^'])''[^']?)/;
 function parseSection(header: string, text: RawText): Section {
     function collectSections(header: string, text: RawText, regexs: RegExp[]): Section {
         if (regexs.length === 0) {
@@ -41,6 +41,51 @@ function parseSection(header: string, text: RawText): Section {
 function parseParagraphs(text: RawText): Paragraph[] {
     let paragraphs: Paragraph[] = [];
     let paragraph: Paragraph = [];
+    // text.split("\n").forEach((line) => {
+    //     if (line.trim() === "") {
+    //         if (paragraph.length > 0) {
+    //             paragraphs.push(paragraph);
+    //             paragraph = [];
+    //         }
+    //     } else {
+    //         // parseInline(line);
+    //         if (_.startsWith(line, "* ")) {
+    //             paragraph.push(<Line>{
+    //                 kind: "li",
+    //                 text: parseInline(line.substring(2))
+    //             });
+    //         } else if (_.startsWith(line, "#:: ")) {
+    //             paragraph.push(<Line>{
+    //                 kind: "egt",
+    //                 text: parseInline(line.substring(4))
+    //             });
+    //         } else if (_.startsWith(line, "#: ")) {
+    //             paragraph.push(<Line>{
+    //                 kind: "eg",
+    //                 text: parseInline(line.substring(3))
+    //             });
+    //         } else if (_.startsWith(line, "# ")) {
+    //             paragraph.push(<Line>{
+    //                 kind: "dd",
+    //                 text: parseInline(line.substring(2))
+    //             });
+    //         } else {
+    //             // p
+    //             if (line.trim() === "") {
+    //                 if (paragraph) {
+    //                     paragraphs.push(paragraph);
+    //                     paragraph = [];
+    //                 }
+    //             } else {
+    //                 paragraph.push(<Line>{
+    //                     kind: "p",
+    //                     text: parseInline(line)
+    //                 });
+    //             }
+    //         }
+    //     }
+    // });
+
     text.split("\n").forEach((line) => {
         if (line.trim() === "") {
             if (paragraph.length > 0) {
@@ -51,44 +96,6 @@ function parseParagraphs(text: RawText): Paragraph[] {
             paragraph.push(line);
         }
     });
-    // text.split("\n").forEach((line) => {
-    //     if (_.startsWith(line, "*")) {
-    //         paragraph.push(<Line>{
-    //             kind: "li",
-    //             text: parseInline(line.substring(2))
-    //         });
-    //     }
-    //     if (_.startsWith(line, "#::")) {
-    //         paragraph.push(<Line>{
-    //             kind: "egt",
-    //             text: parseInline(line.substring(4))
-    //         });
-    //     }
-    //     if (_.startsWith(line, "#:")) {
-    //         paragraph.push(<Line>{
-    //             kind: "eg",
-    //             text: parseInline(line.substring(3))
-    //         });
-    //     }
-    //     if (_.startsWith(line, "#")) {
-    //         paragraph.push(<Line>{
-    //             kind: "dd",
-    //             text: parseInline(line.substring(2))
-    //         });
-    //
-    //     }
-    //     if (line.trim() === "") {
-    //         if (paragraph) {
-    //             paragraphs.push(paragraph);
-    //             paragraph = [];
-    //         }
-    //     } else {
-    //         paragraph.push(<Line>{
-    //             kind: "p",
-    //             text: parseInline(line)
-    //         });
-    //     }
-    // });
 
     if (paragraph.length > 0)
         paragraphs.push(paragraph);
@@ -96,54 +103,121 @@ function parseParagraphs(text: RawText): Paragraph[] {
     return paragraphs;
     // return _.compact(paragraphs.map(_.compact));
 }
+//
+// function parseLink(text: RawText): Link {
+//     const result = text.match(linkRegex);
+//     if (result) {
+//         return {
+//             kind: "a",
+//             text: result[1],
+//             rename: result[2]
+//         }
+//     }
+// }
+//
+// function parseItalic(text: RawText): InlineSimple {
+//     const result = text.match(italicRegex);
+//     if (result) {
+//         return {
+//             kind: "i",
+//             text: result[1]
+//         }
+//     }
+// }
+//
+// function parseBold(text: RawText): InlineSimple {
+//     const result = text.match(boldRegex);
+//     if (result) {
+//         return {
+//             kind: "b",
+//             text: result[1]
+//         }
+//     }
+// }
+//
+// function parseTemplate(text: RawText): Template {
+//     const result = text.match(templateShellRegex);
+//     if (result) {
+//         // result[1].split("|")
+//         return {
+//             kind: "t",
+//             name: "test",
+//             params: [],
+//             named: {}
+//         }
+//     }
+// }
 
-function parseLink(text: RawText): Link {
-    const result = text.match(linkRegex);
-    if (result) {
-        return {
-            kind: "a",
-            text: result[1],
-            rename: result[2]
+function parseInline(text: RawText): Inline[] {
+    let inlines = [];
+    let remaining = text;
+    console.log(text)
+    while (remaining.length > 0) {
+        const result = remaining.match(inlineRegex);
+        if (result) {
+            const spaces = result[1];
+            let cut: string = spaces + result[0];
+            // console.log(cut);
+            // console.log(i);
+            if (result[2]) {
+                inlines.push({
+                    kind: "t",
+                    name: cut
+                })
+            } else if (result[3]) {
+                inlines.push(<Link>{
+                    kind: "a",
+                    text: cut
+                })
+            } else if (result[4]) {
+                inlines.push({
+                    kind: "i",
+                    text: cut
+                })
+            } else if (result[5]) {
+                inlines.push({
+                    kind: "b",
+                    text: cut
+                })
+            }
+            remaining = remaining.substr(cut.length);
+        } else {
+            const indexLink = remaining.indexOf("[[");
+            const indexTemplate = remaining.indexOf("{{");
+            const indexItalic = remaining.indexOf("''");
+            const indices = [indexLink, indexTemplate, indexItalic];
+            // the whole line is a pure <span>
+            if (_.every(indices, (x) => x === -1)) {
+                console.log(`indices: ${indices}`)
+                inlines.push({
+                    kind: "span",
+                    text: remaining
+                });
+                remaining = "";
+            } else {
+                let min = _.min(indices.filter((x) => x >= 0));
+                if (min === 0) {
+                    console.log(`min ${min}, indices: ${indices}`)
+                    console.log(`text: [${remaining}]`);
+                    min = 1;
+                }
+                inlines.push({
+                    kind: "span",
+                    text: remaining.substr(0, min)
+                });
+                remaining = remaining.substr(min);
+            }
         }
     }
-}
+//
+// const linkRegex = /\[\[([^\]\|]+)|(?:\|([^\]]+))?\]\]/;
+// const italicRegex = /''([^.]+)''/;
+// const boldRegex = /'''([^.]+)'''/;
+// const templateShellRegex = /\{\{([^\}]+)\}\}/;
 
-function parseItalic(text: RawText): InlineSimple {
-    const result = text.match(italicRegex);
-    if (result) {
-        return {
-            kind: "i",
-            text: result[1]
-        }
-    }
+    return inlines
 }
-
-function parseBold(text: RawText): InlineSimple {
-    const result = text.match(boldRegex);
-    if (result) {
-        return {
-            kind: "b",
-            text: result[1]
-        }
-    }
-}
-
-function parseTemplate(text: RawText): Template {
-    const result = text.match(templateShellRegex);
-    if (result) {
-        // result[1].split("|")
-        return {
-            kind: "t",
-            name: "test",
-            params: [],
-            named: {}
-        }
-    }
-}
-
-// function parseInline(text: RawText): Inline[] {
 //     return text;
-    // const result = text.match(inlineRegex);
     // console.log(text);
     // if (result) {
     //

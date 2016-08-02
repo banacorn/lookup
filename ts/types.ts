@@ -32,14 +32,14 @@ type Line = RawText;
 type Inline = InlineSimple | Link | Template;
 
 type InlineSimple = {
-    kind: "span" | "i" | "b",
+    kind: "span" | "i" | "b" | "bi",
     text: string
 }
 
 type Link = {
     kind: "a",
     text: string,
-    rename: string
+    rename?: string
 }
 
 type Template = {
