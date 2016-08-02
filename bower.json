@@ -19,6 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "lodash": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js"
+    "lodash": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js",
+    "parsimmon": "https://github.com/jneen/parsimmon"
   }
 }

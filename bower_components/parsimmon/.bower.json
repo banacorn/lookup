@@ -1,0 +1,11 @@
+{
+  "name": "parsimmon",
+  "_cacheHeaders": {
+    "Content-Type": "text/html; charset=utf-8"
+  },
+  "main": "index",
+  "_source": "https://github.com/jneen/parsimmon",
+  "_target": "*",
+  "_originalSource": "https://github.com/jneen/parsimmon",
+  "_direct": true
+}
