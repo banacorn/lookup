@@ -24,6 +24,7 @@
         "ts/parser/pronunciation.ts",
         "ts/types.ts",
         "typings/globals/lodash/index.d.ts",
+        "typings/globals/parsimmon/index.d.ts",
         "typings/index.d.ts"
     ],
     "atom": {

@@ -1,3 +1,7 @@
+import { printEntry } from "./f";
+
+declare var chrome: any;
+
 // default state
 var settings = {
     language: "German",
@@ -66,3 +70,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
     }
 });
+
+export {
+    settings
+}

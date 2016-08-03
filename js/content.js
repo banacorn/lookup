@@ -1,3 +1,5 @@
+"use strict";
+var f_1 = require("./f");
 var settings = {
     language: "German",
     displayAllLanguages: false,
@@ -27,8 +29,9 @@ var settings = {
         externalLinks: true
     }
 };
+exports.settings = settings;
 chrome.storage.sync.get(settings, function (items) {
-    settings = items;
+    exports.settings = settings = items;
 });
 chrome.runtime.onConnect.addListener(function (port) {
     document.addEventListener("mouseup", function () {
@@ -42,7 +45,7 @@ chrome.runtime.onConnect.addListener(function (port) {
         if (response) {
             console.info("https://en.wiktionary.org/wiki/" + response.word);
             var result = parseSection(response.word, response.text);
-            printEntry(result);
+            f_1.printEntry(result);
         }
         else {
             console.warn("Not found");

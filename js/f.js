@@ -1,3 +1,5 @@
+"use strict";
+var content_1 = require("./content");
 function appendFmt(a, b) {
     return {
         text: a.text + b.text,
@@ -26,8 +28,8 @@ function isPartOfSpeech(name) {
     ], name);
 }
 function shouldCollapse(name) {
-    return settings.collapse[_.camelCase(name)]
-        || (settings.collapse.partOfSpeech && isPartOfSpeech(name));
+    return content_1.settings.collapse[_.camelCase(name)]
+        || (content_1.settings.collapse.partOfSpeech && isPartOfSpeech(name));
 }
 function printHeader(name) {
     if (shouldCollapse(name))
@@ -74,16 +76,16 @@ function fmtLine(line) {
 }
 function printEntry(entry) {
     if (entry) {
-        if (settings.displayAllLanguages) {
+        if (content_1.settings.displayAllLanguages) {
             printSection(entry);
         }
         else {
-            var languageEntry = _.find(entry.subs, { header: settings.language });
+            var languageEntry = _.find(entry.subs, { header: content_1.settings.language });
             if (languageEntry) {
                 printSection(languageEntry);
             }
             else {
-                console.warn("No such entry for " + settings.language);
+                console.warn("No such entry for " + content_1.settings.language);
             }
         }
     }
@@ -91,3 +93,4 @@ function printEntry(entry) {
         console.warn("Not found");
     }
 }
+exports.printEntry = printEntry;

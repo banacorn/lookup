@@ -1,8 +1,10 @@
+import { settings } from "./content";
+
 function appendFmt(a: Fmt, b: Fmt) {
     return {
         text: a.text + b.text,
         style: a.style.concat(b.style)
-    }
+    };
 }
 
 function printFmt(fmt: Fmt) {
@@ -164,4 +166,9 @@ function printEntry(entry: Section) {
     } else {
         console.warn("Not found");
     }
+}
+
+
+export {
+    printEntry
 }
