@@ -1,4 +1,5 @@
 import { settings } from "./content";
+import * as _ from "lodash";
 
 function appendFmt(a: Fmt, b: Fmt) {
     return {
@@ -167,7 +168,6 @@ function printEntry(entry: Section) {
         console.warn("Not found");
     }
 }
-
 
 export {
     printEntry

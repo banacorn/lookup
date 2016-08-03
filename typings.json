@@ -1,6 +1,5 @@
 {
-  "globalDependencies": {
-    "lodash": "registry:global/lodash#4.0.0+20160723033700",
-    "parsimmon": "registry:dt/parsimmon#0.5.0+20160317120654"
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20160723033700"
   }
 }

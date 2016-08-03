@@ -20,14 +20,16 @@ function get(word, callback) {
 }
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     detectGerman(tabId, changeInfo, function () {
-        var port = chrome.tabs.connect(tabId, { name: "woerterbuch" });
-        port.onMessage.addListener(function (word) {
-            get(word, function (response) {
-                port.postMessage({
-                    word: word,
-                    text: response
+        setTimeout(function () {
+            var port = chrome.tabs.connect(tabId, { name: "woerterbuch" });
+            port.onMessage.addListener(function (word) {
+                get(word, function (response) {
+                    port.postMessage({
+                        word: word,
+                        text: response
+                    });
                 });
             });
-        });
+        }, 500) // SystemJS is fucking slow
     });
 });

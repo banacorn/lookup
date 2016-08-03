@@ -14,15 +14,18 @@
         "default_title": "Lookup"
     },
 
+    /**
+     * For using Systemjs with Chrome-Extension just load in "js"
+     * - path/to/system.js
+     * - path/to/config.js (systemjs config )
+     * - path/to/your/start/index.js (initial startpoint of your app)
+     */
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
         "js": [
-            "js/parser.js",
-            "js/parser/pronunciation.js",
-            "js/f.js",
-            "js/content.js",
-            "bower_components/lodash/index.js",
-            "bower_components/parsimmon/index"
+            "jspm_packages/system.js",
+            "config.js",
+            "js/init.js"
         ]
     }],
     "background": {
@@ -30,8 +33,12 @@
         "persistent": false
     },
 
-
     "options_ui": {
         "page": "html/options.html"
-    }
+    },
+
+    "web_accessible_resources": [
+        "jspm_packages/*",
+        "js/*.js"
+    ]
 }

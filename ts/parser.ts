@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 const h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
 const h3regex = /\=\=\=([^\=]+)\=\=\=\s/g;
 const h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
@@ -260,4 +262,8 @@ function split(text: RawText, regex: RegExp): {
         index++;
     }
     return result;
+}
+
+export {
+    parseSection
 }

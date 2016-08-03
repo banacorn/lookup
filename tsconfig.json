@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "system",
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": false,
@@ -8,7 +8,8 @@
         "experimentalDecorators": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "jspm_packages"
     ],
     "filesGlob": [
         "**/*.ts",
@@ -17,15 +18,12 @@
         "!node_modules/**"
     ],
     "files": [
-        "ts/background.ts",
         "ts/content.ts",
         "ts/f.ts",
         "ts/parser.ts",
-        "ts/parser/pronunciation.ts",
         "ts/types.ts",
-        "typings/globals/lodash/index.d.ts",
-        "typings/globals/parsimmon/index.d.ts",
-        "typings/index.d.ts"
+        "typings/index.d.ts",
+        "typings/modules/lodash/index.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

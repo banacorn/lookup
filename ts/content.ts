@@ -1,5 +1,5 @@
 import { printEntry } from "./f";
-
+import { parseSection } from "./parser";
 declare var chrome: any;
 
 // default state
@@ -40,7 +40,6 @@ chrome.storage.sync.get(settings, (items) => {
 
 // listeners
 chrome.runtime.onConnect.addListener((port) => {
-
     // listens to text selection events
     document.addEventListener("mouseup", () => {
         var word = window.getSelection().toString().trim();

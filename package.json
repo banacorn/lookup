@@ -1,0 +1,10 @@
+{
+  "jspm": {
+    "dependencies": {
+      "lodash": "npm:lodash@^4.14.1"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^1.6.2"
+    }
+  }
+}
