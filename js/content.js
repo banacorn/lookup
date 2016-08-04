@@ -45,9 +45,12 @@ System.register(["./f", "./parser"], function(exports_1, context_1) {
                 settings = items;
             });
             chrome.runtime.onConnect.addListener(function (port) {
+                var lastWord = undefined;
                 document.addEventListener("mouseup", function () {
                     var word = window.getSelection().toString().trim();
-                    if (word) {
+                    var repeated = word === lastWord;
+                    lastWord = word;
+                    if (word && !repeated) {
                         port.postMessage(word);
                     }
                 }, false);

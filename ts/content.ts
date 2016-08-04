@@ -40,10 +40,13 @@ chrome.storage.sync.get(settings, (items) => {
 
 // listeners
 chrome.runtime.onConnect.addListener((port) => {
+    var lastWord = undefined;
     // listens to text selection events
     document.addEventListener("mouseup", () => {
-        var word = window.getSelection().toString().trim();
-        if (word) {
+        const word = window.getSelection().toString().trim();
+        const repeated = word === lastWord;
+        lastWord = word;
+        if (word && !repeated) {
             // sends request to the background when there's a non-trivial selection
             port.postMessage(word);
         }
