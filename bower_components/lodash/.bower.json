@@ -9,6 +9,5 @@
   "main": "index.js",
   "_source": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js",
   "_target": "*",
-  "_originalSource": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js",
-  "_direct": true
+  "_originalSource": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js"
 }

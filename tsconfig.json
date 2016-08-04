@@ -7,7 +7,7 @@
         "sourceMap": false,
         "outDir": "js",
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
+        "experimentalDecorators": true
     },
     "exclude": [
         "node_modules"
@@ -23,6 +23,7 @@
         "ts/f.ts",
         "ts/parser.ts",
         "ts/types.ts",
+        "typings/globals/parsimmon/index.d.ts",
         "typings/index.d.ts",
         "typings/modules/lodash/index.d.ts"
     ],

@@ -1,11 +1,14 @@
 {
   "name": "parsimmon",
   "_cacheHeaders": {
-    "Content-Type": "text/html; charset=utf-8"
+    "ETag": "\"d3e829060109b9de5688452ffe0af5752f52b1b1\"",
+    "Content-Length": "4179",
+    "Content-Type": "text/plain; charset=utf-8"
   },
-  "main": "index",
-  "_source": "https://github.com/jneen/parsimmon",
+  "_release": "e-tag:d3e829060",
+  "main": "index.js",
+  "_source": "https://raw.githubusercontent.com/jneen/parsimmon/master/src/parsimmon.js",
   "_target": "*",
-  "_originalSource": "https://github.com/jneen/parsimmon",
+  "_originalSource": "https://raw.githubusercontent.com/jneen/parsimmon/master/src/parsimmon.js",
   "_direct": true
 }

@@ -1,7 +1,7 @@
-System.register(["lodash"], function(exports_1, context_1) {
+System.register(["lodash", "parsimmon"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _;
+    var _, P;
     var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex;
     function parseSection(header, text) {
         function collectSections(header, text, regexs) {
@@ -144,8 +144,12 @@ System.register(["lodash"], function(exports_1, context_1) {
         setters:[
             function (_1) {
                 _ = _1;
+            },
+            function (P_1) {
+                P = P_1;
             }],
         execute: function() {
+            console.log(P.all);
             h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
             h3regex = /\=\=\=([^\=]+)\=\=\=\s/g;
             h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
