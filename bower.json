@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "lodash": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js",
-    "parsimmon": "https://github.com/jneen/parsimmon"
+    "parsimmon": "https://github.com/jneen/parsimmon",
+    "system.js": "^0.19.36"
   }
 }

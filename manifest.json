@@ -23,9 +23,8 @@
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
         "js": [
-            "jspm_packages/system.js",
-            "config.js",
-            "js/init.js"
+            "bower_components/system.js/dist/system.js",
+            "config.js"
         ]
     }],
     "background": {
@@ -38,7 +37,7 @@
     },
 
     "web_accessible_resources": [
-        "jspm_packages/*",
+        "bower_components/*",
         "js/*.js"
     ]
 }

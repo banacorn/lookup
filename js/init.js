@@ -1,1 +1,0 @@
-System.import('js/content');

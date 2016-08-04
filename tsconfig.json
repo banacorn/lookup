@@ -1,15 +1,16 @@
 {
     "compilerOptions": {
-        "module": "system",
         "target": "es5",
+        "module": "system",
+        "moduleResolution": "node",
         "noImplicitAny": false,
         "sourceMap": false,
         "outDir": "js",
-        "experimentalDecorators": true
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
     },
     "exclude": [
-        "node_modules",
-        "jspm_packages"
+        "node_modules"
     ],
     "filesGlob": [
         "**/*.ts",
