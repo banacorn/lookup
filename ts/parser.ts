@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as P from "parsimmon";
-console.log(P.all)
+
 const h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
 const h3regex = /\=\=\=([^\=]+)\=\=\=\s/g;
 const h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
