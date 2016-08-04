@@ -14,12 +14,6 @@
         "default_title": "Lookup"
     },
 
-    /**
-     * For using Systemjs with Chrome-Extension just load in "js"
-     * - path/to/system.js
-     * - path/to/config.js (systemjs config )
-     * - path/to/your/start/index.js (initial startpoint of your app)
-     */
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
         "js": [
@@ -33,7 +27,7 @@
     },
 
     "options_ui": {
-        "page": "html/options.html"
+        "page": "html/settings.html"
     },
 
     "web_accessible_resources": [
