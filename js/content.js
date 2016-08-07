@@ -1,12 +1,12 @@
-System.register(["./f", "./parser"], function(exports_1, context_1) {
+System.register(["./fmt", "./parser"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var f_1, parser_1;
+    var fmt_1, parser_1;
     var settings;
     return {
         setters:[
-            function (f_1_1) {
-                f_1 = f_1_1;
+            function (fmt_1_1) {
+                fmt_1 = fmt_1_1;
             },
             function (parser_1_1) {
                 parser_1 = parser_1_1;
@@ -59,7 +59,7 @@ System.register(["./f", "./parser"], function(exports_1, context_1) {
                     if (response) {
                         console.info("https://en.wiktionary.org/wiki/" + response.word);
                         var result = parser_1.parseSection(response.word, response.text);
-                        f_1.printEntry(result);
+                        fmt_1.printEntry(result);
                     }
                     else {
                         console.warn("Not found");

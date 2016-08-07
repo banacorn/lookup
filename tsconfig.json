@@ -20,12 +20,10 @@
     ],
     "files": [
         "ts/content.ts",
-        "ts/f.ts",
+        "ts/fmt.ts",
         "ts/parser.ts",
         "ts/parser/combinator.ts",
         "ts/parser/inline.ts",
-        "ts/parser/link.ts",
-        "ts/parser/template.ts",
         "ts/types.ts",
         "typings/globals/parsimmon/index.d.ts",
         "typings/index.d.ts",

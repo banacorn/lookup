@@ -1,4 +1,4 @@
-import { printEntry } from "./f";
+import { printEntry } from "./fmt";
 import { parseSection } from "./parser";
 declare var chrome: any;
 
