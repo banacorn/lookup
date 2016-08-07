@@ -84,7 +84,7 @@ function fmtParagraph(paragraph: Paragraph): Fmt {
     });
     return fmt;
 }
-function fmtLine(line: Line): Fmt {
+function fmtLine(line: RawText): Fmt {
     return {
         text: line,
         style: []

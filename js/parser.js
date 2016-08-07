@@ -1,8 +1,8 @@
-System.register(["lodash"], function(exports_1, context_1) {
+System.register(["lodash", "parsimmon", "./parser/inline"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _;
-    var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex;
+    var _, P, inline_1;
+    var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex, parseLine, testCases;
     function parseSection(header, text) {
         function collectSections(header, text, regexs) {
             if (regexs.length === 0) {
@@ -79,6 +79,12 @@ System.register(["lodash"], function(exports_1, context_1) {
         setters:[
             function (_1) {
                 _ = _1;
+            },
+            function (P_1) {
+                P = P_1;
+            },
+            function (inline_1_1) {
+                inline_1 = inline_1_1;
             }],
         execute: function() {
             h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
@@ -90,6 +96,22 @@ System.register(["lodash"], function(exports_1, context_1) {
             boldRegex = /'''([^.]+)'''/;
             templateShellRegex = /\{\{([^\}]+)\}\}/;
             inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''(.+)'''|''([^'].+[^'])''[^']?)/;
+            parseLine = P.seq(P.string("#").many(), P.string("*").many(), P.string(":").many(), P.whitespace, inline_1.parseInlines(P.alt(P.eof, P.regex(/\n/)))).map(function (chunk) {
+                return {
+                    oli: chunk[0].length,
+                    uli: chunk[1].length,
+                    indent: chunk[2].length,
+                    line: chunk[3]
+                };
+            });
+            testCases = [
+                "# {{lb|de|co-ordinating}} [[and]]",
+                "#: {{ux|de|Kaffee '''und''' Kuchen|t=coffee '''and''' cake}}",
+                "#: {{ux|de|Ich kam, sah '''und''' siegte.|t=I came, saw, '''and''' conquered.}}",
+                "#* '''1904''', Rudolf Eisler, ''Wörterbuch der philosophischen Begriffe'', Berlin, volume 1, sub verbo ''Ich'', page 446-457:",
+            ];
+            testCases.forEach(function (s) {
+            });
             exports_1("parseSection", parseSection);
         }
     }

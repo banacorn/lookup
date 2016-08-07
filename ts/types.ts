@@ -12,23 +12,16 @@ type Section = {
     subs: Section[]
 }
 
-type Paragraph = Line[];
+type Paragraph = RawText[];
 
-type Line = RawText;
-// type Line = {
-//     kind: "p"
-//         | "li"      // * list items
-//         | "dd"      // # definition description
-//         | "eg"      // #: example
-//         | "egt",    // #:: example translation,
-//     text: Inline[]
-// }
+// type Line = RawText;
+type Line = {
+    oli: number,
+    uli: number,
+    indent: number,
+    line: Inline[]
+}
 
-// type InlineKind = "span"
-//                 | "a"       // link
-//                 | "i"       // italic
-//                 | "b"       // bold
-//                 | "t"       // template
 type Inline = Plain | Bold | Italic | Link;
 
 interface Plain {

@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
+import { parseInlines } from "./parser/inline";
 
 // * In counting, the form {{m|de|eins}} is used: '''''eins''' zu {{l|de|null}}'' − "one-nil" (sport result). The name of the number ''one'', as a noun, is {{m|de|Eins}}.
 // * In order to distinguish the numeral ("one") from the indefinite article ("a, an"), the former may be printed in [[italics]]: Ich hatte nur ''ein'' Bier bestellt.
@@ -110,6 +111,39 @@ function parseParagraphs(text: RawText): Paragraph[] {
     return paragraphs;
 }
 
+const parseLine: Parser<Line> = P.seq(
+        P.string("#").many(),
+        P.string("*").many(),
+        P.string(":").many(),
+        P.whitespace,
+        parseInlines(P.alt(P.eof, P.regex(/\n/)))
+    ).map((chunk) => {
+        return {
+            oli: chunk[0].length,
+            uli: chunk[1].length,
+            indent: chunk[2].length,
+            line: chunk[3]
+        }
+    });
+
+const testCases = [
+    "# {{lb|de|co-ordinating}} [[and]]",
+    "#: {{ux|de|Kaffee '''und''' Kuchen|t=coffee '''and''' cake}}",
+    "#: {{ux|de|Ich kam, sah '''und''' siegte.|t=I came, saw, '''and''' conquered.}}",
+    "#* '''1904''', Rudolf Eisler, ''Wörterbuch der philosophischen Begriffe'', Berlin, volume 1, sub verbo ''Ich'', page 446-457:",
+    // #*: "Das »Ich = Ich« ist die ursprünglichste Erkenntnis, die Urquelle alles Denkens [..], es bedeutet »erstens die rein logische Identität von Subject '''und''' Object im Acte des reinen Selbstbewußtseins, zweitens die reale metaphysische Identität des setzenden absoluten Ich '''und''' des gesetzten begrenzten Ich, '''und''' drittens die zeitliche Identität des Ich in zwei rasch aufeinander folgenden Zeitpunkten« [...]."
+];
+
+testCases.forEach((s) => {
+    // console.log(s)
+    // console.log(parseLine.parse(s))
+});
+
+
+
+// function parseLine(): Parser<Line> {
+//
+// }
 
 function split(text: RawText, regex: RegExp): {
     paragraph: string,
