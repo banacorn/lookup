@@ -29,25 +29,39 @@ type Line = RawText;
 //                 | "i"       // italic
 //                 | "b"       // bold
 //                 | "t"       // template
-type Inline = InlineSimple | Link | Template;
+type Inline = Plain | Bold | Italic | Link;
 
-type InlineSimple = {
-    kind: "span" | "i" | "b" | "bi",
-    text: string
+interface Plain {
+    kind: "plain";
+    text: string;
 }
 
-type Link = {
-    kind: "a",
-    text: string,
-    rename?: string
+interface Bold {
+    kind: "b";
+    subs: Inline[];
 }
 
-type Template = {
-    kind: "t",
+interface Italic {
+    kind: "i";
+    subs: Inline[];
+}
+
+interface Link {
+    kind: "a";
+    subs: Inline[];
+}
+
+type Parameter = {
     name: string,
-    params: string[],
-    named: {}
+    value: Inline[]
+};
+
+interface Template {
+    kind: "t";
+    name: string;
+    params: Parameter[]
 }
+
 
 type Fmt = {
     text: string,
