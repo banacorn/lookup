@@ -59,3 +59,9 @@ type Fmt = {
     text: string,
     style: string[]
 }
+
+export {
+    Plain, Bold, Italic, Link, Template, Parameter,
+    Inline, Line, Section, Paragraph,
+    RawResponse, Fmt, RawText,
+}

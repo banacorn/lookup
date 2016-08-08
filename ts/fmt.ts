@@ -1,5 +1,6 @@
 import { settings } from "./content";
 import * as _ from "lodash";
+import { Fmt, Section, Paragraph, RawText } from "./types";
 
 function appendFmt(a: Fmt, b: Fmt) {
     return {
@@ -79,11 +80,13 @@ function fmtParagraph(paragraph: Paragraph): Fmt {
         style: []
     }
     paragraph.forEach((line) => {
-        fmt = appendFmt(fmt, fmtLineTemp(line));
-        fmt.text += "\n";
+        // fmt = appendFmt(fmt, fmtLineTemp(line));
+        // fmt.text += "\n";
     });
     return fmt;
 }
+
+
 function fmtLineTemp(line: RawText): Fmt {
     return {
         text: line,

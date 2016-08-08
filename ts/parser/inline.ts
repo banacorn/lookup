@@ -1,6 +1,7 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
+import { Inline, Plain, Bold, Italic, Link, Template, Parameter, Line } from "./../types";
 import { before, beforeWhich, muchoPrim } from "./combinator";
 
 function muchoInline(parsers: Parser<Inline>[], codaParser: Parser<any>): Parser<Inline[]> {

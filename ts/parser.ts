@@ -2,6 +2,7 @@ import * as _ from "lodash";
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import { parseLine } from "./parser/inline";
+import { RawText, Section, Paragraph } from "./types";
 
 // * In counting, the form {{m|de|eins}} is used: '''''eins''' zu {{l|de|null}}'' − "one-nil" (sport result). The name of the number ''one'', as a noun, is {{m|de|Eins}}.
 // * In order to distinguish the numeral ("one") from the indefinite article ("a, an"), the former may be printed in [[italics]]: Ich hatte nur ''ein'' Bier bestellt.

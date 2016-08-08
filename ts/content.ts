@@ -1,5 +1,6 @@
 import { printEntry } from "./fmt";
 import { parseSection } from "./parser";
+import { RawResponse } from "./types";
 declare var chrome: any;
 
 // default state

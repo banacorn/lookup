@@ -65,8 +65,6 @@ System.register(["./content", "lodash"], function(exports_1, context_1) {
             style: []
         };
         paragraph.forEach(function (line) {
-            fmt = appendFmt(fmt, fmtLineTemp(line));
-            fmt.text += "\n";
         });
         return fmt;
     }
