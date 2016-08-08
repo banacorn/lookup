@@ -57,6 +57,7 @@ System.register(["./fmt", "./parser"], function(exports_1, context_1) {
                 port.onMessage.addListener(function (response) {
                     console.clear();
                     if (response) {
+                        console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");
                         console.info("https://en.wiktionary.org/wiki/" + response.word);
                         var result = parser_1.parseSection(response.word, response.text);
                         fmt_1.printEntry(result);

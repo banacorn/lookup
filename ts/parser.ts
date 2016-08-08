@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
-import { parseInlines } from "./parser/inline";
+import { parseLine } from "./parser/inline";
 
 // * In counting, the form {{m|de|eins}} is used: '''''eins''' zu {{l|de|null}}'' − "one-nil" (sport result). The name of the number ''one'', as a noun, is {{m|de|Eins}}.
 // * In order to distinguish the numeral ("one") from the indefinite article ("a, an"), the former may be printed in [[italics]]: Ich hatte nur ''ein'' Bier bestellt.
@@ -47,96 +47,63 @@ function parseSection(header: string, text: RawText): Section {
     return collectSections(header, text, [h2regex, h3regex, h4regex]);
 }
 
+function removeComments(text: RawText): RawText {
+    return text.replace(/<!--[-.\n]*-->/g, "")
+}
+
 function parseParagraphs(text: RawText): Paragraph[] {
+    console.log(text)
     let paragraphs: Paragraph[] = [];
-    let paragraph: Paragraph = [];
-    // text.split("\n").forEach((line) => {
-    //     if (line.trim() === "") {
-    //         if (paragraph.length > 0) {
-    //             paragraphs.push(paragraph);
-    //             paragraph = [];
-    //         }
+
+    const processed = removeComments(text)
+        .split(/\n\n/)
+        .filter((text) => text.trim())
+        .map((text) => `\n${text}`)
+
+    // console.log(processed)
+    processed.forEach((line) => {
+        console.log(`[%c${line}%c]`, `color: orange`, `color: black`)
+
+    })
+    // removeComments(text)
+    //     .split(/\n\n/)
+    //     .filter((text) => text.trim())
+    //     .map((text) => text.replace(/\n/g, ""))
+    //     .forEach((paragraph) => {
+    //     console.log(`[%c${paragraph}%c]`, `color: orange`, `color: black`)
+    //     // const result = parseLine.parse(line + "\n");
+    //     // if (result.status) {
+    //     //     console.log(`%csucceed`, `color: green`)
+    //     //     // console.log(result.value)
+    //     // } else {
+    //     //     console.log(`[%c${line}%c]`, `color: orange`, `color: black`)
+    //     //     console.log(`%cfailed`, `color: red`)
+    //     //     console.log(result)
+    //     // }
+    // })
+    // removeComments(text).split(/\n/).filter((x) => x.trim()).forEach((line) => {
+    //     const result = parseLine.parse(line + "\n");
+    //     if (result.status) {
+    //         console.log(`%csucceed`, `color: green`)
+    //         // console.log(result.value)
     //     } else {
-    //         // parseInline(line);
-    //         if (_.startsWith(line, "* ")) {
-    //             paragraph.push(<Line>{
-    //                 kind: "li",
-    //                 text: parseInline(line.substring(2))
-    //             });
-    //         } else if (_.startsWith(line, "#:: ")) {
-    //             paragraph.push(<Line>{
-    //                 kind: "egt",
-    //                 text: parseInline(line.substring(4))
-    //             });
-    //         } else if (_.startsWith(line, "#: ")) {
-    //             paragraph.push(<Line>{
-    //                 kind: "eg",
-    //                 text: parseInline(line.substring(3))
-    //             });
-    //         } else if (_.startsWith(line, "# ")) {
-    //             paragraph.push(<Line>{
-    //                 kind: "dd",
-    //                 text: parseInline(line.substring(2))
-    //             });
-    //         } else {
-    //             // p
-    //             if (line.trim() === "") {
-    //                 if (paragraph) {
-    //                     paragraphs.push(paragraph);
-    //                     paragraph = [];
-    //                 }
-    //             } else {
-    //                 paragraph.push(<Line>{
-    //                     kind: "p",
-    //                     text: parseInline(line)
-    //                 });
-    //             }
-    //         }
+    //         console.log(`[%c${line}%c]`, `color: orange`, `color: black`)
+    //         console.log(`%cfailed`, `color: red`)
+    //         console.log(result)
     //     }
-    // });
-
-    text.split("\n").forEach((line) => {
-        if (line.trim() === "") {
-            if (paragraph.length > 0) {
-                paragraphs.push(paragraph);
-                paragraph = [];
-            }
-        } else {
-            paragraph.push(line);
-        }
-    });
-
-    if (paragraph.length > 0)
-        paragraphs.push(paragraph);
+    // })
     return paragraphs;
 }
 
-const parseLine: Parser<Line> = P.seq(
-        P.string("#").many(),
-        P.string("*").many(),
-        P.string(":").many(),
-        P.whitespace,
-        parseInlines(P.alt(P.eof, P.regex(/\n/)))
-    ).map((chunk) => {
-        return {
-            oli: chunk[0].length,
-            uli: chunk[1].length,
-            indent: chunk[2].length,
-            line: chunk[3]
-        }
-    });
 
 const testCases = [
-    "# {{lb|de|co-ordinating}} [[and]]",
-    "#: {{ux|de|Kaffee '''und''' Kuchen|t=coffee '''and''' cake}}",
-    "#: {{ux|de|Ich kam, sah '''und''' siegte.|t=I came, saw, '''and''' conquered.}}",
-    "#* '''1904''', Rudolf Eisler, ''Wörterbuch der philosophischen Begriffe'', Berlin, volume 1, sub verbo ''Ich'', page 446-457:",
-    // #*: "Das »Ich = Ich« ist die ursprünglichste Erkenntnis, die Urquelle alles Denkens [..], es bedeutet »erstens die rein logische Identität von Subject '''und''' Object im Acte des reinen Selbstbewußtseins, zweitens die reale metaphysische Identität des setzenden absoluten Ich '''und''' des gesetzten begrenzten Ich, '''und''' drittens die zeitliche Identität des Ich in zwei rasch aufeinander folgenden Zeitpunkten« [...]."
+    // "{{also|daß}}\n",
+    // "{{also|anlage}}\n"
 ];
 
 testCases.forEach((s) => {
-    // console.log(s)
-    // console.log(parseLine.parse(s))
+    console.log(s)
+    console.log(parseLine.parse(s))
 });
 
 

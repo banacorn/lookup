@@ -79,17 +79,27 @@ function fmtParagraph(paragraph: Paragraph): Fmt {
         style: []
     }
     paragraph.forEach((line) => {
-        fmt = appendFmt(fmt, fmtLine(line));
+        fmt = appendFmt(fmt, fmtLineTemp(line));
         fmt.text += "\n";
     });
     return fmt;
 }
-function fmtLine(line: RawText): Fmt {
+function fmtLineTemp(line: RawText): Fmt {
     return {
         text: line,
         style: []
     }
 }
+
+// console.log("normal %cbold %citalic", "font-weight: bold", "text-decoration: underline")
+
+// function fmtBold(x: Bold): Fmt {
+// }
+
+
+// function fmtLine(line: Line): Fmt {
+//
+// }
 
 // function formatLine(line: Line): Fmt {
 //

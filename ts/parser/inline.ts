@@ -1,9 +1,7 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { before, muchoPrim } from "./combinator";
-// import { parseTemplate } from "./template";
-// import { parseLink } from "./link";
+import { before, beforeWhich, muchoPrim } from "./combinator";
 
 function muchoInline(parsers: Parser<Inline>[], codaParser: Parser<any>): Parser<Inline[]> {
     return muchoPrim([], parsers, codaParser, (x) => {
@@ -24,14 +22,15 @@ function fromString(s: string): Plain {
     }
 }
 
-function parseInlines(codaParser: Parser<any>, plainCoda?: string[]): Parser<Inline[]> {
+function parseInlines(codaParser: Parser<any>, plainCoda: string[] = []): Parser<Inline[]> {
     return <Parser<Inline[]>>P.lazy(() => {
+        const defaultPlainCodas = ["[[", "'''", "''", "{{", "\n"];
         return muchoInline([
-            parseBold,
-            parseItalic,
+            parseBold(plainCoda),
+            parseItalic(plainCoda),
             parseLink,
             parseTemplate,
-            parsePlain(_.concat(["[[", "'''", "''", "{{"], plainCoda))
+            parsePlain(_.concat(defaultPlainCodas, plainCoda))
         ], codaParser);
     });
 }
@@ -49,25 +48,29 @@ function parsePlain(stops: string[]): Parser<Plain> {
     });
 }
 
-const parseItalic: Parser<Italic> = P.seq(
+function parseItalic(plainCoda: string[] = []): Parser<Italic> {
+    return P.seq(
         P.string("''"),
-        parseInlines(P.string("''"))
+        parseInlines(P.string("''"), plainCoda)
     ).map((chunk) => {
         return <Italic>{
             kind: "i",
             subs: chunk[1]
         };
     });
+}
 
-const parseBold: Parser<Bold> = P.seq(
+function parseBold(plainCoda: string[] = []): Parser<Bold> {
+    return P.seq(
         P.string("'''"),
-        parseInlines(P.string("'''"))
+        parseInlines(P.string("'''"), plainCoda)
     ).map((chunk) => {
         return <Bold>{
             kind: "b",
             subs: chunk[1]
         };
     });
+}
 
 //
 //  Links
@@ -188,20 +191,26 @@ const parseLink: Parser<Link> = P.seq(
 
 function parseParameter(coda: string): Parser<Parameter> {
     // get the string before "=" or the coda, which in case may be a name or an unnamed value
-    return before(["=", coda]).chain((unknown) => {
-        return P.string("=")
-            .then(parseInlines(P.string(coda), [coda]).map((value) => {  // named
+    return beforeWhich(["=", coda]).chain(([unknown, which]) => {
+        if (which === "=") {    // named
+            return P.string("=").then(parseInlines(P.string(coda), [coda]).map((value) => {
                 return {
                     name: unknown,
                     value: value
                 }
-            }))
-            .or(P.string(coda).then(P.succeed({     // unnamed
-                name: "",
-                value: fromString(unknown)
-            })))
+            }));
+        } else {    // unnamed, unwind and parse it with parseInlines again
+            return P.fail<Parameter>("");
+        }
     })
+    .or(parseInlines(P.string(coda), [coda]).map((value) => {
+        return {
+            name: "",
+            value: value
+        }
+    }))
 }
+
 
 const parseComplexTemplate: Parser<any> = P.seq(
         before(["|"]),
@@ -235,9 +244,24 @@ const parseTemplate: Parser<any> = P.string("{{").then(P.alt(
     ));
 
 
+const parseLine: Parser<Line> = P.seq(
+        P.string("#").many(),
+        P.string("*").many(),
+        P.string(":").many(),
+        P.optWhitespace,
+        parseInlines(P.regex(/\n/))
+    ).map((chunk) => {
+        return {
+            oli: chunk[0].length,
+            uli: chunk[1].length,
+            indent: chunk[2].length,
+            line: chunk[4]
+        }
+    });
+
 export {
     fromString,
-    parseInlines
+    parseLine
 }
 
 

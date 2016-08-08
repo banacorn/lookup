@@ -12,9 +12,8 @@ type Section = {
     subs: Section[]
 }
 
-type Paragraph = RawText[];
+type Paragraph = Line[];
 
-// type Line = RawText;
 type Line = {
     oli: number,
     uli: number,

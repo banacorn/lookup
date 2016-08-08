@@ -56,6 +56,7 @@ chrome.runtime.onConnect.addListener((port) => {
         // clear old results
         console.clear();
         if (response) {
+            console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");
             console.info("https://en.wiktionary.org/wiki/" + response.word);
             const result = parseSection(response.word, response.text);
             printEntry(result);

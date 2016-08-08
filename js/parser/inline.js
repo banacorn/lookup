@@ -2,7 +2,7 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var P, _, combinator_1;
-    var parseItalic, parseBold, parseFreeLink, parseRenamedLink, parseARLHideParentheses, parseARLHideComma, parseARLHideNamespace, parseARLHideNamespaceAndParantheses, parseAutoRenamedLink, parseUnblendedLink, parseLink, parseComplexTemplate, parseSimpleTemplate, parseTemplate;
+    var parseFreeLink, parseRenamedLink, parseARLHideParentheses, parseARLHideComma, parseARLHideNamespace, parseARLHideNamespaceAndParantheses, parseAutoRenamedLink, parseUnblendedLink, parseLink, parseComplexTemplate, parseSimpleTemplate, parseTemplate, parseLine;
     function muchoInline(parsers, codaParser) {
         return combinator_1.muchoPrim([], parsers, codaParser, function (x) {
             if (x.kind === "plain") {
@@ -23,13 +23,15 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
         };
     }
     function parseInlines(codaParser, plainCoda) {
+        if (plainCoda === void 0) { plainCoda = []; }
         return P.lazy(function () {
+            var defaultPlainCodas = ["[[", "'''", "''", "{{", "\n"];
             return muchoInline([
-                parseBold,
-                parseItalic,
+                parseBold(plainCoda),
+                parseItalic(plainCoda),
                 parseLink,
                 parseTemplate,
-                parsePlain(_.concat(["[[", "'''", "''", "{{"], plainCoda))
+                parsePlain(_.concat(defaultPlainCodas, plainCoda))
             ], codaParser);
         });
     }
@@ -41,20 +43,45 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
             };
         });
     }
-    function parseParameter(coda) {
-        return combinator_1.before(["=", coda]).chain(function (unknown) {
-            return P.string("=")
-                .then(parseInlines(P.string(coda), [coda]).map(function (value) {
-                return {
-                    name: unknown,
-                    value: value
-                };
-            }))
-                .or(P.string(coda).then(P.succeed({
-                name: "",
-                value: fromString(unknown)
-            })));
+    function parseItalic(plainCoda) {
+        if (plainCoda === void 0) { plainCoda = []; }
+        return P.seq(P.string("''"), parseInlines(P.string("''"), plainCoda)).map(function (chunk) {
+            return {
+                kind: "i",
+                subs: chunk[1]
+            };
         });
+    }
+    function parseBold(plainCoda) {
+        if (plainCoda === void 0) { plainCoda = []; }
+        return P.seq(P.string("'''"), parseInlines(P.string("'''"), plainCoda)).map(function (chunk) {
+            return {
+                kind: "b",
+                subs: chunk[1]
+            };
+        });
+    }
+    function parseParameter(coda) {
+        return combinator_1.beforeWhich(["=", coda]).chain(function (_a) {
+            var unknown = _a[0], which = _a[1];
+            if (which === "=") {
+                return P.string("=").then(parseInlines(P.string(coda), [coda]).map(function (value) {
+                    return {
+                        name: unknown,
+                        value: value
+                    };
+                }));
+            }
+            else {
+                return P.fail("");
+            }
+        })
+            .or(parseInlines(P.string(coda), [coda]).map(function (value) {
+            return {
+                name: "",
+                value: value
+            };
+        }));
     }
     return {
         setters:[
@@ -68,18 +95,6 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
                 combinator_1 = combinator_1_1;
             }],
         execute: function() {
-            parseItalic = P.seq(P.string("''"), parseInlines(P.string("''"))).map(function (chunk) {
-                return {
-                    kind: "i",
-                    subs: chunk[1]
-                };
-            });
-            parseBold = P.seq(P.string("'''"), parseInlines(P.string("'''"))).map(function (chunk) {
-                return {
-                    kind: "b",
-                    subs: chunk[1]
-                };
-            });
             parseFreeLink = P.seq(P.string("[["), combinator_1.before(["]]"]), P.string("]]")).map(function (chunk) {
                 return {
                     kind: "a",
@@ -152,8 +167,16 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
                 };
             });
             parseTemplate = P.string("{{").then(P.alt(parseComplexTemplate, parseSimpleTemplate));
+            parseLine = P.seq(P.string("#").many(), P.string("*").many(), P.string(":").many(), P.optWhitespace, parseInlines(P.regex(/\n/))).map(function (chunk) {
+                return {
+                    oli: chunk[0].length,
+                    uli: chunk[1].length,
+                    indent: chunk[2].length,
+                    line: chunk[4]
+                };
+            });
             exports_1("fromString", fromString);
-            exports_1("parseInlines", parseInlines);
+            exports_1("parseLine", parseLine);
         }
     }
 });

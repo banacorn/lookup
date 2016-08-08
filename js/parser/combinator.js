@@ -21,6 +21,25 @@ System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
             };
         });
     }
+    function beforeWhich(candidates) {
+        return P.custom(function (success, failure) {
+            return function (stream, i) {
+                var indices = candidates.map(function (candidate) {
+                    return {
+                        token: candidate,
+                        index: stream.substr(i).indexOf(candidate)
+                    };
+                }).filter(function (o) { return o.index !== -1; });
+                var chosenIndex = _.minBy(indices, function (o) { return o.index; });
+                if (chosenIndex) {
+                    return success(i + chosenIndex.index, [stream.substr(i, chosenIndex.index), chosenIndex.token]);
+                }
+                else {
+                    return failure(i, "'" + candidates + "' not found");
+                }
+            };
+        });
+    }
     function muchoPrim(acc, parsers, codaParser, predicate) {
         var modifiedParsers = parsers.map(function (parser) {
             return parser.chain(function (chunk) {
@@ -47,6 +66,7 @@ System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
             }],
         execute: function() {
             exports_1("before", before);
+            exports_1("beforeWhich", beforeWhich);
             exports_1("muchoPrim", muchoPrim);
         }
     }
