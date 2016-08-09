@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
-import { parseLine } from "./parser/inline";
+import { parseText } from "./parser/line";
 import { RawText, Section, Paragraph } from "./types";
 
 // * In counting, the form {{m|de|eins}} is used: '''''eins''' zu {{l|de|null}}'' − "one-nil" (sport result). The name of the number ''one'', as a noun, is {{m|de|Eins}}.
@@ -104,7 +104,7 @@ const testCases = [
 
 testCases.forEach((s) => {
     console.log(s)
-    console.log(parseLine.parse(s))
+    console.log(parseText.parse(s))
 });
 
 

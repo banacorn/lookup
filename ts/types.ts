@@ -12,7 +12,7 @@ type Section = {
     subs: Section[]
 }
 
-type Paragraph = Line[];
+type Paragraph = any;
 
 type Line = {
     oli: number,
@@ -21,7 +21,7 @@ type Line = {
     line: Inline[]
 }
 
-type Inline = Plain | Bold | Italic | Link;
+type Inline = Plain | Bold | Italic | Link | Template;
 
 interface Plain {
     kind: "plain";
@@ -29,17 +29,17 @@ interface Plain {
 }
 
 interface Bold {
-    kind: "b";
+    kind: "bold";
     subs: Inline[];
 }
 
 interface Italic {
-    kind: "i";
+    kind: "italic";
     subs: Inline[];
 }
 
 interface Link {
-    kind: "a";
+    kind: "link";
     subs: Inline[];
 }
 
@@ -49,7 +49,7 @@ type Parameter = {
 };
 
 interface Template {
-    kind: "t";
+    kind: "template";
     name: string;
     params: Parameter[]
 }

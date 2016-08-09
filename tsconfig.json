@@ -23,8 +23,11 @@
         "ts/fmt.ts",
         "ts/parser.ts",
         "ts/parser/combinator.ts",
-        "ts/parser/inline.ts",
+        "ts/parser/entry.ts",
+        "ts/parser/line.ts",
         "ts/types.ts",
+        "typings/globals/colors/index.d.ts",
+        "typings/globals/node/index.d.ts",
         "typings/globals/parsimmon/index.d.ts",
         "typings/index.d.ts",
         "typings/modules/lodash/index.d.ts"

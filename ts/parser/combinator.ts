@@ -1,6 +1,8 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
+import "colors";
+import { inspect } from "util";
 
 function before(candidates: string[]): Parser<string> {
     return <Parser<string>>P.custom((success, failure) => {
@@ -59,8 +61,8 @@ function muchoPrim<T>(acc: T[], parsers: Parser<T>[], codaParser: Parser<any>, p
         });
     });
     // insert EOF parser and returns accumulated results on success
-    // modifiedParsers.unshift(codaParser.chain(() => {
-    modifiedParsers.push(codaParser.chain(() => {
+    // modifiedParsers.unshift(codaParser.chain(() => { // shallow
+    modifiedParsers.push(codaParser.chain(() => {   // deep
         return P.succeed(acc);
     }));
     // apply modify parsers to Parsimmon.alt

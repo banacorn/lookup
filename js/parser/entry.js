@@ -1,8 +1,13 @@
-System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
+System.register(["lodash"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, line_1;
-    var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex, testCases;
+    var _;
+    var h2regex, h3regex, h4regex, h5regex, interlangRegex;
+    function parseEntry(header, text) {
+        var result = text.match(interlangRegex);
+        var trimmedText = text.substring(0, text.length - result[1].length);
+        return parseSection(header, trimmedText);
+    }
     function parseSection(header, text) {
         function collectSections(header, text, regexs) {
             if (regexs.length === 0) {
@@ -39,16 +44,10 @@ System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
         return text.replace(/<!--[-.\n]*-->/g, "");
     }
     function parseParagraphs(text) {
-        console.log(text);
-        var paragraphs = [];
-        var processed = removeComments(text)
+        return removeComments(text)
             .split(/\n\n/)
             .filter(function (text) { return text.trim(); })
-            .map(function (text) { return ("\n" + text); });
-        processed.forEach(function (line) {
-            console.log("[%c" + line + "%c]", "color: orange", "color: black");
-        });
-        return paragraphs;
+            .map(function (text) { return ("" + text); });
     }
     function split(text, regex) {
         var splitted = text.split(regex);
@@ -76,25 +75,14 @@ System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
         setters:[
             function (_1) {
                 _ = _1;
-            },
-            function (line_1_1) {
-                line_1 = line_1_1;
             }],
         execute: function() {
             h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
             h3regex = /\=\=\=([^\=]+)\=\=\=\s/g;
             h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
             h5regex = /\=\=\=\=\=([^\=]+)\=\=\=\=\=\s/g;
-            linkRegex = /\[\[([^\]\|]+)|(?:\|([^\]]+))?\]\]/;
-            italicRegex = /''([^.]+)''/;
-            boldRegex = /'''([^.]+)'''/;
-            templateShellRegex = /\{\{([^\}]+)\}\}/;
-            inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''(.+)'''|''([^'].+[^'])''[^']?)/;
-            testCases = [];
-            testCases.forEach(function (s) {
-                console.log(s);
-                console.log(line_1.parseText.parse(s));
-            });
+            interlangRegex = /((?:\[\[\w+\:[^\]]*\]\]\n)*)$/;
+            exports_1("parseEntry", parseEntry);
             exports_1("parseSection", parseSection);
         }
     }
