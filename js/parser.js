@@ -2,7 +2,7 @@ System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var _, line_1;
-    var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex, testCases;
+    var h2regex, h3regex, h4regex, h5regex, linkRegex, italicRegex, boldRegex, templateShellRegex, inlineRegex;
     function parseSection(header, text) {
         function collectSections(header, text, regexs) {
             if (regexs.length === 0) {
@@ -39,14 +39,22 @@ System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
         return text.replace(/<!--[-.\n]*-->/g, "");
     }
     function parseParagraphs(text) {
-        console.log(text);
         var paragraphs = [];
         var processed = removeComments(text)
             .split(/\n\n/)
-            .filter(function (text) { return text.trim(); })
-            .map(function (text) { return ("\n" + text); });
-        processed.forEach(function (line) {
-            console.log("[%c" + line + "%c]", "color: orange", "color: black");
+            .filter(function (text) { return text.trim(); });
+        processed.forEach(function (paragraph) {
+            var result = line_1.parseLine.parse(paragraph);
+            if (result.status) {
+                console.log("[%c" + paragraph + "%c]", "color: orange", "color: black");
+                console.log("%csucceed", "color: green");
+                console.log(result.value);
+            }
+            else {
+                console.log("[%c" + paragraph + "%c]", "color: orange", "color: black");
+                console.log("%cfailed", "color: red");
+                console.log(result);
+            }
         });
         return paragraphs;
     }
@@ -90,11 +98,6 @@ System.register(["lodash", "./parser/line"], function(exports_1, context_1) {
             boldRegex = /'''([^.]+)'''/;
             templateShellRegex = /\{\{([^\}]+)\}\}/;
             inlineRegex = /^(\s*)(?:\{\{([^\}]+)\}\}|\[\[([^\]]+)\]\]|'''(.+)'''|''([^'].+[^'])''[^']?)/;
-            testCases = [];
-            testCases.forEach(function (s) {
-                console.log(s);
-                console.log(line_1.parseText.parse(s));
-            });
             exports_1("parseSection", parseSection);
         }
     }

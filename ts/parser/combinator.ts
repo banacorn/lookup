@@ -1,8 +1,8 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import "colors";
-import { inspect } from "util";
+// import "colors";
+// import { inspect } from "util";
 
 function before(candidates: string[]): Parser<string> {
     return <Parser<string>>P.custom((success, failure) => {
@@ -46,7 +46,7 @@ function beforeWhich(candidates: string[]): Parser<[string, string]> {
 }
 
 
-function muchoPrim<T>(acc: T[], parsers: Parser<T>[], codaParser: Parser<any>, predicate: (x: T) => boolean) {
+function muchoPrim<T>(acc: T[], parsers: Parser<T>[], codaParser: Parser<any>, predicate: (x: T) => boolean): Parser<T[]> {
     // modify parsers to allow them to collect parsed result and then keep going
     const modifiedParsers = parsers.map((parser) => {
         return parser.chain((chunk) => {

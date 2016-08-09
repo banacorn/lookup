@@ -1,4 +1,4 @@
-System.register(["parsimmon", "lodash", "colors"], function(exports_1, context_1) {
+System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var P, _;
@@ -63,8 +63,7 @@ System.register(["parsimmon", "lodash", "colors"], function(exports_1, context_1
             },
             function (_1) {
                 _ = _1;
-            },
-            function (_2) {}],
+            }],
         execute: function() {
             exports_1("before", before);
             exports_1("beforeWhich", beforeWhich);

@@ -8,11 +8,11 @@ type RawResponse = {
 
 type Section = {
     header: string,
-    body: Paragraph[],
+    body: ParseResult<Paragraph>[],
     subs: Section[]
 }
 
-type Paragraph = any;
+type Paragraph = Line[];
 
 type Line = {
     oli: number,
@@ -21,47 +21,74 @@ type Line = {
     line: Inline[]
 }
 
-type Inline = Plain | Bold | Italic | Link | Template;
+//
+//  Inline elements
+//
+type Inline = Inline.Plain
+    | Inline.Bold
+    | Inline.Italic
+    | Inline.Link
+    | Inline.Template;
+namespace Inline {
+    export interface Plain {
+        kind: "plain";
+        text: string;
+    }
 
-interface Plain {
-    kind: "plain";
-    text: string;
+    export interface Bold {
+        kind: "bold";
+        subs: Inline[];
+    }
+
+    export interface Italic {
+        kind: "italic";
+        subs: Inline[];
+    }
+
+    export interface Link {
+        kind: "link";
+        subs: Inline[];
+    }
+
+    export type Parameter = {
+        name: string,
+        value: Inline[]
+    };
+
+    export interface Template {
+        kind: "template";
+        name: string;
+        params: Parameter[]
+    }
 }
 
-interface Bold {
-    kind: "bold";
-    subs: Inline[];
-}
 
-interface Italic {
-    kind: "italic";
-    subs: Inline[];
-}
-
-interface Link {
-    kind: "link";
-    subs: Inline[];
-}
-
-type Parameter = {
-    name: string,
-    value: Inline[]
-};
-
-interface Template {
-    kind: "template";
-    name: string;
-    params: Parameter[]
-}
-
+//
+//  Formatter
+//
 
 type Fmt = {
     text: string,
     style: string[]
 }
 
+//
+//  Freaking Either
+//
+type ParseResult<T> = ParseOk<T> | ParseErr;
+
+interface ParseOk<T> {
+    kind: "ok";
+    value: T;
+}
+
+interface ParseErr {
+    kind: "err";
+    error: string;
+}
+
 export {
-    Plain, Bold, Italic, Link, Template, Parameter,
     Inline, Line, Section, Paragraph,
     RawResponse, Fmt, RawText,
+    ParseResult, ParseOk, ParseErr
 }

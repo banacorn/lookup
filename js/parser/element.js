@@ -2,7 +2,7 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var P, _, combinator_1;
-    var Allowed, insideItalic, insideBold, insideLink, insideTemplate, plain, parseFreeLink, parseARLHideParentheses, parseARLHideComma, parseARLHideNamespace, parseARLHideNamespaceAndParantheses, parseAutoRenamedLink, parseSimpleTemplate, parseText, parseLine;
+    var plain, italic, bold, link, parameter, template, Allowed, insideItalic, insideBold, insideLink, insideTemplate, parseFreeLink, parseARLHideParentheses, parseARLHideComma, parseARLHideNamespace, parseARLHideNamespaceAndParantheses, parseAutoRenamedLink, parseSimpleTemplate, parseElements;
     function allowedParsers(allowed) {
         var parsers = [];
         if (allowed & Allowed.Template)
@@ -35,6 +35,9 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
                 return x.text.length > 0 && !apoInitial;
             }
             else if (x.kind === "template") {
+                return true;
+            }
+            else if (x.kind === "prefix") {
                 return true;
             }
             else {
@@ -148,6 +151,31 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
                 combinator_1 = combinator_1_1;
             }],
         execute: function() {
+            plain = function (s) { return {
+                kind: "plain",
+                text: s
+            }; };
+            italic = function (xs) { return {
+                kind: "italic",
+                subs: xs
+            }; };
+            bold = function (xs) { return {
+                kind: "bold",
+                subs: xs
+            }; };
+            link = function (xs) { return {
+                kind: "link",
+                subs: xs
+            }; };
+            parameter = function (x, xs) { return {
+                name: x,
+                value: xs
+            }; };
+            template = function (x, xs) { return {
+                kind: "template",
+                name: x,
+                params: xs
+            }; };
             (function (Allowed) {
                 Allowed[Allowed["Italic"] = 1] = "Italic";
                 Allowed[Allowed["Bold"] = 2] = "Bold";
@@ -158,10 +186,6 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
             insideBold = function (x) { return x ^ Allowed.Bold; };
             insideLink = function (x) { return x ^ Allowed.Link ^ Allowed.Template; };
             insideTemplate = function (x) { return x; };
-            plain = function (s) { return {
-                kind: "plain",
-                text: s
-            }; };
             parseFreeLink = P.seq(P.string("[["), combinator_1.before(["]]"]), P.string("]]")).map(function (chunk) {
                 return {
                     kind: "link",
@@ -202,25 +226,14 @@ System.register(["parsimmon", "lodash", "./combinator"], function(exports_1, con
                     params: []
                 };
             });
-            parseText = parseInlines(15, P.alt(P.eof));
-            parseLine = P.seq(P.string("#").many()
-                .chain(function (oli) { return P.string("*").many()
-                .chain(function (uli) { return P.string(":").many()
-                .chain(function (indent) {
-                if (oli.length + uli.length + indent.length > 0)
-                    return P.string(" ").then(P.succeed([oli.length, uli.length, indent.length]));
-                else
-                    return P.succeed([0, 0, 0]);
-            }); }); }), parseText).map(function (chunk) {
-                return {
-                    oli: chunk[0][0],
-                    uli: chunk[0][1],
-                    indent: chunk[0][2],
-                    line: chunk[1],
-                };
-            });
-            exports_1("parseText", parseText);
-            exports_1("parseLine", parseLine);
+            parseElements = parseInlines(15, P.alt(P.eof));
+            exports_1("parseElements", parseElements);
+            exports_1("plain", plain);
+            exports_1("italic", italic);
+            exports_1("bold", bold);
+            exports_1("link", link);
+            exports_1("parameter", parameter);
+            exports_1("template", template);
         }
     }
 });

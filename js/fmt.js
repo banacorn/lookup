@@ -53,9 +53,14 @@ System.register(["./content", "lodash"], function(exports_1, context_1) {
             text: "",
             style: []
         };
-        section.body.forEach(function (paragraph) {
-            fmt = appendFmt(fmt, fmtParagraph(paragraph));
-            fmt.text += "\n";
+        section.body.forEach(function (result) {
+            if (result.kind === "ok") {
+                fmt = appendFmt(fmt, fmtParagraph(result.value));
+                fmt.text += "\n";
+            }
+            else {
+                fmt.text = "Paragraph parse error";
+            }
         });
         return fmt;
     }
@@ -65,27 +70,72 @@ System.register(["./content", "lodash"], function(exports_1, context_1) {
             style: []
         };
         paragraph.forEach(function (line) {
+            fmt = appendFmt(fmt, fmtLine(line));
+            fmt.text += "\n";
         });
         return fmt;
     }
-    function fmtLineTemp(line) {
-        return {
-            text: line,
+    function fmtLine(line) {
+        var fmt = {
+            text: "",
             style: []
         };
+        fmt.text += _.repeat("#", line.oli)
+            + _.repeat("*", line.uli)
+            + _.repeat(":", line.indent)
+            + " ";
+        var elements = line.line;
+        elements.forEach(function (element) {
+            fmt = appendFmt(fmt, fmtElement(element));
+        });
+        return fmt;
     }
-    function printEntry(entry) {
+    function fmtElement(element) {
+        var fmt = {
+            text: "",
+            style: []
+        };
+        if (element.kind === "plain") {
+            fmt.text += element.text;
+        }
+        else if (element.kind === "template") {
+            fmt.text += "{{" + element.name;
+            element.params.forEach(function (param) {
+                if (param.name) {
+                    fmt.text += "|" + param.name + "=";
+                    param.value.forEach(function (v) {
+                        fmt = appendFmt(fmt, fmtElement(v));
+                    });
+                }
+                else {
+                    fmt.text += "|";
+                    param.value.forEach(function (v) {
+                        fmt = appendFmt(fmt, fmtElement(v));
+                    });
+                }
+            });
+            fmt.text += "}}";
+        }
+        else {
+            element.subs.forEach(function (e) {
+                fmt = appendFmt(fmt, fmtElement(e));
+            });
+        }
+        return fmt;
+    }
+    function printEntry(settings, entry) {
         if (entry) {
-            if (content_1.settings.displayAllLanguages) {
+            console.log(settings.displayAllLanguages);
+            if (settings.displayAllLanguages) {
                 printSection(entry);
             }
             else {
-                var languageEntry = _.find(entry.subs, { header: content_1.settings.language });
+                var languageEntry = _.find(entry.subs, { header: settings.language });
                 if (languageEntry) {
                     printSection(languageEntry);
                 }
                 else {
-                    console.warn("No such entry for " + content_1.settings.language);
+                    console.warn("No such entry for " + settings.language);
                 }
             }
         }

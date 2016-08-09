@@ -1,10 +1,46 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { Inline, Plain, Bold, Italic, Link, Template, Parameter, Line } from "./../types";
+import { Inline, Line, RawText } from "./../types";
 import { before, beforeWhich, muchoPrim } from "./combinator";
-import { inspect } from "util";
-import "colors";
+// import { inspect } from "util";
+// import "colors";
+
+
+// Type smart constructors
+
+const plain = (s: string) => <Inline.Plain>{
+    kind: "plain",
+    text: s
+}
+
+const italic = (xs: Inline[]) => <Inline.Italic>{
+    kind: "italic",
+    subs: xs
+}
+
+const bold = (xs: Inline[]) => <Inline.Bold>{
+    kind: "bold",
+    subs: xs
+}
+
+const link = (xs: Inline[]) => <Inline.Link>{
+    kind: "link",
+    subs: xs
+}
+
+const parameter = (x: string, xs: Inline[]) => <Inline.Parameter>{
+    name: x,
+    value: xs
+}
+
+const template = (x: string, xs: Inline.Parameter[]) => <Inline.Template>{
+    kind: "template",
+    name: x,
+    params: xs
+}
+
+
 // Bit order: template, link, bold, italic
 type AllowedParsers = number;
 enum Allowed {
@@ -17,12 +53,13 @@ enum Allowed {
 const insideItalic   = (x: AllowedParsers) => x ^ Allowed.Italic
 const insideBold     = (x: AllowedParsers) => x ^ Allowed.Bold
 const insideLink     = (x: AllowedParsers) => x ^ Allowed.Link ^ Allowed.Template
-const insideTemplate = (x: AllowedParsers) => x ^ Allowed.Template
+const insideTemplate = (x: AllowedParsers) => x
+// const insideTemplate = (x: AllowedParsers) => x ^ Allowed.Template
 
-function debug<T>(x: T): T {
-    console.log(inspect(x, false, null).cyan)
-    return x;
-}
+// function debug<T>(x: T): T {
+//     console.log(inspect(x, false, null).cyan)
+//     return x;
+// }
 
 function allowedParsers(allowed: AllowedParsers): Parser<Inline>[] {
     var parsers: Parser<Inline>[] = [];
@@ -41,7 +78,7 @@ function allowedParsers(allowed: AllowedParsers): Parser<Inline>[] {
 
 function stopParsers(allowed: AllowedParsers): string[] {
     // initials
-    var result = ["''", "'''", "[[", "{{"];
+    var result = ["''", "'''", "[[", "{{", "}}", "|"];
 
     // codas
     if (!(allowed & Allowed.Link)) {
@@ -53,6 +90,10 @@ function stopParsers(allowed: AllowedParsers): string[] {
         result.push("|");
     }
 
+    // if(allowed ^ 15) {
+        // result.push("\n* ");
+    // }
+
     return result;
 }
 
@@ -63,15 +104,12 @@ function muchoInline(parsers: Parser<Inline>[], codaParser: Parser<any>): Parser
             return x.text.length > 0 && !apoInitial;
         } else if (x.kind === "template") {
             return true;
+        } else if (x.kind === "prefix") {
+            return true;
         } else {
             return x.subs.length > 0;
         }
     });
-}
-
-const plain = (s: string) => <Plain>{
-    kind: "plain",
-    text: s
 }
 
 function parseInlines(allowed: AllowedParsers, codaParser: Parser<any>): Parser<Inline[]> {
@@ -82,40 +120,40 @@ function parseInlines(allowed: AllowedParsers, codaParser: Parser<any>): Parser<
     });
 }
 
-function parsePlain(allowed: AllowedParsers): Parser<Plain> {
+function parsePlain(allowed: AllowedParsers): Parser<Inline.Plain> {
     // console.log(`plain ${showAllowed(allowed)}`.gray);
     // console.log(`codas ${codaParsers(allowed)}`.gray)
     return P.alt(
         before(stopParsers(allowed)),
         P.all
     ).map((chunk) => {
-        return <Plain>{
+        return <Inline.Plain>{
             kind: "plain",
             text: chunk
         }
     });
 }
 
-function parseItalic(allowed: AllowedParsers): Parser<Italic> {
+function parseItalic(allowed: AllowedParsers): Parser<Inline.Italic> {
     // console.log(`italic ${showAllowed(allowed)}`.yellow);
     return P.seq(
         P.string("''"),
         parseInlines(insideItalic(allowed), P.string("''"))
     ).map((chunk) => {
-        return <Italic>{
+        return <Inline.Italic>{
             kind: "italic",
             subs: chunk[1]
         };
     });
 }
 
-function parseBold(allowed: AllowedParsers): Parser<Bold> {
+function parseBold(allowed: AllowedParsers): Parser<Inline.Bold> {
     // console.log(`bold ${showAllowed(allowed)}`.yellow);
     return P.seq(
         P.string("'''"),
         parseInlines(insideBold(allowed), P.string("'''"))
     ).map((chunk) => {
-        return <Bold>{
+        return <Inline.Bold>{
             kind: "bold",
             subs: chunk[1]
         };
@@ -127,25 +165,25 @@ function parseBold(allowed: AllowedParsers): Parser<Bold> {
 //  Links
 //
 
-const parseFreeLink: Parser<Link> = P.seq(
+const parseFreeLink: Parser<Inline.Link> = P.seq(
         P.string("[["),
         before(["]]"]),
         P.string("]]")
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: [plain(chunk[1])]
         };
     });
 
-function parseRenamedLink(allowed: AllowedParsers): Parser<Link> {
+function parseRenamedLink(allowed: AllowedParsers): Parser<Inline.Link> {
     return P.seq(
         P.string("[["),
         before(stopParsers(insideLink(allowed))),
         P.string("|"),
         parseInlines(insideLink(allowed), P.string("]]"))
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: chunk[3]
         };
@@ -153,56 +191,56 @@ function parseRenamedLink(allowed: AllowedParsers): Parser<Link> {
 }
 
 // Automatically hide stuff in parentheses
-const parseARLHideParentheses: Parser<Link> = P.seq(
+const parseARLHideParentheses: Parser<Inline.Link> = P.seq(
         before(["("]),
         P.string("("),
         before([")"]),
         P.string(")"),
         P.optWhitespace
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: [plain(chunk[0].trim())]
         };
     });
 
 // Automatically hide the comma and following text
-const parseARLHideComma: Parser<Link> = P.seq(
+const parseARLHideComma: Parser<Inline.Link> = P.seq(
         before([","]),
         P.string(","),
         before(["|"])
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: [plain(chunk[0].trim())]
         };
     });
 
 // Automatically hide namespace
-const parseARLHideNamespace: Parser<Link> = P.seq(
+const parseARLHideNamespace: Parser<Inline.Link> = P.seq(
         before([":"]),    // namespace
         P.string(":"),
         before(["|"])     // renamed
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: [plain(chunk[2])]
         };
     });
 
 // Automatically hide namespace AND stuffs in parantheses
-const parseARLHideNamespaceAndParantheses: Parser<Link> = P.seq(
+const parseARLHideNamespaceAndParantheses: Parser<Inline.Link> = P.seq(
         before([":"]),    // namespace
         P.string(":"),
         parseARLHideParentheses
     ).map((chunk) => {
-        return <Link>{
+        return <Inline.Link>{
             kind: "link",
             subs: chunk[2].subs
         };
     });
 
-const parseAutoRenamedLink: Parser<Link> = P.seq(
+const parseAutoRenamedLink: Parser<Inline.Link> = P.seq(
         P.string("[["),
         P.alt(
             parseARLHideNamespaceAndParantheses,
@@ -215,7 +253,7 @@ const parseAutoRenamedLink: Parser<Link> = P.seq(
         return chunk[1]
     });
 
-function parseUnblendedLink(allowed: AllowedParsers): Parser<Link> {
+function parseUnblendedLink(allowed: AllowedParsers): Parser<Inline.Link> {
     return P.alt(
         parseAutoRenamedLink,
         parseRenamedLink(allowed),
@@ -223,7 +261,7 @@ function parseUnblendedLink(allowed: AllowedParsers): Parser<Link> {
     );
 }
 
-function parseLink(allowed: AllowedParsers): Parser<Link> {
+function parseLink(allowed: AllowedParsers): Parser<Inline.Link> {
     return P.seq(
         parseUnblendedLink(allowed),
         P.letters
@@ -248,7 +286,7 @@ function parseLink(allowed: AllowedParsers): Parser<Link> {
 //
 //  Template
 //
-function parseParameter(allowed: AllowedParsers, coda: string): Parser<Parameter> {
+function parseParameter(allowed: AllowedParsers, coda: string): Parser<Inline.Parameter> {
     // get the string before "=" or the coda, which in case may be a name or an unnamed value
     return beforeWhich(["=", coda]).chain(([unknown, which]) => {
         if (which === "=") {    // named
@@ -259,7 +297,7 @@ function parseParameter(allowed: AllowedParsers, coda: string): Parser<Parameter
                 }
             }));
         } else {    // unnamed, unwind and parse it with parseInlines again
-            return P.fail<Parameter>("");
+            return P.fail<Inline.Parameter>("");
         }
     })
     .or(parseInlines(insideTemplate(allowed), P.string(coda)).map((value) => {
@@ -271,14 +309,14 @@ function parseParameter(allowed: AllowedParsers, coda: string): Parser<Parameter
 }
 
 
-function parseComplexTemplate(allowed: AllowedParsers): Parser<Template> {
+function parseComplexTemplate(allowed: AllowedParsers): Parser<Inline.Template> {
     return P.seq(
         before(["|"]),
         P.string("|"),
         parseParameter(allowed, "|").many(),
         parseParameter(allowed, "}}")
     ).map((chunk) => {
-        return <Template>{
+        return <Inline.Template>{
             kind: "template",
             name: chunk[0],
             params: _.concat(chunk[2], [chunk[3]])
@@ -286,11 +324,11 @@ function parseComplexTemplate(allowed: AllowedParsers): Parser<Template> {
     });
 }
 
-const parseSimpleTemplate: Parser<Template> = P.seq(
+const parseSimpleTemplate: Parser<Inline.Template> = P.seq(
         before(["}}"]),
         P.string("}}")
     ).map((chunk) => {
-        return <Template>{
+        return <Inline.Template>{
             kind: "template",
             name: chunk[0],
             params: []
@@ -298,16 +336,44 @@ const parseSimpleTemplate: Parser<Template> = P.seq(
     })
 
 
-function parseTemplate(allowed: AllowedParsers): Parser<Template> {
+function parseTemplate(allowed: AllowedParsers): Parser<Inline.Template> {
     return P.string("{{").then(P.alt(
         parseComplexTemplate(allowed),
         parseSimpleTemplate
     ));
 }
 
-const parseText = parseInlines(15, P.alt(P.eof, P.string("\n")));
+// const parseOLI: Parser<number> = P.string("#").many().map(chunk => chunk[0].length);
+// const parseULI: Parser<number> = P.string("*").many().map(chunk => chunk[0].length);
+// const parseIndent: Parser<number> = P.string(":").many().map(chunk => chunk[0].length);
+
+// const parsePrefix: Parser<Prefix> = P
+//     .regex(/\n?/)
+//     .then(parseOLI
+//     .chain(oli => parseULI
+//     .chain(uli => parseIndent
+//     .chain(indent => {
+//         if (oli + uli + indent > 0)
+//             return P.string(" ")
+//                 .then(P.succeed(<Prefix>{
+//                     kind:   "prefix",
+//                     oli:    oli,
+//                     uli:    uli,
+//                     indent: indent
+//                 }));
+//         else
+//             return P.succeed(<Prefix>{
+//                 kind:   "prefix",
+//                 oli:    0,
+//                 uli:    0,
+//                 indent: 0
+//             });
+//     }))));
+
+const parseElements = parseInlines(15, P.alt(P.eof));
+
 
 export {
-    parseText,
-    parseInlines
+    parseElements,
+    plain, italic, bold, link, parameter, template
 }

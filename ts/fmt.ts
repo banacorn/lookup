@@ -1,6 +1,6 @@
 import { settings } from "./content";
 import * as _ from "lodash";
-import { Fmt, Section, Paragraph, RawText } from "./types";
+import { Fmt, Section, Paragraph, RawText, Line, Inline } from "./types";
 
 function appendFmt(a: Fmt, b: Fmt) {
     return {
@@ -67,9 +67,13 @@ function fmtSection(section: Section): Fmt {
         text: "",
         style: []
     }
-    section.body.forEach((paragraph) => {
-        fmt = appendFmt(fmt, fmtParagraph(paragraph));
-        fmt.text += "\n";
+    section.body.forEach((result) => {
+        if (result.kind === "ok") {
+            fmt = appendFmt(fmt, fmtParagraph(result.value));
+            fmt.text += "\n";
+        } else {
+            fmt.text = `Paragraph parse error`;
+        }
     });
     return fmt;
 }
@@ -80,19 +84,95 @@ function fmtParagraph(paragraph: Paragraph): Fmt {
         style: []
     }
     paragraph.forEach((line) => {
-        // fmt = appendFmt(fmt, fmtLineTemp(line));
-        // fmt.text += "\n";
+        fmt = appendFmt(fmt, fmtLine(line));
+        fmt.text += "\n";
     });
     return fmt;
 }
 
-
-function fmtLineTemp(line: RawText): Fmt {
-    return {
-        text: line,
+function fmtLine(line: Line): Fmt {
+    let fmt = {
+        text: "",
         style: []
     }
+
+    fmt.text += _.repeat("#", line.oli)
+        + _.repeat("*", line.uli)
+        + _.repeat(":", line.indent)
+        + " ";
+
+    const elements = line.line
+
+    elements.forEach((element) => {
+        fmt = appendFmt(fmt, fmtElement(element));
+    });
+    return fmt;
 }
+
+function fmtElement(element: Inline): Fmt {
+    let fmt = {
+        text: "",
+        style: []
+    }
+    if (element.kind === "plain") {
+        fmt.text += element.text;
+    } else if (element.kind === "template") {
+        fmt.text += `{{${element.name}`;
+        element.params.forEach(param => {
+            if (param.name) {   // named
+                fmt.text += `|${param.name}=`;
+                param.value.forEach((v) => {
+                    fmt = appendFmt(fmt, fmtElement(v));
+                });
+            } else {            // unnamed
+                fmt.text += `|`;
+                param.value.forEach((v) => {
+                    fmt = appendFmt(fmt, fmtElement(v));
+                });
+            }
+        });
+        fmt.text += `}}`;
+    } else {
+        element.subs.forEach((e) => {
+            fmt = appendFmt(fmt, fmtElement(e));
+        });
+    }
+    return fmt;
+}
+
+// function formatter<T>(f: (Fmt) => Fmt): Fmt {
+//     let fmt = {
+//         text: "",
+//         style: []
+//     }
+//     return f(fmt);
+// }
+//
+// const fmtElement = (element: Inline) => formatter((fmt) => {
+//     if ()
+//     return fmt;
+// });
+//
+// const fmtPlain = (element: Inline.Plain) => formatter((fmt) => {
+//     fmt.text += element.text;
+//     return fmt;
+// });
+//
+// const fmtBold = (element: Inline.Bold) => formatter((fmt) => {
+//     element.subs.forEach((e) => {
+//         fmt = appendFmt(fmt, fmtElement(e));
+//     });
+//     return fmt;
+// });
+
+// function fmtPlain(plain: Inline.Plain): Fmt {
+//     let fmt = {
+//         text: "",
+//         style: []
+//     }
+//     return fmt;
+// }
+
 
 // console.log("normal %cbold %citalic", "font-weight: bold", "text-decoration: underline")
 
@@ -161,10 +241,10 @@ function fmtLineTemp(line: RawText): Fmt {
 //     }
 // }
 
-function printEntry(entry: Section) {
+function printEntry(settings: any, entry: Section) {
     // if there's such entry
     if (entry) {
-
+        console.log(settings.displayAllLanguages)
         // display all languages
         if (settings.displayAllLanguages) {
             printSection(entry);

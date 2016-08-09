@@ -1,15 +1,15 @@
-System.register(["./fmt", "./parser"], function(exports_1, context_1) {
+System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, parser_1;
+    var fmt_1, entry_1;
     var settings;
     return {
         setters:[
             function (fmt_1_1) {
                 fmt_1 = fmt_1_1;
             },
-            function (parser_1_1) {
-                parser_1 = parser_1_1;
+            function (entry_1_1) {
+                entry_1 = entry_1_1;
             }],
         execute: function() {
             settings = {
@@ -42,6 +42,7 @@ System.register(["./fmt", "./parser"], function(exports_1, context_1) {
                 }
             };
             chrome.storage.sync.get(settings, function (items) {
+                console.log("got settings from background!", items.displayAllLanguages);
                 settings = items;
             });
             chrome.runtime.onConnect.addListener(function (port) {
@@ -59,8 +60,8 @@ System.register(["./fmt", "./parser"], function(exports_1, context_1) {
                     if (response) {
                         console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");
                         console.info("https://en.wiktionary.org/wiki/" + response.word);
-                        var result = parser_1.parseSection(response.word, response.text);
-                        fmt_1.printEntry(result);
+                        var result = entry_1.parseEntry(response.word, response.text);
+                        fmt_1.printEntry(settings, result);
                     }
                     else {
                         console.warn("Not found");

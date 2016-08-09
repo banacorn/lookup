@@ -1,5 +1,5 @@
 import { printEntry } from "./fmt";
-import { parseSection } from "./parser";
+import { parseEntry } from "./parser/entry";
 import { RawResponse } from "./types";
 declare var chrome: any;
 
@@ -36,6 +36,7 @@ var settings = {
 
 // initialize settings
 chrome.storage.sync.get(settings, (items) => {
+    console.log(`got settings from background!`, items.displayAllLanguages)
     settings = items;
 })
 
@@ -59,8 +60,8 @@ chrome.runtime.onConnect.addListener((port) => {
         if (response) {
             console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");
             console.info("https://en.wiktionary.org/wiki/" + response.word);
-            const result = parseSection(response.word, response.text);
-            printEntry(result);
+            const result = parseEntry(response.word, response.text);
+            printEntry(settings, result);
         } else {
             console.warn("Not found");
         }
