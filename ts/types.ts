@@ -67,10 +67,18 @@ namespace Inline {
 //  Formatter
 //
 
-type Fmt = {
+type Style = {
+    i: boolean,     // italic
+    b: boolean,     // bold
+    a: boolean      // link
+};
+
+type Seg = {
     text: string,
-    style: string[]
-}
+    style: Style
+};
+
+type Fmt = Seg[];
 
 //
 //  Freaking Either
@@ -89,6 +97,6 @@ interface ParseErr {
 
 export {
     Inline, Line, Section, Paragraph,
-    RawResponse, Fmt, RawText,
+    RawResponse, Fmt, Seg, RawText,
     ParseResult, ParseOk, ParseErr
 }

@@ -1,18 +1,201 @@
-import { settings } from "./content";
+// import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../types";
+import { Fmt, Inline, Line, Paragraph, Section } from "./types";
 import * as _ from "lodash";
-import { Fmt, Section, Paragraph, RawText, Line, Inline } from "./types";
 
-function appendFmt(a: Fmt, b: Fmt) {
-    return {
-        text: a.text + b.text,
-        style: a.style.concat(b.style)
-    };
+//
+//  Formatter
+//
+
+function extractText(fmt: Fmt): string {
+    return fmt.map(x => x.text).join("");
 }
 
 function printFmt(fmt: Fmt) {
-    if (fmt.text.trim()) {
-        console.log.apply(console, [fmt.text].concat(fmt.style));
+    // texts interspersed by style placeholders "%c"
+    const texts = "%c" + fmt.map(x => x.text).join("%c");
+    // translate style tags to css
+    const styles = fmt.map((seg) => {
+        let css = "";
+        if (seg.style.i)
+            css += "font-style: italic;";
+        if (seg.style.b)
+            css += "font-weight: bold;";
+        if (seg.style.a)
+            css += "text-decoration; underline;";
+        return css;
+    })
+    // print it all out
+    console.log.apply(console, [texts].concat(styles));
+}
+
+// make all segments italic
+function italic(fmt: Fmt): Fmt {
+    return fmt.map((seg) => {
+        seg.style.i = true;
+        return seg;
+    });
+}
+
+// make all segments bold
+function bold(fmt: Fmt): Fmt {
+    return fmt.map((seg) => {
+        seg.style.b = true;
+        return seg;
+    });
+}
+
+// make all segments link-like
+function link(fmt: Fmt): Fmt {
+    return fmt.map((seg) => {
+        seg.style.a = true;
+        return seg;
+    });
+}
+
+
+function add(fmt: Fmt, text: string, i: boolean = false, b: boolean = false, a: boolean = false): Fmt {
+    if (fmt.length === 0) {
+        return [{
+            text: text,
+            style: { i: i, b: b, a: a }
+        }];
+    } else {
+        const lastIndex = fmt.length - 1;
+        const style = { i: i, b: b, a: a };
+        // the style of newly added text is the same as the last segment, simply append them
+        if (_.isEqual(fmt[lastIndex].style, style)) {
+            fmt[lastIndex].text += text;
+            return fmt;
+        } else {
+            return fmt.concat([{
+                text: text,
+                style: style
+            }]);
+        }
     }
+}
+
+function concat(a: Fmt, b: Fmt): Fmt {
+    if (a.length === 0) {
+        return b;
+    } else if (b.length === 0) {
+        return a;
+    } else {
+        if (_.isEqual(a[a.length - 1].style, b[0].style)) {
+            return a.slice(0, a.length - 1).concat([{
+                text: a[a.length - 1].text + b[0].text,
+                style: b[0].style
+            }]).concat(b.slice(1));
+        } else {
+            return a.concat(b);
+        }
+    }
+}
+
+function fold(fmt: Fmt, elements: Inline[], f?: (x: Fmt) => Fmt): Fmt {
+    if (f) {
+        elements.forEach((e) => {
+            fmt = concat(fmt, f(formatElement(e)));
+        });
+    } else {
+        elements.forEach((e) => {
+            fmt = concat(fmt, formatElement(e));
+        });
+    }
+    return fmt;
+}
+
+//
+//  Formatting stuffs
+//
+
+function formatElement(element: Inline): Fmt {
+    switch (element.kind) {
+        case "plain":
+            let fmt = [];
+            return add([], element.text);
+        case "italic":
+            return fold([], element.subs, italic);
+        case "bold":
+            return fold([], element.subs, bold);
+        case "link":
+            return fold([], element.subs, link);
+        case "template":
+            fmt = add([], `{{${element.name}`);
+            element.params.forEach((param) => {
+                if (param.name) {       // named
+                    fmt = add(fmt, `|${param.name}=`);
+                    fmt = fold(fmt, param.value);
+                } else {                // unnamed
+                    fmt = add(fmt, `|`);
+                    fmt = fold(fmt, param.value);
+                }
+            });
+            fmt = add(fmt, `}}`);
+            return fmt
+    }
+}
+
+
+function formatLine(line: Line, order: number): Fmt {
+    // ### only
+    const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
+    // ends with *
+    const bullet = line.uli > 0 && line.indent === 0;
+
+    // const indentSpace = 4;
+    const indentLevel = line.oli + line.uli + line.indent;
+    const indentation = _.repeat("  ", indentLevel);
+
+    const formattedElements: Fmt = fold([], line.line);
+    if (numbered) {
+        return concat([{
+            text: `${indentation}${order}. `,
+            style: { i: false, b: false, a: false }
+        }], formattedElements);
+    } else if (bullet) {
+        return concat([{
+            text: `${indentation}* `,
+            style: { i: false, b: false, a: false }
+        }], formattedElements);
+    } else {
+        return concat([{
+            text: `${indentation}`,
+            style: { i: false, b: false, a: false }
+        }], formattedElements);
+    }
+}
+
+
+function formatParagraph(paragraph: Paragraph): Fmt {
+    let fmt = [];
+
+    let order = [1];
+    paragraph.forEach((line) => {
+        fmt = concat(fmt, formatLine(line, _.last(order)));
+        fmt = add(fmt, "\n");
+        const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
+        const level = line.oli;
+        if (level > order.length)   // indent
+            order.push(1);
+        else if (level < order.length) {
+            order.pop();
+        }
+    });
+    return fmt;
+}
+
+function formatSection(section: Section): Fmt {
+    let fmt = [];
+    section.body.forEach((result) => {
+        if (result.kind === "ok") {
+            fmt = concat(fmt, formatParagraph(result.value));
+            fmt = add(fmt, "\n");
+        } else {
+            fmt = add(fmt, "Paragraph parse error\n");
+        }
+    });
+    return fmt;
 }
 
 
@@ -39,220 +222,42 @@ function isPartOfSpeech(name: string): boolean {
             "Romanization"
         ], name);
 }
-
 // a predicate that decides if a section should be collapsed
-function shouldCollapse(name: string): boolean {
+function shouldCollapse(settings: any, name: string): boolean {
     return settings.collapse[_.camelCase(name)]
         || (settings.collapse.partOfSpeech && isPartOfSpeech(name));
 }
 
-function printHeader(name: string) {
-    if (shouldCollapse(name))
+function printHeader(settings: any, name: string) {
+    if (shouldCollapse(settings, name))
         console.groupCollapsed(name);
     else
         console.group(name);
 }
 
-function printSection(section: Section) {
-    printFmt(fmtSection(section));
+function printSection(settings: any, section: Section) {
+    let formatted = formatSection(section);
+    if (formatted.length)
+        printFmt(formatted);
+
     for (let sub of section.subs) {
-        printHeader(sub.header);
-        printSection(sub);
+        printHeader(settings, sub.header);
+        printSection(settings, sub);
         console.groupEnd();
     }
 }
 
-function fmtSection(section: Section): Fmt {
-    let fmt = {
-        text: "",
-        style: []
-    }
-    section.body.forEach((result) => {
-        if (result.kind === "ok") {
-            fmt = appendFmt(fmt, fmtParagraph(result.value));
-            fmt.text += "\n";
-        } else {
-            fmt.text = `Paragraph parse error`;
-        }
-    });
-    return fmt;
-}
-
-function fmtParagraph(paragraph: Paragraph): Fmt {
-    let fmt = {
-        text: "",
-        style: []
-    }
-    paragraph.forEach((line) => {
-        fmt = appendFmt(fmt, fmtLine(line));
-        fmt.text += "\n";
-    });
-    return fmt;
-}
-
-function fmtLine(line: Line): Fmt {
-    let fmt = {
-        text: "",
-        style: []
-    }
-
-    fmt.text += _.repeat("#", line.oli)
-        + _.repeat("*", line.uli)
-        + _.repeat(":", line.indent)
-        + " ";
-
-    const elements = line.line
-
-    elements.forEach((element) => {
-        fmt = appendFmt(fmt, fmtElement(element));
-    });
-    return fmt;
-}
-
-function fmtElement(element: Inline): Fmt {
-    let fmt = {
-        text: "",
-        style: []
-    }
-    if (element.kind === "plain") {
-        fmt.text += element.text;
-    } else if (element.kind === "template") {
-        fmt.text += `{{${element.name}`;
-        element.params.forEach(param => {
-            if (param.name) {   // named
-                fmt.text += `|${param.name}=`;
-                param.value.forEach((v) => {
-                    fmt = appendFmt(fmt, fmtElement(v));
-                });
-            } else {            // unnamed
-                fmt.text += `|`;
-                param.value.forEach((v) => {
-                    fmt = appendFmt(fmt, fmtElement(v));
-                });
-            }
-        });
-        fmt.text += `}}`;
-    } else {
-        element.subs.forEach((e) => {
-            fmt = appendFmt(fmt, fmtElement(e));
-        });
-    }
-    return fmt;
-}
-
-// function formatter<T>(f: (Fmt) => Fmt): Fmt {
-//     let fmt = {
-//         text: "",
-//         style: []
-//     }
-//     return f(fmt);
-// }
-//
-// const fmtElement = (element: Inline) => formatter((fmt) => {
-//     if ()
-//     return fmt;
-// });
-//
-// const fmtPlain = (element: Inline.Plain) => formatter((fmt) => {
-//     fmt.text += element.text;
-//     return fmt;
-// });
-//
-// const fmtBold = (element: Inline.Bold) => formatter((fmt) => {
-//     element.subs.forEach((e) => {
-//         fmt = appendFmt(fmt, fmtElement(e));
-//     });
-//     return fmt;
-// });
-
-// function fmtPlain(plain: Inline.Plain): Fmt {
-//     let fmt = {
-//         text: "",
-//         style: []
-//     }
-//     return fmt;
-// }
-
-
-// console.log("normal %cbold %citalic", "font-weight: bold", "text-decoration: underline")
-
-// function fmtBold(x: Bold): Fmt {
-// }
-
-
-// function fmtLine(line: Line): Fmt {
-//
-// }
-
-// function formatLine(line: Line): Fmt {
-//
-//     let prefix = "";
-//     switch (line.kind) {
-//         case "li":
-//             prefix = "• "
-//             break;
-//         case "dd":
-//             prefix = "# "
-//             break;
-//         case "eg":
-//             prefix = "    "
-//             break;
-//         case "egt":
-//             prefix = "        "
-//             break;
-//     }
-//
-//     const fmt = formatInline(line.text);
-//     return appendFmt(
-//         { text: prefix, style: []},
-//         fmt
-//     );
-// }
-//
-//
-// function formatInline(items: Inline[]): Fmt {
-//     let text = "";
-//     let style = [];
-//     items.forEach((item) => {
-//         switch (item.kind) {
-//             case "span":
-//                 text += item.text;
-//                 break;
-//             case "i":
-//                 text += `%c${item.text}`;
-//                 style.push("font-style: italic");
-//                 break;
-//             case "b":
-//                 text += `%c${item.text}`;
-//                 style.push("font-style: bold");
-//                 break;
-//             case "a":
-//                 text += `%c${item.text}`;
-//                 style.push("text-decoration: underline");
-//                 break;
-//             case "t":
-//                 text += `{{${item.name}}}`;
-//                 break;
-//         }
-//     });
-//     return {
-//         text: text,
-//         style: style
-//     }
-// }
-
 function printEntry(settings: any, entry: Section) {
     // if there's such entry
     if (entry) {
-        console.log(settings.displayAllLanguages)
         // display all languages
         if (settings.displayAllLanguages) {
-            printSection(entry);
+            printSection(settings, entry);
         } else {
             // find the specified language (nullable)
             const languageEntry = _.find(entry.subs, { header: settings.language });
             if (languageEntry) {
-                printSection(languageEntry);
+                printSection(settings, languageEntry);
             } else {
                 console.warn("No such entry for " + settings.language);
             }
@@ -262,6 +267,11 @@ function printEntry(settings: any, entry: Section) {
     }
 }
 
+
 export {
+    extractText,
+    formatElement,
+    formatLine,
+    formatParagraph,
     printEntry
 }

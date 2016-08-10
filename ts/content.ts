@@ -36,7 +36,6 @@ var settings = {
 
 // initialize settings
 chrome.storage.sync.get(settings, (items) => {
-    console.log(`got settings from background!`, items.displayAllLanguages)
     settings = items;
 })
 

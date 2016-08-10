@@ -42,7 +42,6 @@ System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
                 }
             };
             chrome.storage.sync.get(settings, function (items) {
-                console.log("got settings from background!", items.displayAllLanguages);
                 settings = items;
             });
             chrome.runtime.onConnect.addListener(function (port) {
