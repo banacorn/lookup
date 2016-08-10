@@ -12,6 +12,7 @@ System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
                 entry_1 = entry_1_1;
             }],
         execute: function() {
+            // default state
             settings = {
                 language: "German",
                 displayAllLanguages: false,
@@ -41,20 +42,25 @@ System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
                     externalLinks: true
                 }
             };
+            // initialize settings
             chrome.storage.sync.get(settings, function (items) {
                 settings = items;
             });
+            // listeners
             chrome.runtime.onConnect.addListener(function (port) {
                 var lastWord = undefined;
+                // listens to text selection events
                 document.addEventListener("mouseup", function () {
                     var word = window.getSelection().toString().trim();
                     var repeated = word === lastWord;
                     lastWord = word;
                     if (word && !repeated) {
+                        // sends request to the background when there's a non-trivial selection
                         port.postMessage(word);
                     }
                 }, false);
                 port.onMessage.addListener(function (response) {
+                    // clear old results
                     console.clear();
                     if (response) {
                         console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");

@@ -1,12 +1,17 @@
-System.register(["lodash"], function(exports_1, context_1) {
+System.register(["lodash", "./template"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _;
+    var _, template_1;
+    //
+    //  Formatter
+    //
     function extractText(fmt) {
         return fmt.map(function (x) { return x.text; }).join("");
     }
     function printFmt(fmt) {
+        // texts interspersed by style placeholders "%c"
         var texts = "%c" + fmt.map(function (x) { return x.text; }).join("%c");
+        // translate style tags to css
         var styles = fmt.map(function (seg) {
             var css = "";
             if (seg.style.i)
@@ -17,20 +22,24 @@ System.register(["lodash"], function(exports_1, context_1) {
                 css += "text-decoration; underline;";
             return css;
         });
+        // print it all out
         console.log.apply(console, [texts].concat(styles));
     }
+    // make all segments italic
     function italic(fmt) {
         return fmt.map(function (seg) {
             seg.style.i = true;
             return seg;
         });
     }
+    // make all segments bold
     function bold(fmt) {
         return fmt.map(function (seg) {
             seg.style.b = true;
             return seg;
         });
     }
+    // make all segments link-like
     function link(fmt) {
         return fmt.map(function (seg) {
             seg.style.a = true;
@@ -50,6 +59,7 @@ System.register(["lodash"], function(exports_1, context_1) {
         else {
             var lastIndex = fmt.length - 1;
             var style = { i: i, b: b, a: a };
+            // the style of newly added text is the same as the last segment, simply append them
             if (_.isEqual(fmt[lastIndex].style, style)) {
                 fmt[lastIndex].text += text;
                 return fmt;
@@ -94,6 +104,9 @@ System.register(["lodash"], function(exports_1, context_1) {
         }
         return fmt;
     }
+    //
+    //  Formatting stuffs
+    //
     function formatElement(element) {
         switch (element.kind) {
             case "plain":
@@ -106,36 +119,48 @@ System.register(["lodash"], function(exports_1, context_1) {
             case "link":
                 return fold([], element.subs, link);
             case "template":
-                fmt_1 = add([], "{{" + element.name);
-                element.params.forEach(function (param) {
-                    if (param.name) {
-                        fmt_1 = add(fmt_1, "|" + param.name + "=");
-                        fmt_1 = fold(fmt_1, param.value);
-                    }
-                    else {
-                        fmt_1 = add(fmt_1, "|");
-                        fmt_1 = fold(fmt_1, param.value);
-                    }
-                });
-                fmt_1 = add(fmt_1, "}}");
-                return fmt_1;
+                var transclusion = template_1.transclude(element);
+                if (transclusion) {
+                    return fold([], transclusion);
+                }
+                else {
+                    fmt_1 = add([], "{{" + element.name);
+                    element.params.forEach(function (param) {
+                        if (param.name) {
+                            fmt_1 = add(fmt_1, "|" + param.name + "=");
+                            fmt_1 = fold(fmt_1, param.value);
+                        }
+                        else {
+                            fmt_1 = add(fmt_1, "|");
+                            fmt_1 = fold(fmt_1, param.value);
+                        }
+                    });
+                    fmt_1 = add(fmt_1, "}}");
+                    return fmt_1;
+                }
         }
     }
     function formatLine(line, order) {
+        // ### only
         var numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
-        var bullet = line.uli > 0 && line.indent === 0;
+        // ends with *
+        var hasBullet = line.uli > 0 && line.indent === 0;
+        var bullet = "◦";
+        if (line.uli % 2)
+            bullet = "•";
+        // const indentSpace = 4;
         var indentLevel = line.oli + line.uli + line.indent;
         var indentation = _.repeat("  ", indentLevel);
         var formattedElements = fold([], line.line);
         if (numbered) {
             return concat([{
                     text: "" + indentation + order + ". ",
-                    style: { i: false, b: false, a: false }
+                    style: { i: false, b: true, a: false }
                 }], formattedElements);
         }
-        else if (bullet) {
+        else if (hasBullet) {
             return concat([{
-                    text: indentation + "* ",
+                    text: "" + indentation + bullet + " ",
                     style: { i: false, b: false, a: false }
                 }], formattedElements);
         }
@@ -177,20 +202,28 @@ System.register(["lodash"], function(exports_1, context_1) {
     }
     function isPartOfSpeech(name) {
         return _.includes([
+            // Parts of speech:
             "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
             "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
             "Interjection", "Noun", "Numeral", "Participle", "Particle",
             "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
+            // Morphemes:
             "Circumfix", "Combining form", "Infix", "Interfix", "Prefix",
             "Root", "Suffix",
+            // Symbols and characters:
             "Diacritical mark", "Letter", "Ligature", "Number",
             "Punctuation mark", "Syllable", "Symbol",
+            // Phrases
             "Phrase", "Proverb", "Prepositional phrase",
+            // Han characters and language-specific varieties:
             "Han character", "Hanzi", "Kanji", "Hanja",
+            // Lojban-specific parts of speech
             "Brivla", "Cmavo", "Gismu", "Lujvo", "Rafsi",
+            // Romanization
             "Romanization"
         ], name);
     }
+    // a predicate that decides if a section should be collapsed
     function shouldCollapse(settings, name) {
         return settings.collapse[_.camelCase(name)]
             || (settings.collapse.partOfSpeech && isPartOfSpeech(name));
@@ -213,11 +246,14 @@ System.register(["lodash"], function(exports_1, context_1) {
         }
     }
     function printEntry(settings, entry) {
+        // if there's such entry
         if (entry) {
+            // display all languages
             if (settings.displayAllLanguages) {
                 printSection(settings, entry);
             }
             else {
+                // find the specified language (nullable)
                 var languageEntry = _.find(entry.subs, { header: settings.language });
                 if (languageEntry) {
                     printSection(settings, languageEntry);
@@ -235,12 +271,16 @@ System.register(["lodash"], function(exports_1, context_1) {
         setters:[
             function (_1) {
                 _ = _1;
+            },
+            function (template_1_1) {
+                template_1 = template_1_1;
             }],
         execute: function() {
             exports_1("extractText", extractText);
             exports_1("formatElement", formatElement);
             exports_1("formatLine", formatLine);
             exports_1("formatParagraph", formatParagraph);
+            exports_1("formatSection", formatSection);
             exports_1("printEntry", printEntry);
         }
     }

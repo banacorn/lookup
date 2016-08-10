@@ -1,7 +1,7 @@
 // import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../types";
-import { Fmt, Inline, Line, Paragraph, Section } from "./types";
 import * as _ from "lodash";
-
+import { Fmt, Inline, Line, Paragraph, Section } from "./types";
+import { transclude } from "./template";
 //
 //  Formatter
 //
@@ -121,18 +121,23 @@ function formatElement(element: Inline): Fmt {
         case "link":
             return fold([], element.subs, link);
         case "template":
-            fmt = add([], `{{${element.name}`);
-            element.params.forEach((param) => {
-                if (param.name) {       // named
-                    fmt = add(fmt, `|${param.name}=`);
-                    fmt = fold(fmt, param.value);
-                } else {                // unnamed
-                    fmt = add(fmt, `|`);
-                    fmt = fold(fmt, param.value);
-                }
-            });
-            fmt = add(fmt, `}}`);
-            return fmt
+            const transclusion = transclude(element);
+            if (transclusion) {
+                return fold([], transclusion);
+            } else {
+                fmt = add([], `{{${element.name}`);
+                element.params.forEach((param) => {
+                    if (param.name) {       // named
+                        fmt = add(fmt, `|${param.name}=`);
+                        fmt = fold(fmt, param.value);
+                    } else {                // unnamed
+                        fmt = add(fmt, `|`);
+                        fmt = fold(fmt, param.value);
+                    }
+                });
+                fmt = add(fmt, `}}`);
+                return fmt
+            }
     }
 }
 
@@ -141,8 +146,10 @@ function formatLine(line: Line, order: number): Fmt {
     // ### only
     const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
     // ends with *
-    const bullet = line.uli > 0 && line.indent === 0;
-
+    const hasBullet = line.uli > 0 && line.indent === 0;
+    let bullet = "◦";
+    if (line.uli % 2)
+        bullet = "•";
     // const indentSpace = 4;
     const indentLevel = line.oli + line.uli + line.indent;
     const indentation = _.repeat("  ", indentLevel);
@@ -151,11 +158,11 @@ function formatLine(line: Line, order: number): Fmt {
     if (numbered) {
         return concat([{
             text: `${indentation}${order}. `,
-            style: { i: false, b: false, a: false }
+            style: { i: false, b: true, a: false }
         }], formattedElements);
-    } else if (bullet) {
+    } else if (hasBullet) {
         return concat([{
-            text: `${indentation}* `,
+            text: `${indentation}${bullet} `,
             style: { i: false, b: false, a: false }
         }], formattedElements);
     } else {
@@ -273,5 +280,6 @@ export {
     formatElement,
     formatLine,
     formatParagraph,
+    formatSection,
     printEntry
 }

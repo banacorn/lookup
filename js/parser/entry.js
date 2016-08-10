@@ -32,6 +32,7 @@ System.register(["lodash", "./element"], function(exports_1, context_1) {
             return result;
         }
     }
+    // remove inter language links
     function parseEntry(header, text) {
         var result = text.match(interlangRegex);
         var trimmedText = text.substring(0, text.length - result[1].length);
@@ -49,7 +50,10 @@ System.register(["lodash", "./element"], function(exports_1, context_1) {
                             oli: match[2].length,
                             uli: match[3].length,
                             indent: match[4].length,
+                            // the position in "result.value: Inline[]"
                             index: i,
+                            // since the line prefix may appear in the middle of a
+                            // plain text, we need to sperate them from the prefix
                             before: match[1],
                             after: match[5]
                         };
@@ -58,6 +62,9 @@ System.register(["lodash", "./element"], function(exports_1, context_1) {
             }).filter(function (x) { return x; });
             var lines_1 = [];
             prefixes_1.forEach(function (prefix, i) {
+                // if there's the next index
+                //      then [prefix.after] ++ result.value[prefix.index + 1 .. nextIndex] ++ [nextIndex.before] will be a new line
+                //      else result.value[prefix.index .. ] with be a new line
                 if (i < prefixes_1.length - 1) {
                     var next = prefixes_1[i + 1];
                     var segment = result.value.slice(prefix.index + 1, next.index);
@@ -98,6 +105,7 @@ System.register(["lodash", "./element"], function(exports_1, context_1) {
             };
         }
     }
+    // preprocessors
     function removeComments(text) {
         return text.replace(/<!--[-.\n]*-->/g, "");
     }
@@ -116,7 +124,7 @@ System.register(["lodash", "./element"], function(exports_1, context_1) {
             paragraph: "",
             sections: []
         };
-        var index = 0;
+        var index = 0; // for enumeration
         for (var _i = 0, splitted_1 = splitted; _i < splitted_1.length; _i++) {
             var header = splitted_1[_i];
             if (index === 0) {
