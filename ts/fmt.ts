@@ -7,7 +7,10 @@ import { transclude } from "./template";
 //
 
 function extractText(fmt: Fmt): string {
-    return fmt.map(x => x.text).join("");
+    if (fmt)
+        return fmt.map(x => x.text).join("");
+    else
+        return "";
 }
 
 // make all segments italic
@@ -196,6 +199,10 @@ const seg = (s: string, i: boolean = false, b: boolean = false, a: boolean = fal
 export {
     formatElement,
     formatParagraph,
+
+    italic,
+    bold,
+    link,
 
     seg,
     concat,

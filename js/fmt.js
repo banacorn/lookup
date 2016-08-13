@@ -7,7 +7,10 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
     //  Formatter
     //
     function extractText(fmt) {
-        return fmt.map(function (x) { return x.text; }).join("");
+        if (fmt)
+            return fmt.map(function (x) { return x.text; }).join("");
+        else
+            return "";
     }
     // make all segments italic
     function italic(fmt) {
@@ -204,6 +207,9 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
             };
             exports_1("formatElement", formatElement);
             exports_1("formatParagraph", formatParagraph);
+            exports_1("italic", italic);
+            exports_1("bold", bold);
+            exports_1("link", link);
             exports_1("seg", seg);
             exports_1("concat", concat);
             exports_1("add", add);

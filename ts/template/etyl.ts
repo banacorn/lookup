@@ -30,6 +30,7 @@ function languageCode(code: string): string {
         case "cel-pro": return "Proto-Celtic";
         case "de": return "German";
         case "enm": return "Middle English";
+        case "fr": return "French";
         case "fro": return "Old French";
         case "gem-pro": return "Proto-Germanic";
         case "gmh": return "Middle High German";

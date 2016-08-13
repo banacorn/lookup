@@ -23,7 +23,7 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
             return parseGender(value);
         });
         otherGenderForms.forEach(function (form) {
-            result = F.add(result, ", ", false, false, false);
+            result = F.add(result, ", ");
             result = F.add(result, "" + form, true, false, true);
         });
         //  == Genitive ==
@@ -32,9 +32,9 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         //  neuter, and to the headword alone if it's feminine.
         //  Additional genitive forms can be added with gen2= and gen3=.
         var genitiveForm = determineGenitive(unnamed[1], _.concat([genderForm], otherGenderForms), word);
-        result = F.add(result, " (", false, false, false);
-        result = F.add(result, "genitive", true, false, false);
-        result = F.add(result, " " + genitiveForm, false, false, false);
+        result = F.add(result, " (", false);
+        result = F.add(result, "genitive", true);
+        result = F.add(result, " " + genitiveForm);
         var otherGenitiveForms = named
             .filter(function (_a) {
             var name = _a.name, value = _a.value;
@@ -45,8 +45,8 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
             return F.extractText(value);
         });
         otherGenitiveForms.forEach(function (form) {
-            result = F.add(result, " or", true, false, false);
-            result = F.add(result, " " + form, false, false, false);
+            result = F.add(result, " or", true);
+            result = F.add(result, " " + form);
         });
         //  == Plural ==
         //  Use the third parameter to specify the plural form of the noun.
@@ -55,13 +55,13 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         //  Additional plural forms can be added with pl2= and pl3=.
         var pluralForm = determinePlural(unnamed[2], word);
         if (pluralForm) {
-            result = F.add(result, ", ", false, false, false);
-            result = F.add(result, "plural", true, false, false);
-            result = F.add(result, " " + pluralForm, false, false, false);
+            result = F.add(result, ", ");
+            result = F.add(result, "plural", true);
+            result = F.add(result, " " + pluralForm);
         }
         else {
-            result = F.add(result, ", ", false, false, false);
-            result = F.add(result, "no plural", true, false, false);
+            result = F.add(result, ", ");
+            result = F.add(result, "no plural", true);
         }
         var otherPluralForms = named
             .filter(function (_a) {
@@ -73,8 +73,8 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
             return F.extractText(value);
         });
         otherPluralForms.forEach(function (form) {
-            result = F.add(result, " or", true, false, false);
-            result = F.add(result, " " + form, false, false, false);
+            result = F.add(result, " or", true);
+            result = F.add(result, " " + form);
         });
         //  == Diminutive ==
         //  Use the fourth parameter to specify the diminituve form of the noun.
@@ -82,9 +82,9 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         //  Additional diminutive forms can be added with dim2=.
         var diminutiveForm = determineDiminutive(unnamed[3]);
         if (diminutiveForm) {
-            result = F.add(result, ", ", false, false, false);
-            result = F.add(result, "diminutive", true, false, false);
-            result = F.add(result, " " + diminutiveForm + " ", false, false, false);
+            result = F.add(result, ", ");
+            result = F.add(result, "diminutive", true);
+            result = F.add(result, " " + diminutiveForm + " ");
             result = F.add(result, "n", true, false, true);
         }
         //  == Gendered forms ==
@@ -93,17 +93,17 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         //  These are used especially with nouns denoting professions.
         var feminineForm = determineFeminineForm(named);
         if (feminineForm) {
-            result = F.add(result, ", ", false, false, false);
-            result = F.add(result, "feminine", true, false, false);
-            result = F.add(result, " " + feminineForm, false, false, false);
+            result = F.add(result, ", ");
+            result = F.add(result, "feminine", true);
+            result = F.add(result, " " + feminineForm);
         }
         var masculineForm = determineMasculineForm(named);
         if (masculineForm) {
-            result = F.add(result, ", ", false, false, false);
-            result = F.add(result, "masculine", true, false, false);
-            result = F.add(result, " " + masculineForm, false, false, false);
+            result = F.add(result, ", ");
+            result = F.add(result, "masculine", true);
+            result = F.add(result, " " + masculineForm);
         }
-        result = F.add(result, ")", false, false, false);
+        result = F.add(result, ")");
         return result;
     }
     function determineGenitive(raw, genderForms, word) {
