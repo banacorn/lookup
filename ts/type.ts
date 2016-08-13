@@ -6,22 +6,6 @@ type RawResponse = {
     text: RawText
 };
 
-//
-//  Formatter
-//
-
-type Style = {
-    i: boolean,     // italic
-    b: boolean,     // bold
-    a: boolean      // link
-};
-
-type Seg = {
-    text: string,
-    style: Style
-};
-
-type Fmt = Seg[];
 
 //
 //  Freaking Either
@@ -39,7 +23,8 @@ interface ParseErr {
 }
 
 export * from "./type/ast.ts";
+export * from "./type/fmt.ts";
 export {
-    RawResponse, Fmt, Seg, RawText,
+    RawResponse, RawText,
     ParseResult, ParseOk, ParseErr
 }
