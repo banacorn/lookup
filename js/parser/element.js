@@ -3,11 +3,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
     var __moduleName = context_1 && context_1.id;
     var P, _, type_1, combinator_1;
     var Allowed, insideItalic, insideBold, insideLink, insideTemplate, parseFreeLink, parseARLHideParentheses, parseARLHideComma, parseARLHideNamespace, parseARLHideNamespaceAndParantheses, parseAutoRenamedLink, parseSimpleTemplate, parseElements;
-    // const insideTemplate = (x: AllowedParsers) => x ^ Allowed.Template
-    // function debug<T>(x: T): T {
-    //     console.log(inspect(x, false, null).cyan)
-    //     return x;
-    // }
     function allowedParsers(allowed) {
         var parsers = [];
         if (allowed & Allowed.Template)
@@ -22,9 +17,7 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
         return parsers;
     }
     function stopParsers(allowed) {
-        // initials
         var result = ["''", "'''", "[[", "{{", "}}", "|"];
-        // codas
         if (!(allowed & Allowed.Link)) {
             result.push("]]");
             result.push("|");
@@ -33,9 +26,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
             result.push("}}");
             result.push("|");
         }
-        // if(allowed ^ 15) {
-        // result.push("\n* ");
-        // }
         return result;
     }
     function muchoInline(parsers, codaParser) {
@@ -58,13 +48,10 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
     function parseInlines(allowed, codaParser) {
         return P.lazy(function () {
             var parsers = allowedParsers(allowed);
-            // console.log(`*** ${showAllowed(allowed)}`.cyan)
             return muchoInline(parsers, codaParser);
         });
     }
     function parsePlain(allowed) {
-        // console.log(`plain ${showAllowed(allowed)}`.gray);
-        // console.log(`codas ${codaParsers(allowed)}`.gray)
         return P.alt(combinator_1.before(stopParsers(allowed)), P.all).map(function (chunk) {
             return {
                 kind: "plain",
@@ -73,7 +60,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
         });
     }
     function parseItalic(allowed) {
-        // console.log(`italic ${showAllowed(allowed)}`.yellow);
         return P.seq(P.string("''"), parseInlines(insideItalic(allowed), P.string("''"))).map(function (chunk) {
             return {
                 kind: "italic",
@@ -82,7 +68,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
         });
     }
     function parseBold(allowed) {
-        // console.log(`bold ${showAllowed(allowed)}`.yellow);
         return P.seq(P.string("'''"), parseInlines(insideBold(allowed), P.string("'''"))).map(function (chunk) {
             return {
                 kind: "bold",
@@ -120,11 +105,7 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
             return chunk[0];
         });
     }
-    //
-    //  Template
-    //
     function parseParameter(allowed, coda) {
-        // get the string before "=" or the coda, which in case may be a name or an unnamed value
         return combinator_1.beforeWhich(["=", coda]).chain(function (_a) {
             var unknown = _a[0], which = _a[1];
             if (which === "=") {
@@ -158,9 +139,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
     function parseTemplate(allowed) {
         return P.string("{{").then(P.alt(parseComplexTemplate(allowed), parseSimpleTemplate));
     }
-    ////////////////////////////////////////////////////////////////////////////////
-    // Paragraph
-    ////////////////////////////////////////////////////////////////////////////////
     function parseParagraph(text) {
         var prefixRegex = /(.*)\n(#*)(\**)(\:*) ?(.*)/;
         var result = parseElements.parse(text);
@@ -173,10 +151,7 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
                             oli: match[2].length,
                             uli: match[3].length,
                             indent: match[4].length,
-                            // the position in "result.value: Inline[]"
                             index: i,
-                            // since the line prefix may appear in the middle of a
-                            // plain text, we need to sperate them from the prefix
                             before: match[1],
                             after: match[5]
                         };
@@ -185,9 +160,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
             }).filter(function (x) { return x; });
             var lines_1 = [];
             prefixes_1.forEach(function (prefix, i) {
-                // if there's the next index
-                //      then [prefix.after] ++ result.value[prefix.index + 1 .. nextIndex] ++ [nextIndex.before] will be a new line
-                //      else result.value[prefix.index .. ] with be a new line
                 if (i < prefixes_1.length - 1) {
                     var next = prefixes_1[i + 1];
                     var segment = result.value.slice(prefix.index + 1, next.index);
@@ -216,7 +188,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
                     });
                 }
             });
-            // return <ParseOk<AST.Line[]>>{
             return {
                 kind: "ok",
                 value: lines_1
@@ -254,41 +225,31 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
             insideBold = function (x) { return x ^ Allowed.Bold; };
             insideLink = function (x) { return x ^ Allowed.Link ^ Allowed.Template; };
             insideTemplate = function (x) { return x; };
-            //
-            //  Links
-            //
             parseFreeLink = P.seq(P.string("[["), combinator_1.before(["]]"]), P.string("]]")).map(function (chunk) {
                 return {
                     kind: "link",
                     subs: [type_1.AST.plain(chunk[1])]
                 };
             });
-            // Automatically hide stuff in parentheses
             parseARLHideParentheses = P.seq(combinator_1.before(["("]), P.string("("), combinator_1.before([")"]), P.string(")"), P.optWhitespace).map(function (chunk) {
                 return {
                     kind: "link",
                     subs: [type_1.AST.plain(chunk[0].trim())]
                 };
             });
-            // Automatically hide the comma and following text
             parseARLHideComma = P.seq(combinator_1.before([","]), P.string(","), combinator_1.before(["|"])).map(function (chunk) {
                 return {
                     kind: "link",
                     subs: [type_1.AST.plain(chunk[0].trim())]
                 };
             });
-            // Automatically hide namespace
-            parseARLHideNamespace = P.seq(combinator_1.before([":"]), // namespace
-            P.string(":"), combinator_1.before(["|"]) // renamed
-            ).map(function (chunk) {
+            parseARLHideNamespace = P.seq(combinator_1.before([":"]), P.string(":"), combinator_1.before(["|"])).map(function (chunk) {
                 return {
                     kind: "link",
                     subs: [type_1.AST.plain(chunk[2])]
                 };
             });
-            // Automatically hide namespace AND stuffs in parantheses
-            parseARLHideNamespaceAndParantheses = P.seq(combinator_1.before([":"]), // namespace
-            P.string(":"), parseARLHideParentheses).map(function (chunk) {
+            parseARLHideNamespaceAndParantheses = P.seq(combinator_1.before([":"]), P.string(":"), parseARLHideParentheses).map(function (chunk) {
                 return {
                     kind: "link",
                     subs: chunk[2].subs
@@ -304,31 +265,6 @@ System.register(["parsimmon", "lodash", "./../type", "./combinator"], function(e
                     params: []
                 };
             });
-            // const parseOLI: Parser<number> = P.string("#").many().map(chunk => chunk[0].length);
-            // const parseULI: Parser<number> = P.string("*").many().map(chunk => chunk[0].length);
-            // const parseIndent: Parser<number> = P.string(":").many().map(chunk => chunk[0].length);
-            // const parsePrefix: Parser<Prefix> = P
-            //     .regex(/\n?/)
-            //     .then(parseOLI
-            //     .chain(oli => parseULI
-            //     .chain(uli => parseIndent
-            //     .chain(indent => {
-            //         if (oli + uli + indent > 0)
-            //             return P.string(" ")
-            //                 .then(P.succeed(<Prefix>{
-            //                     kind:   "prefix",
-            //                     oli:    oli,
-            //                     uli:    uli,
-            //                     indent: indent
-            //                 }));
-            //         else
-            //             return P.succeed(<Prefix>{
-            //                 kind:   "prefix",
-            //                 oli:    0,
-            //                 uli:    0,
-            //                 indent: 0
-            //             });
-            //     }))));
             parseElements = parseInlines(15, P.alt(P.eof));
             exports_1("parseElements", parseElements);
             exports_1("parseParagraph", parseParagraph);

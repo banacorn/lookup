@@ -28,7 +28,7 @@ System.register(["../parser/element", "../parser/section", "../fmt", "../type", 
     function parseAndFormat(word, body) {
         var rawEntry = section_1.parseEntry(word, body);
         var parsedEntry = type_1.mapSection(element_1.parseParagraph)(rawEntry);
-        return type_1.mapSection(fmt_1.formatParagraph)(parsedEntry);
+        return type_1.mapSection(fmt_1.formatParagraph(word))(parsedEntry);
     }
     return {
         setters:[

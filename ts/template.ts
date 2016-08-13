@@ -4,7 +4,7 @@ import { fold } from "./fmt";
 
 import deNoun from "./template/de-noun";
 
-function sortParams(params: AST.Parameter[]): {
+function sortParams(params: AST.Parameter[], word: string): {
     named: {
         name: string,
         value: Fmt
@@ -14,7 +14,7 @@ function sortParams(params: AST.Parameter[]): {
     let unnamed = [];
     let named = [];
     params.forEach((param) => {
-        const valueFmt = fold([], param.value);
+        const valueFmt = fold([], param.value, word);
         if (param.name === "") {
             unnamed.push(valueFmt);
         } else {

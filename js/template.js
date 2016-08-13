@@ -2,11 +2,11 @@ System.register(["./fmt", "./template/de-noun"], function(exports_1, context_1) 
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var fmt_1, de_noun_1;
-    function sortParams(params) {
+    function sortParams(params, word) {
         var unnamed = [];
         var named = [];
         params.forEach(function (param) {
-            var valueFmt = fmt_1.fold([], param.value);
+            var valueFmt = fmt_1.fold([], param.value, word);
             if (param.name === "") {
                 unnamed.push(valueFmt);
             }
@@ -22,7 +22,6 @@ System.register(["./fmt", "./template/de-noun"], function(exports_1, context_1) 
             unnamed: unnamed
         };
     }
-    // https://en.wiktionary.org/wiki/Template:de-noun
     function transclude(word, template) {
         switch (template.name) {
             case "de-noun": return de_noun_1.default(word, template.params);

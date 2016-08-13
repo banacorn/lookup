@@ -15,7 +15,7 @@ type GenderedForm = string;
 
 // {{de-noun|Gender|Genitive|Plural|Diminutive|Gendered forms}}
 function deNoun(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw);
+    const {named, unnamed} = sortParams(raw, word);
     let result = [F.seg(`${word} `, false, true)];
 
     //  == Gender ==

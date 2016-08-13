@@ -74,14 +74,14 @@ function concat(a: Fmt, b: Fmt): Fmt {
     }
 }
 
-function fold(fmt: Fmt, elements: AST.Inline[], f?: (x: Fmt) => Fmt): Fmt {
+function fold(fmt: Fmt, elements: AST.Inline[], word: string, f?: (x: Fmt) => Fmt): Fmt {
     if (f) {
         elements.forEach((e) => {
-            fmt = concat(fmt, f(formatElement(e)));
+            fmt = concat(fmt, f(formatElement(word)(e)));
         });
     } else {
         elements.forEach((e) => {
-            fmt = concat(fmt, formatElement(e));
+            fmt = concat(fmt, formatElement(word)(e));
         });
     }
     return fmt;
@@ -91,40 +91,42 @@ function fold(fmt: Fmt, elements: AST.Inline[], f?: (x: Fmt) => Fmt): Fmt {
 //  Formatting stuffs
 //
 
-function formatElement(element: AST.Inline): Fmt {
-    switch (element.kind) {
-        case "plain":
-            let fmt = [];
-            return add([], element.text);
-        case "italic":
-            return fold([], element.subs, italic);
-        case "bold":
-            return fold([], element.subs, bold);
-        case "link":
-            return fold([], element.subs, link);
-        case "template":
-            const transclusion = transclude("unknown entry", element);
-            if (transclusion) {
-                return transclusion;
-            } else {
-                fmt = add([], `{{${element.name}`);
-                element.params.forEach((param) => {
-                    if (param.name) {       // named
-                        fmt = add(fmt, `|${param.name}=`);
-                        fmt = fold(fmt, param.value);
-                    } else {                // unnamed
-                        fmt = add(fmt, `|`);
-                        fmt = fold(fmt, param.value);
-                    }
-                });
-                fmt = add(fmt, `}}`);
-                return fmt
-            }
+
+function formatElement(word: string): (element: AST.Inline) => Fmt {
+    return function(element: AST.Inline): Fmt {
+        switch (element.kind) {
+            case "plain":
+                let fmt = [];
+                return add([], element.text);
+            case "italic":
+                return fold([], element.subs, word, italic);
+            case "bold":
+                return fold([], element.subs, word, bold);
+            case "link":
+                return fold([], element.subs, word, link);
+            case "template":
+                const transclusion = transclude(word, element);
+                if (transclusion) {
+                    return transclusion;
+                } else {
+                    fmt = add([], `{{${element.name}`);
+                    element.params.forEach((param) => {
+                        if (param.name) {       // named
+                            fmt = add(fmt, `|${param.name}=`);
+                            fmt = fold(fmt, param.value, word);
+                        } else {                // unnamed
+                            fmt = add(fmt, `|`);
+                            fmt = fold(fmt, param.value, word);
+                        }
+                    });
+                    fmt = add(fmt, `}}`);
+                    return fmt
+                }
+        }
     }
 }
 
-
-function formatLine(line: AST.Line, order: number): Fmt {
+function formatLine(line: AST.Line, order: number, word: string): Fmt {
     // ### only
     const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
     // ends with *
@@ -136,7 +138,7 @@ function formatLine(line: AST.Line, order: number): Fmt {
     const indentLevel = line.oli + line.uli + line.indent;
     const indentation = _.repeat("  ", indentLevel);
 
-    const formattedElements: Fmt = fold([], line.line);
+    const formattedElements: Fmt = fold([], line.line, word);
     if (numbered) {
         return concat([{
             text: `${indentation}${order}. `,
@@ -156,24 +158,26 @@ function formatLine(line: AST.Line, order: number): Fmt {
 }
 
 
-function formatParagraph(result: ParsedParagraph): Fmt {
-    let order = [1];
-    if (result.kind === "ok") {
-        let fmt = [];
-        result.value.forEach((line) => {
-            fmt = concat(fmt, formatLine(line, _.last(order)));
-            fmt = add(fmt, "\n");
-            const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
-            const level = line.oli;
-            if (level > order.length)   // indent
-                order.push(1);
-            else if (level < order.length) {
-                order.pop();
-            }
-        });
-        return fmt;
-    } else {
-        return add([], "failed to parse this paragraph\n");
+function formatParagraph(word: string): (result: ParsedParagraph) => Fmt {
+    return function(result: ParsedParagraph): Fmt {
+        let order = [1];
+        if (result.kind === "ok") {
+            let fmt = [];
+            result.value.forEach((line) => {
+                fmt = concat(fmt, formatLine(line, _.last(order), word));
+                fmt = add(fmt, "\n");
+                const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
+                const level = line.oli;
+                if (level > order.length)   // indent
+                    order.push(1);
+                else if (level < order.length) {
+                    order.pop();
+                }
+            });
+            return fmt;
+        } else {
+            return add([], "failed to parse this paragraph\n");
+        }
     }
 }
 

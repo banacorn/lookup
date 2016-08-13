@@ -37,7 +37,7 @@ function printFmt(fmt: Fmt) {
 function parseAndFormat(word: string, body: RawText): Section<Fmt> {
     const rawEntry: Section<RawText> = parseEntry(word, body);
     const parsedEntry: Section<ParsedParagraph> = mapSection(parseParagraph)(rawEntry);
-    return mapSection(formatParagraph)(parsedEntry);
+    return mapSection(formatParagraph(word))(parsedEntry);
 }
 
 export {

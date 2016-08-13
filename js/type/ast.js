@@ -6,7 +6,6 @@ System.register([], function(exports_1, context_1) {
         setters:[],
         execute: function() {
             (function (AST) {
-                // smart constructors
                 AST.plain = function (s) { return {
                     kind: "plain",
                     text: s
