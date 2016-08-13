@@ -163,15 +163,16 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
             if (result.kind === "ok") {
                 var fmt_2 = [];
                 result.value.forEach(function (line) {
-                    fmt_2 = concat(fmt_2, formatLine(line, _.last(order), word));
-                    fmt_2 = add(fmt_2, "\n");
                     var numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
                     var level = line.oli;
                     if (level > order.length)
                         order.push(1);
-                    else if (level < order.length) {
+                    else if (level < order.length)
                         order.pop();
-                    }
+                    fmt_2 = concat(fmt_2, formatLine(line, _.last(order), word));
+                    fmt_2 = add(fmt_2, "\n");
+                    if (level === order.length)
+                        order[order.length - 1] += 1;
                 });
                 return fmt_2;
             }

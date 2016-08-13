@@ -164,15 +164,17 @@ function formatParagraph(word: string): (result: ParsedParagraph) => Fmt {
         if (result.kind === "ok") {
             let fmt = [];
             result.value.forEach((line) => {
-                fmt = concat(fmt, formatLine(line, _.last(order), word));
-                fmt = add(fmt, "\n");
                 const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
                 const level = line.oli;
                 if (level > order.length)   // indent
                     order.push(1);
-                else if (level < order.length) {
+                else if (level < order.length)
                     order.pop();
-                }
+
+                fmt = concat(fmt, formatLine(line, _.last(order), word));
+                fmt = add(fmt, "\n");
+                if (level === order.length)
+                    order[order.length - 1] += 1;
             });
             return fmt;
         } else {

@@ -38,7 +38,6 @@ function transclude(word: string, template: AST.Template): Fmt {
         case "de-noun": return deNoun(word, template.params);
         case "etyl": return etyl(word, template.params);
     }
-
     return undefined
 }
 

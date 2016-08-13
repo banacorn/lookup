@@ -3,6 +3,8 @@ import { parseParagraph } from "../parser/element";
 import { parseEntry } from "../parser/section";
 import { formatParagraph } from "../fmt";
 import { flattenSection, Section, Fmt, RawText, mapSection, ParsedParagraph } from "../type";
+// import { inspect } from "util";
+// const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
 
 import "colors";
 
