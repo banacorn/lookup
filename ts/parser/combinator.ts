@@ -1,6 +1,6 @@
 import * as P from "parsimmon";
-import { Parser } from "parsimmon";
 import * as _ from "lodash";
+import { Parser } from "parsimmon";
 // import "colors";
 // import { inspect } from "util";
 

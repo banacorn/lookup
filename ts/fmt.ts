@@ -1,9 +1,6 @@
-// import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../type";
 import * as _ from "lodash";
-import { Fmt, Seg, AST } from "./type";
+import { Fmt, AST, ParsedParagraph, Section, Seg } from "./type";
 import { transclude } from "./template";
-
-let WORD;
 
 //
 //  Formatter
@@ -11,24 +8,6 @@ let WORD;
 
 function extractText(fmt: Fmt): string {
     return fmt.map(x => x.text).join("");
-}
-
-function printFmt(fmt: Fmt) {
-    // texts interspersed by style placeholders "%c"
-    const texts = "%c" + fmt.map(x => x.text).join("%c");
-    // translate style tags to css
-    const styles = fmt.map((seg) => {
-        let css = "";
-        if (seg.style.i)
-            css += "font-style: italic;";
-        if (seg.style.b)
-            css += "font-weight: bold;";
-        if (seg.style.a)
-            css += "text-decoration; underline;";
-        return css;
-    })
-    // print it all out
-    console.log.apply(console, [texts].concat(styles));
 }
 
 // make all segments italic
@@ -124,7 +103,7 @@ function formatElement(element: AST.Inline): Fmt {
         case "link":
             return fold([], element.subs, link);
         case "template":
-            const transclusion = transclude(WORD, element);
+            const transclusion = transclude("unknown entry", element);
             if (transclusion) {
                 return transclusion;
             } else {
@@ -177,108 +156,44 @@ function formatLine(line: AST.Line, order: number): Fmt {
 }
 
 
-function formatParagraph(paragraph: AST.Paragraph, word: string = "Unknown Entry"): Fmt {
-    WORD = word;
-
-    let fmt = [];
-
+function formatParagraph(result: ParsedParagraph): Fmt {
     let order = [1];
-    paragraph.forEach((line) => {
-        fmt = concat(fmt, formatLine(line, _.last(order)));
-        fmt = add(fmt, "\n");
-        const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
-        const level = line.oli;
-        if (level > order.length)   // indent
-            order.push(1);
-        else if (level < order.length) {
-            order.pop();
-        }
-    });
-    return fmt;
-}
-
-function formatSection(section: AST.Section): Fmt {
-    let fmt = [];
-    section.body.forEach((result) => {
-        if (result.kind === "ok") {
-            fmt = concat(fmt, formatParagraph(result.value));
+    if (result.kind === "ok") {
+        let fmt = [];
+        result.value.forEach((line) => {
+            fmt = concat(fmt, formatLine(line, _.last(order)));
             fmt = add(fmt, "\n");
-        } else {
-            fmt = add(fmt, "Paragraph parse error\n");
-        }
-    });
-    return fmt;
-}
-
-
-function isPartOfSpeech(name: string): boolean {
-    return _.includes([
-            // Parts of speech:
-            "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
-            "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
-            "Interjection", "Noun", "Numeral", "Participle", "Particle",
-            "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
-            // Morphemes:
-            "Circumfix", "Combining form", "Infix", "Interfix", "Prefix",
-            "Root", "Suffix",
-            // Symbols and characters:
-            "Diacritical mark", "Letter", "Ligature", "Number",
-            "Punctuation mark", "Syllable", "Symbol",
-            // Phrases
-            "Phrase", "Proverb", "Prepositional phrase",
-            // Han characters and language-specific varieties:
-            "Han character", "Hanzi", "Kanji", "Hanja",
-            // Lojban-specific parts of speech
-            "Brivla", "Cmavo", "Gismu", "Lujvo", "Rafsi",
-            // Romanization
-            "Romanization"
-        ], name);
-}
-// a predicate that decides if a section should be collapsed
-function shouldCollapse(settings: any, name: string): boolean {
-    return settings.collapse[_.camelCase(name)]
-        || (settings.collapse.partOfSpeech && isPartOfSpeech(name));
-}
-
-function printHeader(settings: any, name: string) {
-    if (shouldCollapse(settings, name))
-        console.groupCollapsed(name);
-    else
-        console.group(name);
-}
-
-function printSection(settings: any, section: AST.Section) {
-    let formatted = formatSection(section);
-    if (formatted.length)
-        printFmt(formatted);
-
-    for (let sub of section.subs) {
-        printHeader(settings, sub.header);
-        printSection(settings, sub);
-        console.groupEnd();
-    }
-}
-
-function printEntry(settings: any, entry: AST.Section) {
-    WORD = entry.header;
-    // if there's such entry
-    if (entry) {
-        // display all languages
-        if (settings.displayAllLanguages) {
-            printSection(settings, entry);
-        } else {
-            // find the specified language (nullable)
-            const languageEntry = _.find(entry.subs, { header: settings.language });
-            if (languageEntry) {
-                printSection(settings, languageEntry);
-            } else {
-                console.warn("No such entry for " + settings.language);
+            const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
+            const level = line.oli;
+            if (level > order.length)   // indent
+                order.push(1);
+            else if (level < order.length) {
+                order.pop();
             }
-        }
+        });
+        return fmt;
     } else {
-        console.warn("Not found");
+        return add([], "failed to parse this paragraph\n");
     }
 }
+
+// function formatSection(section: Section<ParsedParagraph>): Section<Fmt> {
+//     let fmt = [];
+//
+//     const formattedBody: Fmt[] = section.body.map((result) => {
+//         if (result.kind === "ok") {
+//             return formatParagraph(result.value);
+//         } else {
+//             return add([], "Paragraph parse error");
+//         }
+//     });
+//     return {
+//         header: section.header,
+//         body: formattedBody,
+//         subs: section.subs.map(formatSection),
+//     };
+// }
+//
 
 //
 //  Segment constructor
@@ -292,17 +207,11 @@ const seg = (s: string, i: boolean = false, b: boolean = false, a: boolean = fal
 
 export {
     formatElement,
-    formatLine,
     formatParagraph,
-    formatSection,
-
 
     seg,
-
     concat,
     add,
     extractText,
     fold,
-
-    printEntry
 }

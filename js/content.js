@@ -1,18 +1,14 @@
-System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
+System.register(["./backend/browser"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, entry_1;
+    var browser_1;
     var settings;
     return {
         setters:[
-            function (fmt_1_1) {
-                fmt_1 = fmt_1_1;
-            },
-            function (entry_1_1) {
-                entry_1 = entry_1_1;
+            function (browser_1_1) {
+                browser_1 = browser_1_1;
             }],
         execute: function() {
-            // default state
             settings = {
                 language: "German",
                 displayAllLanguages: false,
@@ -42,31 +38,25 @@ System.register(["./fmt", "./parser/entry"], function(exports_1, context_1) {
                     externalLinks: true
                 }
             };
-            // initialize settings
             chrome.storage.sync.get(settings, function (items) {
                 settings = items;
             });
-            // listeners
             chrome.runtime.onConnect.addListener(function (port) {
                 var lastWord = undefined;
-                // listens to text selection events
                 document.addEventListener("mouseup", function () {
                     var word = window.getSelection().toString().trim();
                     var repeated = word === lastWord;
                     lastWord = word;
                     if (word && !repeated) {
-                        // sends request to the background when there's a non-trivial selection
                         port.postMessage(word);
                     }
                 }, false);
                 port.onMessage.addListener(function (response) {
-                    // clear old results
                     console.clear();
                     if (response) {
                         console.info("https://en.wiktionary.org/w/index.php?title=" + response.word + "&action=raw");
                         console.info("https://en.wiktionary.org/wiki/" + response.word);
-                        var result = entry_1.parseEntry(response.word, response.text);
-                        fmt_1.printEntry(settings, result);
+                        browser_1.printEntry(settings, browser_1.parseAndFormat(response.word, response.text));
                     }
                     else {
                         console.warn("Not found");

@@ -1,5 +1,5 @@
 import { AST, Fmt } from "./type";
-import { extractText, fold } from "./fmt";
+import { fold } from "./fmt";
 // import { inspect } from "util";
 
 import deNoun from "./template/de-noun";

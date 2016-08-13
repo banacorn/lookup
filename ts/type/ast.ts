@@ -1,15 +1,7 @@
-import { ParseResult } from "../type";
-
 namespace AST {
     //
     // Block elements
     //
-
-    export type Section = {
-        header: string,
-        body: ParseResult<Paragraph>[],
-        subs: Section[]
-    }
 
     export type Paragraph = Line[];
 
@@ -59,6 +51,40 @@ namespace AST {
         name: string;
         params: Parameter[]
     }
+
+
+    // smart constructors
+    export const plain = (s: string) => <AST.Plain>{
+        kind: "plain",
+        text: s
+    }
+
+    export const italic = (xs: AST.Inline[]) => <AST.Italic>{
+        kind: "italic",
+        subs: xs
+    }
+
+    export const bold = (xs: AST.Inline[]) => <AST.Bold>{
+        kind: "bold",
+        subs: xs
+    }
+
+    export const link = (xs: AST.Inline[]) => <AST.Link>{
+        kind: "link",
+        subs: xs
+    }
+
+    export const parameter = (x: string, xs: AST.Inline[]) => <AST.Parameter>{
+        name: x,
+        value: xs
+    }
+
+    export const template = (x: string, xs: AST.Parameter[]) => <AST.Template>{
+        kind: "template",
+        name: x,
+        params: xs
+    }
+
 }
 
 export {

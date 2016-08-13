@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import { AST } from "../type";
-import { plain } from "../parser/element";
 import { sortParams } from "../template";
 // import { inspect } from "util";
 import { Fmt } from "../type";

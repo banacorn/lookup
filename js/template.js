@@ -22,7 +22,6 @@ System.register(["./fmt", "./template/de-noun"], function(exports_1, context_1) 
             unnamed: unnamed
         };
     }
-    // https://en.wiktionary.org/wiki/Template:de-noun
     function transclude(word, template) {
         switch (template.name) {
             case "de-noun": return de_noun_1.default(word, template.params);

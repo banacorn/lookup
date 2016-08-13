@@ -1,44 +1,11 @@
 import * as P from "parsimmon";
-import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { AST, RawText } from "./../type";
+import { Parser } from "parsimmon";
+import { AST, RawText, ParsedParagraph } from "./../type";
 import { before, beforeWhich, muchoPrim } from "./combinator";
 // import { inspect } from "util";
 // import "colors";
 
-
-// Type smart constructors
-
-const plain = (s: string) => <AST.Plain>{
-    kind: "plain",
-    text: s
-}
-
-const italic = (xs: AST.Inline[]) => <AST.Italic>{
-    kind: "italic",
-    subs: xs
-}
-
-const bold = (xs: AST.Inline[]) => <AST.Bold>{
-    kind: "bold",
-    subs: xs
-}
-
-const link = (xs: AST.Inline[]) => <AST.Link>{
-    kind: "link",
-    subs: xs
-}
-
-const parameter = (x: string, xs: AST.Inline[]) => <AST.Parameter>{
-    name: x,
-    value: xs
-}
-
-const template = (x: string, xs: AST.Parameter[]) => <AST.Template>{
-    kind: "template",
-    name: x,
-    params: xs
-}
 
 
 // Bit order: template, link, bold, italic
@@ -172,7 +139,7 @@ const parseFreeLink: Parser<AST.Link> = P.seq(
     ).map((chunk) => {
         return <AST.Link>{
             kind: "link",
-            subs: [plain(chunk[1])]
+            subs: [AST.plain(chunk[1])]
         };
     });
 
@@ -200,7 +167,7 @@ const parseARLHideParentheses: Parser<AST.Link> = P.seq(
     ).map((chunk) => {
         return <AST.Link>{
             kind: "link",
-            subs: [plain(chunk[0].trim())]
+            subs: [AST.plain(chunk[0].trim())]
         };
     });
 
@@ -212,7 +179,7 @@ const parseARLHideComma: Parser<AST.Link> = P.seq(
     ).map((chunk) => {
         return <AST.Link>{
             kind: "link",
-            subs: [plain(chunk[0].trim())]
+            subs: [AST.plain(chunk[0].trim())]
         };
     });
 
@@ -224,7 +191,7 @@ const parseARLHideNamespace: Parser<AST.Link> = P.seq(
     ).map((chunk) => {
         return <AST.Link>{
             kind: "link",
-            subs: [plain(chunk[2])]
+            subs: [AST.plain(chunk[2])]
         };
     });
 
@@ -343,6 +310,78 @@ function parseTemplate(allowed: AllowedParsers): Parser<AST.Template> {
     ));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Paragraph
+////////////////////////////////////////////////////////////////////////////////
+
+function parseParagraph(text: RawText): ParsedParagraph {
+    const prefixRegex = /(.*)\n(#*)(\**)(\:*) ?(.*)/;
+    const result = parseElements.parse(text);
+    if (result.status) {
+        const prefixes = result.value.map((element, i) => {
+            if (element.kind === "plain") {
+                const match = element.text.match(prefixRegex)
+                if (match) {
+                    return {
+                        oli: match[2].length,
+                        uli: match[3].length,
+                        indent: match[4].length,
+                        // the position in "result.value: Inline[]"
+                        index: i,
+                        // since the line prefix may appear in the middle of a
+                        // plain text, we need to sperate them from the prefix
+                        before: match[1],
+                        after: match[5]
+                    }
+                }
+            }
+        }).filter(x => x);
+
+        let lines: AST.Line[] = [];
+        prefixes.forEach((prefix, i) => {
+            // if there's the next index
+            //      then [prefix.after] ++ result.value[prefix.index + 1 .. nextIndex] ++ [nextIndex.before] will be a new line
+            //      else result.value[prefix.index .. ] with be a new line
+            if (i < prefixes.length - 1) {
+                const next = prefixes[i + 1];
+                const segment = result.value.slice(prefix.index + 1, next.index)
+                let mergedLine: AST.Inline[] = segment;
+                if (prefix.after)
+                    mergedLine = _.concat([AST.plain(prefix.after)], mergedLine);
+                if (next.before)
+                    mergedLine = _.concat(mergedLine, [AST.plain(next.before)]);
+                lines.push({
+                    oli: prefix.oli,
+                    uli: prefix.uli,
+                    indent: prefix.indent,
+                    line: mergedLine
+                })
+            } else {
+                const segment = result.value.slice(prefix.index + 1)
+                let mergedLine: AST.Inline[] = segment;
+                if (prefix.after)
+                    mergedLine = _.concat([AST.plain(prefix.after)], mergedLine);
+                lines.push({
+                    oli: prefix.oli,
+                    uli: prefix.uli,
+                    indent: prefix.indent,
+                    line: mergedLine
+                })
+            }
+        });
+        // return <ParseOk<AST.Line[]>>{
+        return {
+            kind: "ok",
+            value: lines
+        };
+    } else {
+        return {
+            kind: "err",
+            error: `index: ${result.index.toString()}`
+        }
+    }
+}
+
 // const parseOLI: Parser<number> = P.string("#").many().map(chunk => chunk[0].length);
 // const parseULI: Parser<number> = P.string("*").many().map(chunk => chunk[0].length);
 // const parseIndent: Parser<number> = P.string(":").many().map(chunk => chunk[0].length);
@@ -375,5 +414,5 @@ const parseElements = parseInlines(15, P.alt(P.eof));
 
 export {
     parseElements,
-    plain, italic, bold, link, parameter, template
+    parseParagraph
 }
