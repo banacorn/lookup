@@ -3,21 +3,27 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
     var __moduleName = context_1 && context_1.id;
     var _, template_1;
     var seg;
+    //
+    //  Formatter
+    //
     function extractText(fmt) {
         return fmt.map(function (x) { return x.text; }).join("");
     }
+    // make all segments italic
     function italic(fmt) {
         return fmt.map(function (seg) {
             seg.style.i = true;
             return seg;
         });
     }
+    // make all segments bold
     function bold(fmt) {
         return fmt.map(function (seg) {
             seg.style.b = true;
             return seg;
         });
     }
+    // make all segments link-like
     function link(fmt) {
         return fmt.map(function (seg) {
             seg.style.a = true;
@@ -37,6 +43,7 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
         else {
             var lastIndex = fmt.length - 1;
             var style = { i: i, b: b, a: a };
+            // the style of newly added text is the same as the last segment, simply append them
             if (_.isEqual(fmt[lastIndex].style, style)) {
                 fmt[lastIndex].text += text;
                 return fmt;
@@ -81,6 +88,9 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
         }
         return fmt;
     }
+    //
+    //  Formatting stuffs
+    //
     function formatElement(word) {
         return function (element) {
             switch (element.kind) {
@@ -117,11 +127,14 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
         };
     }
     function formatLine(line, order, word) {
+        // ### only
         var numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
+        // ends with *
         var hasBullet = line.uli > 0 && line.indent === 0;
         var bullet = "◦";
         if (line.uli % 2)
             bullet = "•";
+        // const indentSpace = 4;
         var indentLevel = line.oli + line.uli + line.indent;
         var indentation = _.repeat("  ", indentLevel);
         var formattedElements = fold([], line.line, word);
@@ -176,6 +189,9 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
                 template_1 = template_1_1;
             }],
         execute: function() {
+            //
+            //  Segment constructor
+            //
             seg = function (s, i, b, a) {
                 if (i === void 0) { i = false; }
                 if (b === void 0) { b = false; }

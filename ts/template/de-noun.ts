@@ -1,10 +1,9 @@
 import * as _ from "lodash";
-import { AST } from "../type";
+import { AST, Fmt } from "../type";
 import { sortParams } from "../template";
-// import { inspect } from "util";
-import { Fmt } from "../type";
 import * as F from "../fmt";
 
+// import { inspect } from "util";
 // const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
 
 type Gender = string;

@@ -3,13 +3,14 @@ System.register(["lodash"], function(exports_1, context_1) {
     var __moduleName = context_1 && context_1.id;
     var _;
     var h2regex, h3regex, h4regex, h5regex, interlangRegex;
+    // helper functions
     function split(text, regex) {
         var splitted = text.split(regex);
         var result = {
             paragraph: "",
             sections: []
         };
-        var index = 0;
+        var index = 0; // for enumeration
         for (var _i = 0, splitted_1 = splitted; _i < splitted_1.length; _i++) {
             var header = splitted_1[_i];
             if (index === 0) {
@@ -31,10 +32,12 @@ System.register(["lodash"], function(exports_1, context_1) {
     function removeInterLangLink(text) {
         return text.replace(/((?:\[\[\S+\:\S+\]\]\n?)+$)/g, "");
     }
+    // parses an entry into sections of structured RawText
     function parseEntry(header, text) {
         var processed = removeInterLangLink(removeComments(text));
         return parseSection(header, header, processed, [h2regex, h3regex, h4regex, h5regex]);
     }
+    // parses a piece of RawText into sections of structured RawText
     function parseSection(entryWord, header, text, regexs) {
         if (regexs.length === 0) {
             return {

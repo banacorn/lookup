@@ -2,6 +2,8 @@ System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var P, _;
+    // import "colors";
+    // import { inspect } from "util";
     function before(candidates) {
         return P.custom(function (success, failure) {
             return function (stream, i) {
@@ -41,8 +43,10 @@ System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
         });
     }
     function muchoPrim(acc, parsers, codaParser, predicate) {
+        // modify parsers to allow them to collect parsed result and then keep going
         var modifiedParsers = parsers.map(function (parser) {
             return parser.chain(function (chunk) {
+                // if the predicate is satisfied, then keep going
                 if (predicate(chunk)) {
                     return muchoPrim(_.concat(acc, [chunk]), parsers, codaParser, predicate);
                 }
@@ -51,9 +55,12 @@ System.register(["parsimmon", "lodash"], function(exports_1, context_1) {
                 }
             });
         });
+        // insert EOF parser and returns accumulated results on success
+        // modifiedParsers.unshift(codaParser.chain(() => { // shallow
         modifiedParsers.push(codaParser.chain(function () {
             return P.succeed(acc);
         }));
+        // apply modify parsers to Parsimmon.alt
         return P.alt.apply(P.alt, modifiedParsers);
     }
     return {

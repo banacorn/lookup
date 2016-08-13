@@ -3,6 +3,7 @@ import { fold } from "./fmt";
 // import { inspect } from "util";
 
 import deNoun from "./template/de-noun";
+import etyl from "./template/etyl";
 
 function sortParams(params: AST.Parameter[], word: string): {
     named: {
@@ -35,6 +36,7 @@ function sortParams(params: AST.Parameter[], word: string): {
 function transclude(word: string, template: AST.Template): Fmt {
     switch (template.name) {
         case "de-noun": return deNoun(word, template.params);
+        case "etyl": return etyl(word, template.params);
     }
 
     return undefined
