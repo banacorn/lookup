@@ -177,24 +177,6 @@ function formatParagraph(result: ParsedParagraph): Fmt {
     }
 }
 
-// function formatSection(section: Section<ParsedParagraph>): Section<Fmt> {
-//     let fmt = [];
-//
-//     const formattedBody: Fmt[] = section.body.map((result) => {
-//         if (result.kind === "ok") {
-//             return formatParagraph(result.value);
-//         } else {
-//             return add([], "Paragraph parse error");
-//         }
-//     });
-//     return {
-//         header: section.header,
-//         body: formattedBody,
-//         subs: section.subs.map(formatSection),
-//     };
-// }
-//
-
 //
 //  Segment constructor
 //

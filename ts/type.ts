@@ -2,12 +2,6 @@ import * as _ from "lodash";
 import { AST } from "./type/ast";
 
 type RawText = string;
-type Word = string;
-
-type RawResponse = {
-    word: Word
-    text: RawText
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Entry & Section
@@ -61,7 +55,7 @@ interface ParseErr {
 export * from "./type/ast";
 export * from "./type/fmt";
 export {
-    RawResponse, RawText,
+    RawText,
     Section, ParsedParagraph, mapSection, flattenSection,
     ParseResult, ParseOk, ParseErr
 }

@@ -23,7 +23,6 @@ System.register(["lodash", "./type/ast"], function(exports_1, context_1) {
         return bodies;
     }
     var exportedNames_1 = {
-        'RawResponse': true,
         'RawText': true,
         'Section': true,
         'ParsedParagraph': true,

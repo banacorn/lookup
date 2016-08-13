@@ -185,23 +185,6 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
                 template_1 = template_1_1;
             }],
         execute: function() {
-            // function formatSection(section: Section<ParsedParagraph>): Section<Fmt> {
-            //     let fmt = [];
-            //
-            //     const formattedBody: Fmt[] = section.body.map((result) => {
-            //         if (result.kind === "ok") {
-            //             return formatParagraph(result.value);
-            //         } else {
-            //             return add([], "Paragraph parse error");
-            //         }
-            //     });
-            //     return {
-            //         header: section.header,
-            //         body: formattedBody,
-            //         subs: section.subs.map(formatSection),
-            //     };
-            // }
-            //
             //
             //  Segment constructor
             //

@@ -1,6 +1,5 @@
 import { printEntry, parseAndFormat } from "./backend/browser";
 import { parseEntry } from "./parser/section";
-import { RawResponse } from "./type";
 declare var chrome: any;
 
 // default state
@@ -53,7 +52,7 @@ chrome.runtime.onConnect.addListener((port) => {
         }
     }, false);
 
-    port.onMessage.addListener((response: RawResponse) => {
+    port.onMessage.addListener((response) => {
         // clear old results
         console.clear();
         if (response) {
