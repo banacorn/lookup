@@ -1,7 +1,7 @@
-System.register(["./../type", "colors"], function(exports_1, context_1) {
+System.register(["../parser/element", "../parser/section", "../fmt", "../type", "colors"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var type_1;
+    var element_1, section_1, fmt_1, type_1;
     function printEntry(entry) {
         var sections = type_1.flattenSection(entry);
         sections.forEach(function (section) {
@@ -25,14 +25,29 @@ System.register(["./../type", "colors"], function(exports_1, context_1) {
         });
         console.log(text);
     }
+    function parseAndFormat(word, body) {
+        var rawEntry = section_1.parseEntry(word, body);
+        var parsedEntry = type_1.mapSection(element_1.parseParagraph)(rawEntry);
+        return type_1.mapSection(fmt_1.formatParagraph)(parsedEntry);
+    }
     return {
         setters:[
+            function (element_1_1) {
+                element_1 = element_1_1;
+            },
+            function (section_1_1) {
+                section_1 = section_1_1;
+            },
+            function (fmt_1_1) {
+                fmt_1 = fmt_1_1;
+            },
             function (type_1_1) {
                 type_1 = type_1_1;
             },
             function (_1) {}],
         execute: function() {
             exports_1("printEntry", printEntry);
+            exports_1("parseAndFormat", parseAndFormat);
         }
     }
 });

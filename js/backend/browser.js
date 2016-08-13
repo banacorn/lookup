@@ -4,20 +4,28 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
     var _, element_1, section_1, fmt_1, type_1;
     function isPartOfSpeech(name) {
         return _.includes([
+            // Parts of speech:
             "Adjective", "Adverb", "Ambiposition", "Article", "Circumposition",
             "Classifier", "Conjunction", "Contraction", "Counter", "Determiner",
             "Interjection", "Noun", "Numeral", "Participle", "Particle",
             "Postposition", "Preposition", "Pronoun", "Proper noun", "Verb",
+            // Morphemes:
             "Circumfix", "Combining form", "Infix", "Interfix", "Prefix",
             "Root", "Suffix",
+            // Symbols and characters:
             "Diacritical mark", "Letter", "Ligature", "Number",
             "Punctuation mark", "Syllable", "Symbol",
+            // Phrases
             "Phrase", "Proverb", "Prepositional phrase",
+            // Han characters and language-specific varieties:
             "Han character", "Hanzi", "Kanji", "Hanja",
+            // Lojban-specific parts of speech
             "Brivla", "Cmavo", "Gismu", "Lujvo", "Rafsi",
+            // Romanization
             "Romanization"
         ], name);
     }
+    // a predicate that decides if a section should be collapsed
     function shouldCollapse(settings, name) {
         return settings.collapse[_.camelCase(name)]
             || (settings.collapse.partOfSpeech && isPartOfSpeech(name));
@@ -29,6 +37,7 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
             console.group(name);
     }
     function printSection(settings, section) {
+        // let formatted = formatSection(section);
         if (section.body.length) {
             section.body.forEach(function (paragraph) {
                 printFmt(paragraph);
@@ -43,11 +52,14 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
         }
     }
     function printEntry(settings, entry) {
+        // if there's such entry
         if (entry) {
+            // display all languages
             if (settings.displayAllLanguages) {
                 printSection(settings, entry);
             }
             else {
+                // find the specified language (nullable)
                 var languageEntry = _.find(entry.subs, { header: settings.language });
                 if (languageEntry) {
                     printSection(settings, languageEntry);
@@ -62,7 +74,9 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
         }
     }
     function printFmt(fmt) {
+        // texts interspersed by style placeholders "%c"
         var texts = "%c" + fmt.map(function (x) { return x.text; }).join("%c");
+        // translate style tags to css
         var styles = fmt.map(function (seg) {
             var css = "";
             if (seg.style.i)
@@ -73,6 +87,7 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
                 css += "text-decoration; underline;";
             return css;
         });
+        // print it all out
         console.log.apply(console, [texts].concat(styles));
     }
     function parseAndFormat(word, body) {
