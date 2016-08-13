@@ -9,6 +9,7 @@ type RawText = string;
 
 type ParsedParagraph = ParseResult<AST.Paragraph>;
 type Section<T> = {
+    entryWord: string,
     header: string,
     body: T[],
     subs: Section<T>[]
@@ -17,6 +18,7 @@ type Section<T> = {
 function mapSection<T, U>(f :(t: T) => U): ((t: Section<T>) => Section<U>) {
     return function(section: Section<T>): Section<U> {
         return {
+            entryWord: section.entryWord,
             header: section.header,
             body: section.body.map(f),
             subs: section.subs.map(mapSection(f))

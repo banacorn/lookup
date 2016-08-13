@@ -45,13 +45,14 @@ function removeInterLangLink(text: RawText): RawText {
 // parses an entry into sections of structured RawText
 function parseEntry(header: string, text: RawText): Section<RawText> {
     const processed = removeInterLangLink(removeComments(text));
-    return parseSection(header, processed, [h2regex, h3regex, h4regex, h5regex]);
+    return parseSection(header, header, processed, [h2regex, h3regex, h4regex, h5regex]);
 }
 
 // parses a piece of RawText into sections of structured RawText
-function parseSection(header: string, text: RawText, regexs: RegExp[]): Section<RawText> {
+function parseSection(entryWord: string, header: string, text: RawText, regexs: RegExp[]): Section<RawText> {
     if (regexs.length === 0) {
         return {
+            entryWord: entryWord,
             header: header,
             body: text
                 .split(/\n\n/)
@@ -61,6 +62,7 @@ function parseSection(header: string, text: RawText, regexs: RegExp[]): Section<
         };
     } else {
         let result = {
+            entryWord: entryWord,
             header: header,
             body: undefined,
             subs: []
@@ -75,7 +77,7 @@ function parseSection(header: string, text: RawText, regexs: RegExp[]): Section<
                     .map((text) => "\n" + text);
             }
             if (index % 2 === 1) {
-                result.subs.push(parseSection(chunk, splittedChunks[index + 1], _.tail(regexs)));
+                result.subs.push(parseSection(entryWord, chunk, splittedChunks[index + 1], _.tail(regexs)));
             }
             index++;
         }

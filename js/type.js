@@ -5,6 +5,7 @@ System.register(["lodash", "./type/ast"], function(exports_1, context_1) {
     function mapSection(f) {
         return function (section) {
             return {
+                entryWord: section.entryWord,
                 header: section.header,
                 body: section.body.map(f),
                 subs: section.subs.map(mapSection(f))

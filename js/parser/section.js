@@ -35,12 +35,13 @@ System.register(["lodash"], function(exports_1, context_1) {
     // parses an entry into sections of structured RawText
     function parseEntry(header, text) {
         var processed = removeInterLangLink(removeComments(text));
-        return parseSection(header, processed, [h2regex, h3regex, h4regex, h5regex]);
+        return parseSection(header, header, processed, [h2regex, h3regex, h4regex, h5regex]);
     }
     // parses a piece of RawText into sections of structured RawText
-    function parseSection(header, text, regexs) {
+    function parseSection(entryWord, header, text, regexs) {
         if (regexs.length === 0) {
             return {
+                entryWord: entryWord,
                 header: header,
                 body: text
                     .split(/\n\n/)
@@ -51,6 +52,7 @@ System.register(["lodash"], function(exports_1, context_1) {
         }
         else {
             var result = {
+                entryWord: entryWord,
                 header: header,
                 body: undefined,
                 subs: []
@@ -66,7 +68,7 @@ System.register(["lodash"], function(exports_1, context_1) {
                         .map(function (text) { return "\n" + text; });
                 }
                 if (index % 2 === 1) {
-                    result.subs.push(parseSection(chunk, splittedChunks[index + 1], _.tail(regexs)));
+                    result.subs.push(parseSection(entryWord, chunk, splittedChunks[index + 1], _.tail(regexs)));
                 }
                 index++;
             }
