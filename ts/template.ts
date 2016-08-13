@@ -1,10 +1,10 @@
-import { Inline, Fmt } from "./type";
-// import { inspect } from "util";
+import { AST, Fmt } from "./type";
 import { extractText, fold } from "./fmt";
+// import { inspect } from "util";
 
 import deNoun from "./template/de-noun";
 
-function sortParams(params: Inline.Parameter[]): {
+function sortParams(params: AST.Parameter[]): {
     named: {
         name: string,
         value: Fmt
@@ -32,7 +32,7 @@ function sortParams(params: Inline.Parameter[]): {
 
 
 // https://en.wiktionary.org/wiki/Template:de-noun
-function transclude(word: string, template: Inline.Template): Fmt {
+function transclude(word: string, template: AST.Template): Fmt {
     switch (template.name) {
         case "de-noun": return deNoun(word, template.params);
     }

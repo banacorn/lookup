@@ -1,7 +1,7 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { Line, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../type";
+import { AST, RawText, ParseResult, ParseOk, ParseErr } from "./../type";
 import { parseElements, plain } from "./element";
 
 const h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;
@@ -10,7 +10,7 @@ const h4regex = /\=\=\=\=([^\=]+)\=\=\=\=\s/g;
 const h5regex = /\=\=\=\=\=([^\=]+)\=\=\=\=\=\s/g;
 const interlangRegex = /((?:\[\[\w+\:[^\]]*\]\]\n)*)$/
 
-function collectSections(header: string, text: RawText, regexs: RegExp[]): Section {
+function collectSections(header: string, text: RawText, regexs: RegExp[]): AST.Section {
     if (regexs.length === 0) {
         return {
             header: header,
@@ -39,13 +39,13 @@ function collectSections(header: string, text: RawText, regexs: RegExp[]): Secti
 }
 
 // remove inter language links
-function parseEntry(header: string, text: RawText): Section {
+function parseEntry(header: string, text: RawText): AST.Section {
     const result = text.match(interlangRegex);
     const trimmedText = text.substring(0, text.length - result[1].length);
     return collectSections(header, text, [h2regex, h3regex, h4regex, h5regex]);
 }
 
-function parseParagraph(text: RawText): ParseResult<Paragraph> {
+function parseParagraph(text: RawText): ParseResult<AST.Paragraph> {
     const prefixRegex = /(.*)\n(#*)(\**)(\:*) ?(.*)/;
     const result = parseElements.parse(text);
     if (result.status) {
@@ -68,7 +68,7 @@ function parseParagraph(text: RawText): ParseResult<Paragraph> {
             }
         }).filter(x => x);
 
-        let lines: Line[] = [];
+        let lines: AST.Line[] = [];
         prefixes.forEach((prefix, i) => {
             // if there's the next index
             //      then [prefix.after] ++ result.value[prefix.index + 1 .. nextIndex] ++ [nextIndex.before] will be a new line
@@ -76,7 +76,7 @@ function parseParagraph(text: RawText): ParseResult<Paragraph> {
             if (i < prefixes.length - 1) {
                 const next = prefixes[i + 1];
                 const segment = result.value.slice(prefix.index + 1, next.index)
-                let mergedLine: Inline[] = segment;
+                let mergedLine: AST.Inline[] = segment;
                 if (prefix.after)
                     mergedLine = _.concat([plain(prefix.after)], mergedLine);
                 if (next.before)
@@ -89,7 +89,7 @@ function parseParagraph(text: RawText): ParseResult<Paragraph> {
                 })
             } else {
                 const segment = result.value.slice(prefix.index + 1)
-                let mergedLine: Inline[] = segment;
+                let mergedLine: AST.Inline[] = segment;
                 if (prefix.after)
                     mergedLine = _.concat([plain(prefix.after)], mergedLine);
                 lines.push({
@@ -100,7 +100,7 @@ function parseParagraph(text: RawText): ParseResult<Paragraph> {
                 })
             }
         });
-        return <ParseOk<Line[]>>{
+        return <ParseOk<AST.Line[]>>{
             kind: "ok",
             value: lines
         };
@@ -123,7 +123,7 @@ function removeInterLangLink(text: RawText): RawText {
 }
 
 
-function parseParagraphs(text: RawText): ParseResult<Paragraph>[] {
+function parseParagraphs(text: RawText): ParseResult<AST.Paragraph>[] {
     return removeInterLangLink(removeComments(text))
         .split(/\n\n/)
         .filter((text) => text.trim())
@@ -133,7 +133,7 @@ function parseParagraphs(text: RawText): ParseResult<Paragraph>[] {
 
 function split(text: RawText, regex: RegExp): {
     paragraph: string,
-    sections: Section[]
+    sections: AST.Section[]
 } {
     const splitted = text.split(regex);
     let result = {

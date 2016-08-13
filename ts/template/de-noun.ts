@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { Inline } from "../type";
+import { AST } from "../type";
 import { plain } from "../parser/element";
 import { sortParams } from "../template";
 // import { inspect } from "util";
@@ -15,7 +15,7 @@ type Diminutive = string;
 type GenderedForm = string;
 
 // {{de-noun|Gender|Genitive|Plural|Diminutive|Gendered forms}}
-function deNoun(word: string, raw: Inline.Parameter[]): Fmt {
+function deNoun(word: string, raw: AST.Parameter[]): Fmt {
     const {named, unnamed} = sortParams(raw);
     let result = [F.seg(`${word} `, false, true)];
 

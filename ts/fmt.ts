@@ -1,6 +1,6 @@
 // import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../type";
 import * as _ from "lodash";
-import { Fmt, Seg, Inline, Line, Paragraph, Section } from "./type";
+import { Fmt, Seg, AST } from "./type";
 import { transclude } from "./template";
 
 let WORD;
@@ -95,7 +95,7 @@ function concat(a: Fmt, b: Fmt): Fmt {
     }
 }
 
-function fold(fmt: Fmt, elements: Inline[], f?: (x: Fmt) => Fmt): Fmt {
+function fold(fmt: Fmt, elements: AST.Inline[], f?: (x: Fmt) => Fmt): Fmt {
     if (f) {
         elements.forEach((e) => {
             fmt = concat(fmt, f(formatElement(e)));
@@ -112,7 +112,7 @@ function fold(fmt: Fmt, elements: Inline[], f?: (x: Fmt) => Fmt): Fmt {
 //  Formatting stuffs
 //
 
-function formatElement(element: Inline): Fmt {
+function formatElement(element: AST.Inline): Fmt {
     switch (element.kind) {
         case "plain":
             let fmt = [];
@@ -145,7 +145,7 @@ function formatElement(element: Inline): Fmt {
 }
 
 
-function formatLine(line: Line, order: number): Fmt {
+function formatLine(line: AST.Line, order: number): Fmt {
     // ### only
     const numbered = line.oli > 0 && line.uli === 0 && line.indent === 0;
     // ends with *
@@ -177,7 +177,7 @@ function formatLine(line: Line, order: number): Fmt {
 }
 
 
-function formatParagraph(paragraph: Paragraph, word: string = "Unknown Entry"): Fmt {
+function formatParagraph(paragraph: AST.Paragraph, word: string = "Unknown Entry"): Fmt {
     WORD = word;
 
     let fmt = [];
@@ -197,7 +197,7 @@ function formatParagraph(paragraph: Paragraph, word: string = "Unknown Entry"): 
     return fmt;
 }
 
-function formatSection(section: Section): Fmt {
+function formatSection(section: AST.Section): Fmt {
     let fmt = [];
     section.body.forEach((result) => {
         if (result.kind === "ok") {
@@ -247,7 +247,7 @@ function printHeader(settings: any, name: string) {
         console.group(name);
 }
 
-function printSection(settings: any, section: Section) {
+function printSection(settings: any, section: AST.Section) {
     let formatted = formatSection(section);
     if (formatted.length)
         printFmt(formatted);
@@ -259,7 +259,7 @@ function printSection(settings: any, section: Section) {
     }
 }
 
-function printEntry(settings: any, entry: Section) {
+function printEntry(settings: any, entry: AST.Section) {
     WORD = entry.header;
     // if there's such entry
     if (entry) {

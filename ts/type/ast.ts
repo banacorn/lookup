@@ -1,31 +1,34 @@
-//
-// Block elements
-//
+import { ParseResult } from "../type";
 
-type Section = {
-    header: string,
-    body: ParseResult<Paragraph>[],
-    subs: Section[]
-}
+namespace AST {
+    //
+    // Block elements
+    //
 
-type Paragraph = Line[];
+    export type Section = {
+        header: string,
+        body: ParseResult<Paragraph>[],
+        subs: Section[]
+    }
 
-type Line = {
-    oli: number,
-    uli: number,
-    indent: number,
-    line: Inline[]
-}
+    export type Paragraph = Line[];
 
-//
-//  Inline elements
-//
-type Inline = Inline.Plain
-    | Inline.Bold
-    | Inline.Italic
-    | Inline.Link
-    | Inline.Template;
-namespace Inline {
+    export type Line = {
+        oli: number,
+        uli: number,
+        indent: number,
+        line: Inline[]
+    }
+
+    //
+    //  Inline elements
+    //
+    export type Inline = Plain
+        | Bold
+        | Italic
+        | Link
+        | Template;
+
     export interface Plain {
         kind: "plain";
         text: string;
@@ -58,39 +61,6 @@ namespace Inline {
     }
 }
 
-
-//
-//  Formatter
-//
-
-type Style = {
-    i: boolean,     // italic
-    b: boolean,     // bold
-    a: boolean      // link
-};
-
-type Seg = {
-    text: string,
-    style: Style
-};
-
-type Fmt = Seg[];
-
-//
-//  Freaking Either
-//
-type ParseResult<T> = ParseOk<T> | ParseErr;
-
-interface ParseOk<T> {
-    kind: "ok";
-    value: T;
-}
-
-interface ParseErr {
-    kind: "err";
-    error: string;
-}
-
 export {
-    Inline, Line, Section, Paragraph,
-}
+    AST
+};
