@@ -1,7 +1,7 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { Line, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../types";
+import { Line, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../type";
 import { parseElements, plain } from "./element";
 
 const h2regex = /(?:\s\s\-\-\-\-\s\s)?\=\=([^\=]+)\=\=\s/g;

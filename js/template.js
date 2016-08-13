@@ -1,25 +1,45 @@
-System.register(["./parser/element"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/de-noun"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var element_1;
-    function deNoun(params) {
-        console.log(params);
-        return [element_1.plain("hey")];
+    var fmt_1, de_noun_1;
+    function sortParams(params) {
+        var unnamed = [];
+        var named = [];
+        params.forEach(function (param) {
+            var valueFmt = fmt_1.fold([], param.value);
+            if (param.name === "") {
+                unnamed.push(valueFmt);
+            }
+            else {
+                named.push({
+                    name: param.name,
+                    value: valueFmt
+                });
+            }
+        });
+        return {
+            named: named,
+            unnamed: unnamed
+        };
     }
     // https://en.wiktionary.org/wiki/Template:de-noun
-    function transclude(template) {
+    function transclude(word, template) {
         switch (template.name) {
-            case "de-noun": return deNoun(template.params);
+            case "de-noun": return de_noun_1.default(word, template.params);
         }
         return undefined;
     }
     return {
         setters:[
-            function (element_1_1) {
-                element_1 = element_1_1;
+            function (fmt_1_1) {
+                fmt_1 = fmt_1_1;
+            },
+            function (de_noun_1_1) {
+                de_noun_1 = de_noun_1_1;
             }],
         execute: function() {
             exports_1("transclude", transclude);
+            exports_1("sortParams", sortParams);
         }
     }
 });

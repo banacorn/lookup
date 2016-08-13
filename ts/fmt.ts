@@ -1,7 +1,10 @@
-// import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../types";
+// import { Fmt, Paragraph, Section, RawText, ParseResult, ParseOk, ParseErr, Inline } from "./../type";
 import * as _ from "lodash";
-import { Fmt, Inline, Line, Paragraph, Section } from "./types";
+import { Fmt, Seg, Inline, Line, Paragraph, Section } from "./type";
 import { transclude } from "./template";
+
+let WORD;
+
 //
 //  Formatter
 //
@@ -121,9 +124,9 @@ function formatElement(element: Inline): Fmt {
         case "link":
             return fold([], element.subs, link);
         case "template":
-            const transclusion = transclude(element);
+            const transclusion = transclude(WORD, element);
             if (transclusion) {
-                return fold([], transclusion);
+                return transclusion;
             } else {
                 fmt = add([], `{{${element.name}`);
                 element.params.forEach((param) => {
@@ -174,7 +177,9 @@ function formatLine(line: Line, order: number): Fmt {
 }
 
 
-function formatParagraph(paragraph: Paragraph): Fmt {
+function formatParagraph(paragraph: Paragraph, word: string = "Unknown Entry"): Fmt {
+    WORD = word;
+
     let fmt = [];
 
     let order = [1];
@@ -255,6 +260,7 @@ function printSection(settings: any, section: Section) {
 }
 
 function printEntry(settings: any, entry: Section) {
+    WORD = entry.header;
     // if there's such entry
     if (entry) {
         // display all languages
@@ -274,12 +280,29 @@ function printEntry(settings: any, entry: Section) {
     }
 }
 
+//
+//  Segment constructor
+//
+
+const seg = (s: string, i: boolean = false, b: boolean = false, a: boolean = false) => <Seg>{
+    text: s,
+    style: { i: i, b: b, a: a }
+}
+
 
 export {
-    extractText,
     formatElement,
     formatLine,
     formatParagraph,
     formatSection,
+
+
+    seg,
+
+    concat,
+    add,
+    extractText,
+    fold,
+
     printEntry
 }

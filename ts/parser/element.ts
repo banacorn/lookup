@@ -1,7 +1,7 @@
 import * as P from "parsimmon";
 import { Parser } from "parsimmon";
 import * as _ from "lodash";
-import { Inline, Line, RawText } from "./../types";
+import { Inline, Line, RawText } from "./../type";
 import { before, beforeWhich, muchoPrim } from "./combinator";
 // import { inspect } from "util";
 // import "colors";

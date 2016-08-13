@@ -2,6 +2,7 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var _, template_1;
+    var WORD, seg;
     //
     //  Formatter
     //
@@ -119,9 +120,9 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
             case "link":
                 return fold([], element.subs, link);
             case "template":
-                var transclusion = template_1.transclude(element);
+                var transclusion = template_1.transclude(WORD, element);
                 if (transclusion) {
-                    return fold([], transclusion);
+                    return transclusion;
                 }
                 else {
                     fmt_1 = add([], "{{" + element.name);
@@ -171,7 +172,9 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
                 }], formattedElements);
         }
     }
-    function formatParagraph(paragraph) {
+    function formatParagraph(paragraph, word) {
+        if (word === void 0) { word = "Unknown Entry"; }
+        WORD = word;
         var fmt = [];
         var order = [1];
         paragraph.forEach(function (line) {
@@ -246,6 +249,7 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
         }
     }
     function printEntry(settings, entry) {
+        WORD = entry.header;
         // if there's such entry
         if (entry) {
             // display all languages
@@ -276,11 +280,27 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
                 template_1 = template_1_1;
             }],
         execute: function() {
-            exports_1("extractText", extractText);
+            //
+            //  Segment constructor
+            //
+            seg = function (s, i, b, a) {
+                if (i === void 0) { i = false; }
+                if (b === void 0) { b = false; }
+                if (a === void 0) { a = false; }
+                return {
+                    text: s,
+                    style: { i: i, b: b, a: a }
+                };
+            };
             exports_1("formatElement", formatElement);
             exports_1("formatLine", formatLine);
             exports_1("formatParagraph", formatParagraph);
             exports_1("formatSection", formatSection);
+            exports_1("seg", seg);
+            exports_1("concat", concat);
+            exports_1("add", add);
+            exports_1("extractText", extractText);
+            exports_1("fold", fold);
             exports_1("printEntry", printEntry);
         }
     }

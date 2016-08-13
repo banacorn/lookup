@@ -1,10 +1,6 @@
-type RawText = string;
-type Word = string;
-
-type RawResponse = {
-    word: Word
-    text: RawText
-};
+//
+// Block elements
+//
 
 type Section = {
     header: string,
@@ -97,6 +93,4 @@ interface ParseErr {
 
 export {
     Inline, Line, Section, Paragraph,
-    RawResponse, Fmt, Seg, RawText,
-    ParseResult, ParseOk, ParseErr
 }
