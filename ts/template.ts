@@ -12,6 +12,7 @@ import etyl from "./template/etyl";
 import head from "./template/head";
 import homophones from "./template/homophones";
 import hyphenation from "./template/hyphenation";
+import label from "./template/label";
 import m from "./template/m";
 import ipa from "./template/ipa";
 import rhymes from "./template/rhymes";
@@ -56,6 +57,10 @@ function transclude(word: string, template: AST.Template): Fmt {
         case "head": return head(word, template.params);
         case "homophones": return homophones(word, template.params);
         case "hyphenation": return hyphenation(word, template.params);
+        case "lb":
+        case "lbl":
+        case "lable":
+            return label(word, template.params);
         case "m": return m(word, template.params);
         case "IPA": return ipa(word, template.params);
         case "rhymes": return rhymes(word, template.params);
