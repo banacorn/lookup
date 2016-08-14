@@ -3,7 +3,8 @@ import { AST, Fmt } from "../type";
 import { sortParams } from "../template";
 import * as F from "../fmt";
 
-// {{IPA|pronunciation 1|pronunciation 2|pronunciation 3|lang=en}}
+// https://en.wiktionary.org/wiki/Template:rhymes
+// {{rhymes|ɪsən|lang=en}}
 function rhymes(word: string, raw: AST.Parameter[]): Fmt {
     const {named, unnamed} = sortParams(raw, word);
 
