@@ -1,10 +1,9 @@
-System.register(["lodash", "../template", "../fmt"], function(exports_1, context_1) {
+System.register(["lodash", "../fmt"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, template_1, F;
+    var _, F;
     // {{de-noun|Gender|Genitive|Plural|Diminutive|Gendered forms}}
-    function deNoun(word, raw) {
-        var _a = template_1.sortParams(raw, word), named = _a.named, unnamed = _a.unnamed;
+    function deNoun(word, named, unnamed) {
         var result = [F.seg(word + " ", false, true)];
         //  == Gender ==
         //  "Use m as the first parameter to indicate masculine gender, f for
@@ -176,9 +175,6 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         setters:[
             function (_1) {
                 _ = _1;
-            },
-            function (template_1_1) {
-                template_1 = template_1_1;
             },
             function (F_1) {
                 F = F_1;

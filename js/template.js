@@ -1,7 +1,7 @@
-System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/mention", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, m_1, ipa_1, rhymes_1;
+    var fmt_1, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, mention_1, ipa_1, rhymes_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
@@ -24,24 +24,27 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
     }
     // https://en.wiktionary.org/wiki/Template:de-noun
     function transclude(word, template) {
+        var _a = sortParams(template.params, word), named = _a.named, unnamed = _a.unnamed;
         switch (template.name) {
-            case "a": return a_1.default(word, template.params);
-            case "audio": return audio_1.default(word, template.params);
-            case "de-noun": return de_noun_1.default(word, template.params);
-            case "de-verb form of": return de_verb_form_of_1.default(word, template.params);
-            case "de-form-adj": return de_form_adj_1.default(word, template.params);
-            case "de-inflected form of": return de_inflected_form_of_1.default(word, template.params);
-            case "etyl": return etyl_1.default(word, template.params);
-            case "head": return head_1.default(word, template.params);
-            case "homophones": return homophones_1.default(word, template.params);
-            case "hyphenation": return hyphenation_1.default(word, template.params);
+            case "a": return a_1.default(word, named, unnamed);
+            case "audio": return audio_1.default(word, named, unnamed);
+            case "de-noun": return de_noun_1.default(word, named, unnamed);
+            case "de-verb form of": return de_verb_form_of_1.default(word, named, unnamed);
+            case "de-form-adj": return de_form_adj_1.default(word, named, unnamed);
+            case "de-inflected form of": return de_inflected_form_of_1.default(word, named, unnamed);
+            case "etyl": return etyl_1.default(word, named, unnamed);
+            case "head": return head_1.default(word, named, unnamed);
+            case "homophones": return homophones_1.default(word, named, unnamed);
+            case "hyphenation": return hyphenation_1.default(word, named, unnamed);
             case "lb":
             case "lbl":
             case "lable":
-                return label_1.default(word, template.params);
-            case "m": return m_1.default(word, template.params);
-            case "IPA": return ipa_1.default(word, template.params);
-            case "rhymes": return rhymes_1.default(word, template.params);
+                return label_1.default(word, named, unnamed);
+            case "m":
+            case "mention":
+                return mention_1.default(word, named, unnamed);
+            case "IPA": return ipa_1.default(word, named, unnamed);
+            case "rhymes": return rhymes_1.default(word, named, unnamed);
         }
         return undefined;
     }
@@ -83,8 +86,8 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             function (label_1_1) {
                 label_1 = label_1_1;
             },
-            function (m_1_1) {
-                m_1 = m_1_1;
+            function (mention_1_1) {
+                mention_1 = mention_1_1;
             },
             function (ipa_1_1) {
                 ipa_1 = ipa_1_1;

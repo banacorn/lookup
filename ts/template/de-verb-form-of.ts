@@ -1,12 +1,10 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 
 // https://en.wiktionary.org/wiki/Template:de-verb_form_of
 // {{de-verb form of|1|2|3|4}}
-function deVerbFormOf(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function deVerbFormOf(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [];
 
     const infinitive = F.extractText(unnamed[0]);

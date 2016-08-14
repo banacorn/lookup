@@ -1,13 +1,10 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 
 // https://en.wiktionary.org/wiki/Template:hyphenation
 // {{hyphenation|knowl|edge|caption=Hyphenation US|lang=en}}
-function hyphenation(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
-
+function hyphenation(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [];
 
     const caption = _.find(named, ["name", "caption"]);

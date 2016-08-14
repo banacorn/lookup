@@ -4,7 +4,7 @@ System.register(["../fmt"], function(exports_1, context_1) {
     var F;
     // https://en.wiktionary.org/wiki/Template:audio
     // {{audio|<name of sound file>|<text to use as link to soundfile>|lang=<language code>}}
-    function audio(word, raw) {
+    function audio(word, named, unnamed) {
         return [F.seg("\uD83D\uDD0A")];
     }
     return {

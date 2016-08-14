@@ -41,15 +41,15 @@ namespace AST {
         subs: Inline[];
     }
 
-    export type Parameter = {
+    export type Parameter<T> = {
         name: string,
-        value: Inline[]
+        value: T[]
     };
 
     export interface Template {
         kind: "template";
         name: string;
-        params: Parameter[]
+        params: Parameter<Inline>[]
     }
 
 
@@ -74,12 +74,12 @@ namespace AST {
         subs: xs
     }
 
-    export const parameter = (x: string, xs: AST.Inline[]) => <AST.Parameter>{
+    export const parameter = (x: string, xs: AST.Inline[]) => <AST.Parameter<AST.Inline>>{
         name: x,
         value: xs
     }
 
-    export const template = (x: string, xs: AST.Parameter[]) => <AST.Template>{
+    export const template = (x: string, xs: AST.Parameter<AST.Inline>[]) => <AST.Template>{
         kind: "template",
         name: x,
         params: xs

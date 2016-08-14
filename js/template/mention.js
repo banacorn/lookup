@@ -1,9 +1,9 @@
-System.register(["lodash", "../template", "../fmt"], function(exports_1, context_1) {
+System.register(["lodash", "../fmt"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, template_1, F;
-    function m(word, raw) {
-        var _a = template_1.sortParams(raw, word), named = _a.named, unnamed = _a.unnamed;
+    var _, F;
+    // {{m|language|link|link_text|translation|tr=transliteration|lit=literal_translation|pos=part_of_speech}}
+    function mention(word, named, unnamed) {
         var language = unnamed[0];
         var link = unnamed[1];
         var linkText = unnamed[2];
@@ -11,14 +11,17 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         var transliteration = _.find(named, ["name", "tr"]);
         var partOfSpeech = _.find(named, ["name", "pos"]);
         var showedText = [];
+        // showed text
         if (F.extractText(linkText))
             showedText = F.concat(showedText, F.link(F.italic(linkText)));
         else if (F.extractText(link))
             showedText = F.concat(showedText, F.link(F.italic(link)));
         var inParentheses = [F.seg(" (")];
+        // transliteration
         if (transliteration && F.extractText(transliteration.value)) {
             inParentheses = F.add(inParentheses, "" + F.extractText(transliteration.value));
         }
+        // translation
         if (F.extractText(translation)) {
             if (inParentheses.length > 1)
                 inParentheses = F.add(inParentheses, ", ");
@@ -26,6 +29,7 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
             inParentheses = F.concat(inParentheses, F.italic(translation));
             inParentheses = F.add(inParentheses, "\u201D");
         }
+        // part of speech
         if (partOfSpeech && F.extractText(partOfSpeech.value)) {
             if (inParentheses.length > 1)
                 inParentheses = F.add(inParentheses, ", ");
@@ -47,6 +51,7 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
                     break;
             }
         }
+        // // literal translation
         if (transliteration && F.extractText(transliteration.value)) {
             if (inParentheses.length > 1)
                 inParentheses = F.add(inParentheses, ", ");
@@ -63,14 +68,11 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
             function (_1) {
                 _ = _1;
             },
-            function (template_1_1) {
-                template_1 = template_1_1;
-            },
             function (F_1) {
                 F = F_1;
             }],
         execute: function() {
-            exports_1("default",m);
+            exports_1("default",mention);
         }
     }
 });

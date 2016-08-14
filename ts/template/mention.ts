@@ -1,15 +1,10 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
-// import { inspect } from "util";
-// const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
 
 // {{m|language|link|link_text|translation|tr=transliteration|lit=literal_translation|pos=part_of_speech}}
 
-function m(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
-
+function mention(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     const language = unnamed[0];
     const link = unnamed[1];
     const linkText = unnamed[2];
@@ -79,4 +74,4 @@ function m(word: string, raw: AST.Parameter[]): Fmt {
 }
 
 
-export default m;
+export default mention;

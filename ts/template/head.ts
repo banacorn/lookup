@@ -1,6 +1,5 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 import { inspect } from "util";
 
@@ -8,9 +7,7 @@ import { inspect } from "util";
 
 // https://en.wiktionary.org/wiki/Template:head
 // {{IPA|pronunciation 1|pronunciation 2|pronunciation 3|lang=en}}
-function head(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
-
+function head(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [];
 
     const headword = _.find(named, ["name", "head"]);
@@ -30,7 +27,7 @@ function head(word: string, raw: AST.Parameter[]): Fmt {
     const dealtNamed = [
         { name: "head" }
     ];
-    _.pullAllBy(named, dealtNamed, "name").forEach((pair: AST.Parameter) => {
+    _.pullAllBy(named, dealtNamed, "name").forEach((pair: AST.Parameter<AST.Inline>) => {
         undealt += `|${pair.name} = ${F.extractText(F.fold([], pair.value, word))}`;
     })
     undealt += `}}`;

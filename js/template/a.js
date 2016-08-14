@@ -1,12 +1,11 @@
-System.register(["../template", "../fmt"], function(exports_1, context_1) {
+System.register(["../fmt"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var template_1, F;
+    var F;
     var simpleCodeName;
     // https://en.wiktionary.org/wiki/Template:accent
     // {{a|US|Canada}}
-    function a(word, raw) {
-        var _a = template_1.sortParams(raw, word), named = _a.named, unnamed = _a.unnamed;
+    function a(word, named, unnamed) {
         var complexCodeName = {
             "cot-caught": [F.seg("cot", true), F.seg("–"), F.seg("caught", true), F.seg(" merger")],
             "caught-cot": [F.seg("cot", true), F.seg("–"), F.seg("caught", true), F.seg(" merger")],
@@ -42,9 +41,6 @@ System.register(["../template", "../fmt"], function(exports_1, context_1) {
     }
     return {
         setters:[
-            function (template_1_1) {
-                template_1 = template_1_1;
-            },
             function (F_1) {
                 F = F_1;
             }],

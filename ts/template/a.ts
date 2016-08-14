@@ -1,6 +1,5 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import { seg } from "../fmt";
 import * as F from "../fmt";
 
@@ -107,8 +106,7 @@ const simpleCodeName = {
 
 // https://en.wiktionary.org/wiki/Template:accent
 // {{a|US|Canada}}
-function a(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function a(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
 
     const complexCodeName = {
         "cot-caught": [F.seg("cot", true), F.seg("–"), F.seg("caught", true), F.seg(" merger")],

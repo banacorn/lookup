@@ -1,6 +1,5 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 
 // import { inspect } from "util";
@@ -13,8 +12,7 @@ type Diminutive = string;
 type GenderedForm = string;
 
 // {{de-noun|Gender|Genitive|Plural|Diminutive|Gendered forms}}
-function deNoun(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function deNoun(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [F.seg(`${word} `, false, true)];
 
     //  == Gender ==

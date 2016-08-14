@@ -253,7 +253,7 @@ function parseLink(allowed: AllowedParsers): Parser<AST.Link> {
 //
 //  Template
 //
-function parseParameter(allowed: AllowedParsers, coda: string): Parser<AST.Parameter> {
+function parseParameter(allowed: AllowedParsers, coda: string): Parser<AST.Parameter<AST.Inline>> {
     // get the string before "=" or the coda, which in case may be a name or an unnamed value
     return beforeWhich(["=", coda]).chain(([unknown, which]) => {
         if (which === "=") {    // named
@@ -264,7 +264,7 @@ function parseParameter(allowed: AllowedParsers, coda: string): Parser<AST.Param
                 }
             }));
         } else {    // unnamed, unwind and parse it with parseInlines again
-            return P.fail<AST.Parameter>("");
+            return P.fail<AST.Parameter<AST.Inline>>("");
         }
     })
     .or(parseInlines(insideTemplate(allowed), P.string(coda)).map((value) => {

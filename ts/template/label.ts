@@ -1,13 +1,11 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import { seg } from "../fmt";
 import * as F from "../fmt";
 
 // https://en.wiktionary.org/wiki/Template:label
 // {{lb|en|AU|slang}}
-function label(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function label(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
 
     let result = [seg(`(`)];
     let commaNext = false;

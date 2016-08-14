@@ -1,4 +1,4 @@
-import { AST, Fmt } from "./type";
+import { AST, Fmt, Seg } from "./type";
 import { fold } from "./fmt";
 // import { inspect } from "util";
 
@@ -13,15 +13,12 @@ import head from "./template/head";
 import homophones from "./template/homophones";
 import hyphenation from "./template/hyphenation";
 import label from "./template/label";
-import m from "./template/m";
+import mention from "./template/mention";
 import ipa from "./template/ipa";
 import rhymes from "./template/rhymes";
 
-function sortParams(params: AST.Parameter[], word: string): {
-    named: {
-        name: string,
-        value: Fmt
-    }[],
+function sortParams(params: AST.Parameter<AST.Inline>[], word: string): {
+    named: AST.Parameter<Seg>[]
     unnamed: Fmt[]
 } {
     let unnamed = [];
@@ -46,24 +43,28 @@ function sortParams(params: AST.Parameter[], word: string): {
 
 // https://en.wiktionary.org/wiki/Template:de-noun
 function transclude(word: string, template: AST.Template): Fmt {
+    const {named, unnamed} = sortParams(template.params, word);
+
     switch (template.name) {
-        case "a": return a(word, template.params);
-        case "audio": return audio(word, template.params);
-        case "de-noun": return deNoun(word, template.params);
-        case "de-verb form of": return deVerbFormOf(word, template.params);
-        case "de-form-adj": return deFormAdj(word, template.params);
-        case "de-inflected form of": return deInFlectedFormOf(word, template.params);
-        case "etyl": return etyl(word, template.params);
-        case "head": return head(word, template.params);
-        case "homophones": return homophones(word, template.params);
-        case "hyphenation": return hyphenation(word, template.params);
+        case "a": return a(word, named, unnamed);
+        case "audio": return audio(word, named, unnamed);
+        case "de-noun": return deNoun(word, named, unnamed);
+        case "de-verb form of": return deVerbFormOf(word, named, unnamed);
+        case "de-form-adj": return deFormAdj(word, named, unnamed);
+        case "de-inflected form of": return deInFlectedFormOf(word, named, unnamed);
+        case "etyl": return etyl(word, named, unnamed);
+        case "head": return head(word, named, unnamed);
+        case "homophones": return homophones(word, named, unnamed);
+        case "hyphenation": return hyphenation(word, named, unnamed);
         case "lb":
         case "lbl":
         case "lable":
-            return label(word, template.params);
-        case "m": return m(word, template.params);
-        case "IPA": return ipa(word, template.params);
-        case "rhymes": return rhymes(word, template.params);
+            return label(word, named, unnamed);
+        case "m":
+        case "mention":
+            return mention(word, named, unnamed);
+        case "IPA": return ipa(word, named, unnamed);
+        case "rhymes": return rhymes(word, named, unnamed);
     }
     return undefined
 }

@@ -1,13 +1,11 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 // import { inspect } from "util";
 // const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
 
 // {{etyl|src|dst}}
-function etyl(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function etyl(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     const src = F.extractText(unnamed[0]);
     const dst = F.extractText(unnamed[1]);
     const srcName = languageCode(src);

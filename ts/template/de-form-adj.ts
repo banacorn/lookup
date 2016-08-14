@@ -1,12 +1,10 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 
 // https://en.wiktionary.org/wiki/Template:de-form-adj
 // {{de-form-adj|s|m|g|bestimmt|nocat=1}}
-function deFormAdj(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
+function deFormAdj(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [];
 
 

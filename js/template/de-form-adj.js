@@ -1,11 +1,10 @@
-System.register(["lodash", "../template", "../fmt"], function(exports_1, context_1) {
+System.register(["lodash", "../fmt"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, template_1, F;
+    var _, F;
     // https://en.wiktionary.org/wiki/Template:de-form-adj
     // {{de-form-adj|s|m|g|bestimmt|nocat=1}}
-    function deFormAdj(word, raw) {
-        var _a = template_1.sortParams(raw, word), named = _a.named, unnamed = _a.unnamed;
+    function deFormAdj(word, named, unnamed) {
         var result = [];
         var baseForm = F.extractText(_.last(unnamed));
         var degree = _.find(named, ["name", "deg"]);
@@ -126,9 +125,6 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         setters:[
             function (_1) {
                 _ = _1;
-            },
-            function (template_1_1) {
-                template_1 = template_1_1;
             },
             function (F_1) {
                 F = F_1;

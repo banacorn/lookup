@@ -1,14 +1,11 @@
 import * as _ from "lodash";
-import { AST, Fmt } from "../type";
-import { sortParams } from "../template";
+import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
 // import { inspect } from "util";
 // const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
 
 // {{IPA|pronunciation 1|pronunciation 2|pronunciation 3|lang=en}}
-function ipa(word: string, raw: AST.Parameter[]): Fmt {
-    const {named, unnamed} = sortParams(raw, word);
-
+function ipa(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [F.seg(`IPA: `)];
 
     // pronunciations
