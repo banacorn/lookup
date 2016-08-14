@@ -1,5 +1,6 @@
+import * as _ from "lodash";
 import { AST, Fmt, Seg } from "./type";
-import { fold } from "./fmt";
+import * as F from "./fmt";
 // import { inspect } from "util";
 
 import a from "./template/a";
@@ -14,6 +15,7 @@ import homophones from "./template/homophones";
 import hyphenation from "./template/hyphenation";
 import label from "./template/label";
 import mention from "./template/mention";
+import prefix from "./template/prefix";
 import ipa from "./template/ipa";
 import rhymes from "./template/rhymes";
 
@@ -24,7 +26,7 @@ function sortParams(params: AST.Parameter<AST.Inline>[], word: string): {
     let unnamed = [];
     let named = [];
     params.forEach((param) => {
-        const valueFmt = fold([], param.value, word);
+        const valueFmt = F.fold([], param.value, word);
         if (param.name === "") {
             unnamed.push(valueFmt);
         } else {
@@ -40,6 +42,31 @@ function sortParams(params: AST.Parameter<AST.Inline>[], word: string): {
     }
 }
 
+
+function find(named: AST.Parameter<Seg>[], rawKeys: string | string[], callback: (value: Fmt) => void, fallback?: () => void) {
+
+    let keys: string[];
+    if (rawKeys instanceof Array) {
+        // normalize all keys
+        keys = rawKeys.map((key) => {
+            if (typeof key === "string") {
+                return key;
+            } else {
+                return F.extractText(key);
+            }
+        });
+    } else {
+        keys = [rawKeys]
+    }
+
+    const values = named.filter((pair) => _.includes(keys, pair.name));
+    if (_.head(values)) {
+        callback(_.head(values).value);
+    } else {
+        if (fallback)
+            fallback();
+    }
+}
 
 // https://en.wiktionary.org/wiki/Template:de-noun
 function transclude(word: string, template: AST.Template): Fmt {
@@ -63,6 +90,7 @@ function transclude(word: string, template: AST.Template): Fmt {
         case "m":
         case "mention":
             return mention(word, named, unnamed);
+        case "prefix": return prefix(word, named, unnamed);
         case "IPA": return ipa(word, named, unnamed);
         case "rhymes": return rhymes(word, named, unnamed);
     }
@@ -71,5 +99,6 @@ function transclude(word: string, template: AST.Template): Fmt {
 
 export {
     transclude,
-    sortParams
+    sortParams,
+    find
 }

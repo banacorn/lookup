@@ -1,12 +1,12 @@
-System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/mention", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
+System.register(["lodash", "./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/mention", "./template/prefix", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, mention_1, ipa_1, rhymes_1;
+    var _, F, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, mention_1, prefix_1, ipa_1, rhymes_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
         params.forEach(function (param) {
-            var valueFmt = fmt_1.fold([], param.value, word);
+            var valueFmt = F.fold([], param.value, word);
             if (param.name === "") {
                 unnamed.push(valueFmt);
             }
@@ -21,6 +21,31 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             named: named,
             unnamed: unnamed
         };
+    }
+    function find(named, rawKeys, callback, fallback) {
+        var keys;
+        if (rawKeys instanceof Array) {
+            // normalize all keys
+            keys = rawKeys.map(function (key) {
+                if (typeof key === "string") {
+                    return key;
+                }
+                else {
+                    return F.extractText(key);
+                }
+            });
+        }
+        else {
+            keys = [rawKeys];
+        }
+        var values = named.filter(function (pair) { return _.includes(keys, pair.name); });
+        if (_.head(values)) {
+            callback(_.head(values).value);
+        }
+        else {
+            if (fallback)
+                fallback();
+        }
     }
     // https://en.wiktionary.org/wiki/Template:de-noun
     function transclude(word, template) {
@@ -43,6 +68,7 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             case "m":
             case "mention":
                 return mention_1.default(word, named, unnamed);
+            case "prefix": return prefix_1.default(word, named, unnamed);
             case "IPA": return ipa_1.default(word, named, unnamed);
             case "rhymes": return rhymes_1.default(word, named, unnamed);
         }
@@ -50,8 +76,11 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
     }
     return {
         setters:[
-            function (fmt_1_1) {
-                fmt_1 = fmt_1_1;
+            function (_1) {
+                _ = _1;
+            },
+            function (F_1) {
+                F = F_1;
             },
             function (a_1_1) {
                 a_1 = a_1_1;
@@ -89,6 +118,9 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             function (mention_1_1) {
                 mention_1 = mention_1_1;
             },
+            function (prefix_1_1) {
+                prefix_1 = prefix_1_1;
+            },
             function (ipa_1_1) {
                 ipa_1 = ipa_1_1;
             },
@@ -98,6 +130,7 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
         execute: function() {
             exports_1("transclude", transclude);
             exports_1("sortParams", sortParams);
+            exports_1("find", find);
         }
     }
 });

@@ -40,6 +40,7 @@
         "ts/template/ipa.ts",
         "ts/template/label.ts",
         "ts/template/mention.ts",
+        "ts/template/prefix.ts",
         "ts/template/rhymes.ts",
         "ts/type.ts",
         "ts/type/ast.ts",
