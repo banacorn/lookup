@@ -1,7 +1,7 @@
-System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/etyl", "./template/head", "./template/homophones", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, audio_1, de_noun_1, etyl_1, head_1, homophones_1, m_1, ipa_1, rhymes_1;
+    var fmt_1, audio_1, de_noun_1, etyl_1, head_1, homophones_1, hyphenation_1, m_1, ipa_1, rhymes_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
@@ -30,6 +30,7 @@ System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/
             case "etyl": return etyl_1.default(word, template.params);
             case "head": return head_1.default(word, template.params);
             case "homophones": return homophones_1.default(word, template.params);
+            case "hyphenation": return hyphenation_1.default(word, template.params);
             case "m": return m_1.default(word, template.params);
             case "IPA": return ipa_1.default(word, template.params);
             case "rhymes": return rhymes_1.default(word, template.params);
@@ -55,6 +56,9 @@ System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/
             },
             function (homophones_1_1) {
                 homophones_1 = homophones_1_1;
+            },
+            function (hyphenation_1_1) {
+                hyphenation_1 = hyphenation_1_1;
             },
             function (m_1_1) {
                 m_1 = m_1_1;
