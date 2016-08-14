@@ -10,9 +10,9 @@ System.register(["lodash", "../template", "../fmt"], function(exports_1, context
         var caption = _.find(named, ["name", "caption"]);
         // caption
         if (caption && F.extractText(caption.value))
-            result = F.add(result, F.extractText(caption.value) + ": ", false, true);
+            result = F.add(result, F.extractText(caption.value) + ": ");
         else
-            result = F.add(result, "Hyphenation: ", false, true);
+            result = F.add(result, "Hyphenation: ");
         // hyphenation
         unnamed.forEach(function (segment, i) {
             if (i !== 0)

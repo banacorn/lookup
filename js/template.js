@@ -1,7 +1,7 @@
-System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, audio_1, de_noun_1, etyl_1, head_1, homophones_1, hyphenation_1, m_1, ipa_1, rhymes_1;
+    var fmt_1, a_1, audio_1, de_noun_1, etyl_1, head_1, homophones_1, hyphenation_1, m_1, ipa_1, rhymes_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
@@ -25,6 +25,7 @@ System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/
     // https://en.wiktionary.org/wiki/Template:de-noun
     function transclude(word, template) {
         switch (template.name) {
+            case "a": return a_1.default(word, template.params);
             case "audio": return audio_1.default(word, template.params);
             case "de-noun": return de_noun_1.default(word, template.params);
             case "etyl": return etyl_1.default(word, template.params);
@@ -41,6 +42,9 @@ System.register(["./fmt", "./template/audio", "./template/de-noun", "./template/
         setters:[
             function (fmt_1_1) {
                 fmt_1 = fmt_1_1;
+            },
+            function (a_1_1) {
+                a_1 = a_1_1;
             },
             function (audio_1_1) {
                 audio_1 = audio_1_1;

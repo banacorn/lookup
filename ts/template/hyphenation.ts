@@ -14,9 +14,9 @@ function hyphenation(word: string, raw: AST.Parameter[]): Fmt {
 
     // caption
     if (caption && F.extractText(caption.value))
-        result = F.add(result, `${F.extractText(caption.value)}: `, false, true);
+        result = F.add(result, `${F.extractText(caption.value)}: `);
     else
-        result = F.add(result, `Hyphenation: `, false, true);
+        result = F.add(result, `Hyphenation: `);
 
     // hyphenation
     unnamed.forEach((segment, i) => {
@@ -24,7 +24,7 @@ function hyphenation(word: string, raw: AST.Parameter[]): Fmt {
             result = F.add(result, `‧`);
         result = F.add(result, `${F.extractText(segment)}`);
     });
-    
+
     return result
 }
 
