@@ -15,7 +15,7 @@ function ipa(word: string, raw: AST.Parameter[]): Fmt {
     unnamed.forEach((pronunciation, i) => {
         if (i !== 0)
             result = F.add(result, `, `);
-        result = F.add(result, `${F.extractText(pronunciation)}`);
+        result = F.add(result, `${F.extractText(pronunciation)}`, false, true);
     });
 
     return result

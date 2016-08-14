@@ -12,7 +12,7 @@ System.register(["../template", "../fmt"], function(exports_1, context_1) {
         unnamed.forEach(function (pronunciation, i) {
             if (i !== 0)
                 result = F.add(result, ", ");
-            result = F.add(result, "" + F.extractText(pronunciation));
+            result = F.add(result, "" + F.extractText(pronunciation), false, true);
         });
         return result;
     }
