@@ -8,6 +8,7 @@ import etyl from "./template/etyl";
 import head from "./template/head";
 import m from "./template/m";
 import ipa from "./template/ipa";
+import rhymes from "./template/rhymes";
 
 function sortParams(params: AST.Parameter[], word: string): {
     named: {
@@ -45,6 +46,7 @@ function transclude(word: string, template: AST.Template): Fmt {
         case "head": return head(word, template.params);
         case "m": return m(word, template.params);
         case "IPA": return ipa(word, template.params);
+        case "rhymes": return rhymes(word, template.params);
     }
     return undefined
 }
