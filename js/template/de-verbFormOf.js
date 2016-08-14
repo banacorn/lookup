@@ -79,7 +79,7 @@ System.register(["../template", "../fmt"], function(exports_1, context_1) {
         result = F.add(result, " of", true);
         // infinitive
         if (infinitive) {
-            result = F.add(result, " " + infinitive, false, true);
+            result = F.add(result, " " + infinitive + ".", false, true);
         }
         return result;
     }
