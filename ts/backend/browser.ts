@@ -41,18 +41,13 @@ function printHeader(settings: any, name: string) {
 }
 
 function printSection(settings: any, section: Section<Fmt>) {
-    // let formatted = formatSection(section);
     if (section.body.length) {
         let body = [];
         section.body.forEach((paragraph) => {
             body = concat(body, paragraph);
             body = add(body, "\n");
-            // printFmt(paragraph);
-            // console.log("\n");
         });
         printFmt(body);
-
-
     }
 
     for (let sub of section.subs) {
