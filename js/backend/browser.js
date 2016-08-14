@@ -39,10 +39,14 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
     function printSection(settings, section) {
         // let formatted = formatSection(section);
         if (section.body.length) {
+            var body_1 = [];
             section.body.forEach(function (paragraph) {
-                printFmt(paragraph);
-                console.log("\n");
+                body_1 = fmt_1.concat(body_1, paragraph);
+                body_1 = fmt_1.add(body_1, "\n");
+                // printFmt(paragraph);
+                // console.log("\n");
             });
+            printFmt(body_1);
         }
         for (var _i = 0, _a = section.subs; _i < _a.length; _i++) {
             var sub = _a[_i];

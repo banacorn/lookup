@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { parseParagraph } from "../parser/element";
 import { parseEntry } from "../parser/section";
-import { formatParagraph } from "../fmt";
+import { formatParagraph, concat, add } from "../fmt";
 import { Section, Fmt, RawText, mapSection, ParsedParagraph } from "../type";
 
 function isPartOfSpeech(name: string): boolean {
@@ -43,10 +43,16 @@ function printHeader(settings: any, name: string) {
 function printSection(settings: any, section: Section<Fmt>) {
     // let formatted = formatSection(section);
     if (section.body.length) {
+        let body = [];
         section.body.forEach((paragraph) => {
-            printFmt(paragraph);
-            console.log("\n");
-        })
+            body = concat(body, paragraph);
+            body = add(body, "\n");
+            // printFmt(paragraph);
+            // console.log("\n");
+        });
+        printFmt(body);
+
+
     }
 
     for (let sub of section.subs) {
