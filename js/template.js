@@ -1,7 +1,7 @@
-System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verbFormOf", "./template/de-form-adj", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/m", "./template/ipa", "./template/rhymes"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, a_1, audio_1, de_noun_1, de_verbFormOf_1, de_form_adj_1, etyl_1, head_1, homophones_1, hyphenation_1, m_1, ipa_1, rhymes_1;
+    var fmt_1, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, m_1, ipa_1, rhymes_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
@@ -28,8 +28,9 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             case "a": return a_1.default(word, template.params);
             case "audio": return audio_1.default(word, template.params);
             case "de-noun": return de_noun_1.default(word, template.params);
-            case "de-verb form of": return de_verbFormOf_1.default(word, template.params);
+            case "de-verb form of": return de_verb_form_of_1.default(word, template.params);
             case "de-form-adj": return de_form_adj_1.default(word, template.params);
+            case "de-inflected form of": return de_inflected_form_of_1.default(word, template.params);
             case "etyl": return etyl_1.default(word, template.params);
             case "head": return head_1.default(word, template.params);
             case "homophones": return homophones_1.default(word, template.params);
@@ -54,11 +55,14 @@ System.register(["./fmt", "./template/a", "./template/audio", "./template/de-nou
             function (de_noun_1_1) {
                 de_noun_1 = de_noun_1_1;
             },
-            function (de_verbFormOf_1_1) {
-                de_verbFormOf_1 = de_verbFormOf_1_1;
+            function (de_verb_form_of_1_1) {
+                de_verb_form_of_1 = de_verb_form_of_1_1;
             },
             function (de_form_adj_1_1) {
                 de_form_adj_1 = de_form_adj_1_1;
+            },
+            function (de_inflected_form_of_1_1) {
+                de_inflected_form_of_1 = de_inflected_form_of_1_1;
             },
             function (etyl_1_1) {
                 etyl_1 = etyl_1_1;

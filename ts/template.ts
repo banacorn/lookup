@@ -5,8 +5,9 @@ import { fold } from "./fmt";
 import a from "./template/a";
 import audio from "./template/audio";
 import deNoun from "./template/de-noun";
-import deVerbFormOf from "./template/de-verbFormOf";
+import deVerbFormOf from "./template/de-verb-form-of";
 import deFormAdj from "./template/de-form-adj";
+import deInFlectedFormOf from "./template/de-inflected-form-of";
 import etyl from "./template/etyl";
 import head from "./template/head";
 import homophones from "./template/homophones";
@@ -50,6 +51,7 @@ function transclude(word: string, template: AST.Template): Fmt {
         case "de-noun": return deNoun(word, template.params);
         case "de-verb form of": return deVerbFormOf(word, template.params);
         case "de-form-adj": return deFormAdj(word, template.params);
+        case "de-inflected form of": return deInFlectedFormOf(word, template.params);
         case "etyl": return etyl(word, template.params);
         case "head": return head(word, template.params);
         case "homophones": return homophones(word, template.params);
