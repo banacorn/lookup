@@ -1,7 +1,7 @@
-System.register(["./fmt", "./template/de-noun", "./template/etyl", "./template/m"], function(exports_1, context_1) {
+System.register(["./fmt", "./template/de-noun", "./template/etyl", "./template/m", "./template/ipa"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var fmt_1, de_noun_1, etyl_1, m_1;
+    var fmt_1, de_noun_1, etyl_1, m_1, ipa_1;
     function sortParams(params, word) {
         var unnamed = [];
         var named = [];
@@ -28,6 +28,7 @@ System.register(["./fmt", "./template/de-noun", "./template/etyl", "./template/m
             case "de-noun": return de_noun_1.default(word, template.params);
             case "etyl": return etyl_1.default(word, template.params);
             case "m": return m_1.default(word, template.params);
+            case "IPA": return ipa_1.default(word, template.params);
         }
         return undefined;
     }
@@ -44,6 +45,9 @@ System.register(["./fmt", "./template/de-noun", "./template/etyl", "./template/m
             },
             function (m_1_1) {
                 m_1 = m_1_1;
+            },
+            function (ipa_1_1) {
+                ipa_1 = ipa_1_1;
             }],
         execute: function() {
             exports_1("transclude", transclude);
