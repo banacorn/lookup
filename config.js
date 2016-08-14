@@ -4,6 +4,7 @@ System.config({
     map: {
         "lodash": "bower_components/lodash/index.js",
         "parsimmon": "bower_components/parsimmon/index.js",
+        "util": "bower_components/util/util.min.js"
     },
     packages: {
         scripts: {

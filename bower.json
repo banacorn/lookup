@@ -21,6 +21,7 @@
   "dependencies": {
     "lodash": "https://raw.githubusercontent.com/lodash/lodash/4.14.1/dist/lodash.js",
     "parsimmon": "https://raw.githubusercontent.com/jneen/parsimmon/master/src/parsimmon.js",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "util": "^3.46.1"
   }
 }
