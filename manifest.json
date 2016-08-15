@@ -16,5 +16,11 @@
     "background": {
         "scripts": ["chrome/background.js"],
         "persistent": false
-    }
+    },
+    "content_scripts": [{
+        "matches": ["http://*/*", "https://*/*", "file://*/*"],
+        "js": [
+            "chrome/content.js"
+        ]
+    }]
 }
