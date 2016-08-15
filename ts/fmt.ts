@@ -37,6 +37,19 @@ function link(fmt: Fmt): Fmt {
     });
 }
 
+// wrap in a pair of parentheses
+function parentheses(fmt: Fmt): Fmt {
+    return concat([seg(`(`)], concat(fmt, [seg(`)`)]));
+}
+function join(fmts: Fmt[], delimeter: Fmt): Fmt {
+    let result = [];
+    fmts.forEach((fmt, i) => {
+        result = concat(result, fmt)
+        if (i < fmts.length - 1) // not the last, add the delimeter
+            result = concat(result, delimeter)
+    });
+    return result;
+}
 
 function add(fmt: Fmt, text: string, i: boolean = false, b: boolean = false, a: boolean = false): Fmt {
     if (fmt.length === 0) {
@@ -203,10 +216,12 @@ export {
     italic,
     bold,
     link,
+    parentheses,
 
     seg,
     concat,
     add,
+    join,
     extractText,
     fold,
 }

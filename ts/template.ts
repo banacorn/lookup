@@ -4,6 +4,7 @@ import * as F from "./fmt";
 
 import a from "./template/a";
 import audio from "./template/audio";
+import compound from "./template/compound";
 import deNoun from "./template/de-noun";
 import deVerbFormOf from "./template/de-verb-form-of";
 import deFormAdj from "./template/de-form-adj";
@@ -95,6 +96,7 @@ function transclude(word: string, template: AST.Template): Fmt {
     switch (template.name) {
         case "a": return a(word, named, unnamed);
         case "audio": return audio(word, named, unnamed);
+        case "compound": return compound(word, named, unnamed);
         case "de-noun": return deNoun(word, named, unnamed);
         case "de-verb form of": return deVerbFormOf(word, named, unnamed);
         case "de-form-adj": return deFormAdj(word, named, unnamed);

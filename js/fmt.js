@@ -33,6 +33,19 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
             return seg;
         });
     }
+    // wrap in a pair of parentheses
+    function parentheses(fmt) {
+        return concat([seg("(")], concat(fmt, [seg(")")]));
+    }
+    function join(fmts, delimeter) {
+        var result = [];
+        fmts.forEach(function (fmt, i) {
+            result = concat(result, fmt);
+            if (i < fmts.length - 1)
+                result = concat(result, delimeter);
+        });
+        return result;
+    }
     function add(fmt, text, i, b, a) {
         if (i === void 0) { i = false; }
         if (b === void 0) { b = false; }
@@ -210,9 +223,11 @@ System.register(["lodash", "./template"], function(exports_1, context_1) {
             exports_1("italic", italic);
             exports_1("bold", bold);
             exports_1("link", link);
+            exports_1("parentheses", parentheses);
             exports_1("seg", seg);
             exports_1("concat", concat);
             exports_1("add", add);
+            exports_1("join", join);
             exports_1("extractText", extractText);
             exports_1("fold", fold);
         }

@@ -16,7 +16,7 @@ System.register(["lodash", "../fmt", "../template"], function(exports_1, context
         });
         // gender
         template_1.findEnum(named, "g", function (value, i, key) {
-            result = F.add(result, "!!" + F.extractText(value), true, false, true);
+            result = F.add(result, "" + F.extractText(value), true, false, true);
             dealtNames.push(key);
         });
         // display undealt parameters

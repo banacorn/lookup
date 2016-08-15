@@ -1,7 +1,7 @@
-System.register(["lodash", "./fmt", "./template/a", "./template/audio", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/mention", "./template/prefix", "./template/ipa", "./template/rhymes", "util"], function(exports_1, context_1) {
+System.register(["lodash", "./fmt", "./template/a", "./template/audio", "./template/compound", "./template/de-noun", "./template/de-verb-form-of", "./template/de-form-adj", "./template/de-inflected-form-of", "./template/etyl", "./template/head", "./template/homophones", "./template/hyphenation", "./template/label", "./template/mention", "./template/prefix", "./template/ipa", "./template/rhymes", "util"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, F, a_1, audio_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, mention_1, prefix_1, ipa_1, rhymes_1, util_1;
+    var _, F, a_1, audio_1, compound_1, de_noun_1, de_verb_form_of_1, de_form_adj_1, de_inflected_form_of_1, etyl_1, head_1, homophones_1, hyphenation_1, label_1, mention_1, prefix_1, ipa_1, rhymes_1, util_1;
     var debug;
     function sortParams(params, word) {
         var unnamed = [];
@@ -78,6 +78,7 @@ System.register(["lodash", "./fmt", "./template/a", "./template/audio", "./templ
         switch (template.name) {
             case "a": return a_1.default(word, named, unnamed);
             case "audio": return audio_1.default(word, named, unnamed);
+            case "compound": return compound_1.default(word, named, unnamed);
             case "de-noun": return de_noun_1.default(word, named, unnamed);
             case "de-verb form of": return de_verb_form_of_1.default(word, named, unnamed);
             case "de-form-adj": return de_form_adj_1.default(word, named, unnamed);
@@ -112,6 +113,9 @@ System.register(["lodash", "./fmt", "./template/a", "./template/audio", "./templ
             },
             function (audio_1_1) {
                 audio_1 = audio_1_1;
+            },
+            function (compound_1_1) {
+                compound_1 = compound_1_1;
             },
             function (de_noun_1_1) {
                 de_noun_1 = de_noun_1_1;

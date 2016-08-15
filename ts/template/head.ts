@@ -19,7 +19,7 @@ function head(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
 
     // gender
     findEnum(named, "g", (value, i, key) => {
-        result = F.add(result, `!!${F.extractText(value)}`, true, false, true);
+        result = F.add(result, `${F.extractText(value)}`, true, false, true);
         dealtNames.push(key);
     });
 
