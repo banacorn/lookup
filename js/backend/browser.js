@@ -85,7 +85,7 @@ System.register(["lodash", "../parser/element", "../parser/section", "../fmt", "
             if (seg.style.b)
                 css += "font-weight: bold;";
             if (seg.style.a)
-                css += "text-decoration; underline;";
+                css += "text-decoration: underline;";
             return css;
         });
         // print it all out

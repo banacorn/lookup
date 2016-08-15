@@ -1,86 +1,103 @@
-System.register(["../fmt", "../template"], function(exports_1, context_1) {
+System.register(["../fmt", "./compound"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var F, template_1;
+    var F, compound_1;
     // https://en.wiktionary.org/wiki/Template:prefix
     // {{prefix|language code|prefix|root}}
     function prefix(word, named, unnamed) {
-        var result = [];
-        var prefix = F.extractText(unnamed[0]);
-        var root = F.extractText(unnamed[1]);
-        // displayed prefix
-        template_1.find(named, "alt1", function (value) {
-            // alternation found
-            result = F.add(result, F.extractText(value) + "- ", false, true);
-        }, function () {
-            // alternation not found
-            result = F.add(result, prefix + "- ", false, true);
-        });
-        var prefixMisc = [F.seg("(")];
-        var prefixMiscComma = false;
-        // prefix transliteration
-        template_1.find(named, "tr1", function (value) {
-            prefixMisc = F.add(prefixMisc, "" + F.extractText(value), true);
-            prefixMiscComma = true;
-        });
-        // prefix glosses
-        template_1.find(named, ["t1", "gloss1"], function (value) {
-            if (prefixMiscComma)
-                prefixMisc = F.add(prefixMisc, ", ");
-            prefixMisc = F.add(prefixMisc, "\u201C" + F.extractText(value) + "\u201D");
-            prefixMiscComma = true;
-        });
-        // prefix POS
-        template_1.find(named, "pos1", function (value) {
-            if (prefixMiscComma)
-                prefixMisc = F.add(prefixMisc, ", ");
-            prefixMisc = F.add(prefixMisc, "" + F.extractText(value));
-            prefixMiscComma = true;
-        });
-        prefixMisc = F.add(prefixMisc, ") ");
-        if (F.extractText(prefixMisc) !== "() ")
-            result = F.concat(result, prefixMisc);
-        // displayed root
-        template_1.find(named, "alt2", function (value) {
-            // alternation found
-            result = F.add(result, "+ " + F.extractText(value) + " ", false, true);
-        }, function () {
-            // alternation not found
-            result = F.add(result, "+ " + root + " ", false, true);
-        });
-        var rootMisc = [F.seg("(")];
-        var rootMiscComma = false;
-        // root transliteration
-        template_1.find(named, "tr2", function (value) {
-            rootMisc = F.add(rootMisc, "" + F.extractText(value), true);
-            rootMiscComma = true;
-        });
-        // root glosses
-        template_1.find(named, ["t2", "gloss2"], function (value) {
-            if (rootMiscComma)
-                rootMisc = F.add(rootMisc, ", ");
-            rootMisc = F.add(rootMisc, "\u201C" + F.extractText(value) + "\u201D");
-            rootMiscComma = true;
-        });
-        // root POS
-        template_1.find(named, "pos2", function (value) {
-            if (rootMiscComma)
-                rootMisc = F.add(rootMisc, ", ");
-            rootMisc = F.add(rootMisc, "" + F.extractText(value));
-            rootMiscComma = true;
-        });
-        rootMisc = F.add(rootMisc, ")");
-        if (F.extractText(rootMisc) !== "()")
-            result = F.concat(result, rootMisc);
-        return result;
+        // add "-" to prefix
+        unnamed[0] = F.add(unnamed[0], "-");
+        return compound_1.default(word, named, unnamed);
+        // let result = [];
+        //
+        // let prefix = F.extractText(unnamed[0]);
+        // let root = F.extractText(unnamed[1]);
+        //
+        // // displayed prefix
+        // find(named, "alt1", (value) => {
+        //     // alternation found
+        //     result = F.add(result, `${F.extractText(value)}- `, false, true);
+        // }, () => {
+        //     // alternation not found
+        //     result = F.add(result, `${prefix}- `, false, true);
+        // })
+        //
+        // let prefixMisc = [F.seg(`(`)];
+        // let prefixMiscComma = false;
+        //
+        // // prefix transliteration
+        // find(named, "tr1", (value) => {
+        //     prefixMisc = F.add(prefixMisc, `${F.extractText(value)}`, true);
+        //     prefixMiscComma = true;
+        // })
+        //
+        // // prefix glosses
+        // find(named, ["t1", "gloss1"], (value) => {
+        //     if (prefixMiscComma)
+        //         prefixMisc = F.add(prefixMisc, `, `);
+        //     prefixMisc = F.add(prefixMisc, `“${F.extractText(value)}”`);
+        //     prefixMiscComma = true;
+        // })
+        //
+        // // prefix POS
+        // find(named, "pos1", (value) => {
+        //     if (prefixMiscComma)
+        //         prefixMisc = F.add(prefixMisc, `, `);
+        //     prefixMisc = F.add(prefixMisc, `${F.extractText(value)}`);
+        //     prefixMiscComma = true;
+        // })
+        //
+        // prefixMisc = F.add(prefixMisc, `) `);
+        //
+        // if (F.extractText(prefixMisc) !== "() ")
+        //     result = F.concat(result, prefixMisc);
+        //
+        // // displayed root
+        // find(named, "alt2", (value) => {
+        //     // alternation found
+        //     result = F.add(result, `+ ${F.extractText(value)} `, false, true);
+        // }, () => {
+        //     // alternation not found
+        //     result = F.add(result, `+ ${root} `, false, true);
+        // })
+        //
+        // let rootMisc = [F.seg(`(`)];
+        // let rootMiscComma = false;
+        //
+        // // root transliteration
+        // find(named, "tr2", (value) => {
+        //     rootMisc = F.add(rootMisc, `${F.extractText(value)}`, true);
+        //     rootMiscComma = true;
+        // })
+        //
+        // // root glosses
+        // find(named, ["t2", "gloss2"], (value) => {
+        //     if (rootMiscComma)
+        //         rootMisc = F.add(rootMisc, `, `);
+        //     rootMisc = F.add(rootMisc, `“${F.extractText(value)}”`);
+        //     rootMiscComma = true;
+        // })
+        //
+        // // root POS
+        // find(named, "pos2", (value) => {
+        //     if (rootMiscComma)
+        //         rootMisc = F.add(rootMisc, `, `);
+        //     rootMisc = F.add(rootMisc, `${F.extractText(value)}`);
+        //     rootMiscComma = true;
+        // })
+        // rootMisc = F.add(rootMisc, `)`);
+        //
+        // if (F.extractText(rootMisc) !== "()")
+        //     result = F.concat(result, rootMisc);
+        // return result;
     }
     return {
         setters:[
             function (F_1) {
                 F = F_1;
             },
-            function (template_1_1) {
-                template_1 = template_1_1;
+            function (compound_1_1) {
+                compound_1 = compound_1_1;
             }],
         execute: function() {
             exports_1("default",prefix);
