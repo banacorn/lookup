@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 import { AST, Fmt, Seg } from "./type";
 import * as F from "./fmt";
-// import { inspect } from "util";
 
 import a from "./template/a";
 import audio from "./template/audio";
@@ -43,29 +42,50 @@ function sortParams(params: AST.Parameter<AST.Inline>[], word: string): {
 }
 
 
-function find(named: AST.Parameter<Seg>[], rawKeys: string | string[], callback: (value: Fmt) => void, fallback?: () => void) {
-
+function find(named: AST.Parameter<Seg>[], rawKeys: string | string[], callback: (value: Fmt, key: string) => void, fallback?: () => void) {
     let keys: string[];
     if (rawKeys instanceof Array) {
-        // normalize all keys
-        keys = rawKeys.map((key) => {
-            if (typeof key === "string") {
-                return key;
-            } else {
-                return F.extractText(key);
-            }
-        });
+        keys = rawKeys
     } else {
         keys = [rawKeys]
     }
-
     const values = named.filter((pair) => _.includes(keys, pair.name));
     if (_.head(values)) {
-        callback(_.head(values).value);
+        callback(_.head(values).value, _.head(values).name);
     } else {
         if (fallback)
             fallback();
     }
+}
+
+import { inspect } from "util";
+const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
+
+function findEnum(named: AST.Parameter<Seg>[], rawKeys: string | string[], callback: (value: Fmt, index: number, key: string) => void): Fmt[] {
+    let keys: string[];
+    if (rawKeys instanceof Array) {
+        keys = rawKeys
+    } else {
+        keys = [rawKeys]
+    }
+
+    let values = [];
+    named.forEach((pair) => {
+        keys.forEach((key) => {
+            if (_.startsWith(pair.name, key)) {
+                const match = pair.name.substr(key.length).match(/^(\d*)$/);
+                if (match) {
+                    values.push({
+                        key: key,
+                        value: pair.value,
+                        index: parseInt(match[1])
+                    });
+                }
+            }
+        })
+    });
+    values.forEach(({value, index, key}) => callback(value, index, key));
+    return values.map(({value}) => value);
 }
 
 // https://en.wiktionary.org/wiki/Template:de-noun
@@ -100,5 +120,6 @@ function transclude(word: string, template: AST.Template): Fmt {
 export {
     transclude,
     sortParams,
-    find
+    find,
+    findEnum
 }

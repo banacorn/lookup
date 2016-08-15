@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
+import { find } from "../template";
 
 // https://en.wiktionary.org/wiki/Template:de-form-adj
 // {{de-form-adj|s|m|g|bestimmt|nocat=1}}
@@ -17,19 +18,19 @@ function deFormAdj(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): F
     const fall = F.extractText(otherParams[2]);
 
     // degree
-    if (degree && F.extractText(degree.value)) {
-        switch (F.extractText(degree.value)) {
+    find(named, "deg", (value) => {
+        switch (F.extractText(value)) {
             case "c":
                 result = F.add(result, `comparative `, true);
                 break;
             case "s":
-            result = F.add(result, `superlative `, true);
+                result = F.add(result, `superlative `, true);
                 break;
             default:
                 result = F.add(result, `unknown degree `, true);
                 break;
         }
-    }
+    });
 
     //  declension
     if (declension) {

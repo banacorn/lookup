@@ -1,16 +1,15 @@
 import * as _ from "lodash";
 import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
+import { find } from "../template";
 
+// https://en.wiktionary.org/wiki/Template:mention
 // {{m|language|link|link_text|translation|tr=transliteration|lit=literal_translation|pos=part_of_speech}}
-
 function mention(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     const language = unnamed[0];
     const link = unnamed[1];
     const linkText = unnamed[2];
     const translation = unnamed[3];
-    const transliteration = _.find(named, ["name", "tr"]);
-    const partOfSpeech = _.find(named, ["name", "pos"]);
 
     let showedText = [];
     // showed text
@@ -19,56 +18,64 @@ function mention(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt
     else if (F.extractText(link))
         showedText = F.concat(showedText, F.link(F.italic(link)));
 
-    let inParentheses = [F.seg(` (`)];
+    let misc = [F.seg(` (`)];
+    let miscComma = false;
 
     // transliteration
-    if (transliteration && F.extractText(transliteration.value)) {
-        inParentheses = F.add(inParentheses, `${F.extractText(transliteration.value)}`);
-    }
+    find(named, "tr", (value) => {
+        misc = F.add(misc, `${F.extractText(value)}`);
+        miscComma = true;
+    });
 
     // translation
     if (F.extractText(translation)) {
-        if (inParentheses.length > 1)
-            inParentheses = F.add(inParentheses, `, `);
-        inParentheses = F.add(inParentheses, `“`);
-        inParentheses = F.concat(inParentheses, F.italic(translation));
-        inParentheses = F.add(inParentheses, `”`);
+        if (miscComma)
+            misc = F.add(misc, `, `);
+        misc = F.add(misc, `“`);
+        misc = F.concat(misc, F.italic(translation));
+        misc = F.add(misc, `”`);
+        miscComma = true;
     }
 
     // part of speech
-    if (partOfSpeech && F.extractText(partOfSpeech.value)) {
-        if (inParentheses.length > 1)
-            inParentheses = F.add(inParentheses, `, `);
-        switch (F.extractText(partOfSpeech.value)) {
+    find(named, "pos", (value) => {
+        if (miscComma)
+            misc = F.add(misc, `, `);
+        switch (F.extractText(value)) {
             case "a":
-                inParentheses = F.add(inParentheses, `adj`);
+                misc = F.add(misc, `adj`);
                 break;
             case "adv":
-                inParentheses = F.add(inParentheses, `adv`);
+                misc = F.add(misc, `adv`);
                 break;
             case "n":
-                inParentheses = F.add(inParentheses, `noun`);
+                misc = F.add(misc, `noun`);
                 break;
             case "verb":
-                inParentheses = F.add(inParentheses, `verb`);
+                misc = F.add(misc, `verb`);
                 break;
             default:
-                inParentheses = F.add(inParentheses, F.extractText(partOfSpeech.value));
+                misc = F.add(misc, F.extractText(value));
                 break;
         }
-    }
+        miscComma = true;
+    });
 
-    // // literal translation
-    if (transliteration && F.extractText(transliteration.value)) {
-        if (inParentheses.length > 1)
-            inParentheses = F.add(inParentheses, `, `);
-        inParentheses = F.add(inParentheses, `literally “${F.extractText(transliteration.value)}“`);
-    }
 
-    inParentheses = F.add(inParentheses, `)`);
 
-    if (F.extractText(inParentheses) !== " ()")
-        return F.concat(showedText, inParentheses);
+    // literal translation
+    find(named, "lit", (value) => {
+        if (miscComma)
+            misc = F.add(misc, `, `);
+
+        misc = F.add(misc, `literally “${F.extractText(value)}“`);
+        miscComma = true;
+    });
+
+    misc = F.add(misc, `)`);
+
+    if (F.extractText(misc) !== " ()")
+        return F.concat(showedText, misc);
     else
         return showedText;
 }

@@ -1,22 +1,27 @@
 import * as _ from "lodash";
 import { AST, Fmt, Seg } from "../type";
 import * as F from "../fmt";
-import { inspect } from "util";
-
-// const debug = (s: any, color = "cyan") => console.log(inspect(s, false, null)[color]);
+import { find, findEnum } from "../template";
 
 // https://en.wiktionary.org/wiki/Template:head
 // {{IPA|pronunciation 1|pronunciation 2|pronunciation 3|lang=en}}
 function head(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
     let result = [];
-
-    const headword = _.find(named, ["name", "head"]);
+    const dealtNames = [];
 
     // displayed headword
-    if (headword && F.extractText(headword.value))
-        result = F.add(result, `${F.extractText(headword.value)}`, false, true);
-    else
-        result = F.add(result, `${word}`, false, true);
+    find(named, "head", (value) => {
+        result = F.add(result, `${F.extractText(value)} `, false, true);
+        dealtNames.push("head");
+    }, () => {
+        result = F.add(result, `${word} `, false, true);
+    });
+
+    // gender
+    findEnum(named, "g", (value, i, key) => {
+        result = F.add(result, `!!${F.extractText(value)}`, true, false, true);
+        dealtNames.push(key);
+    });
 
     // display undealt parameters
     let undealt = `{{head`;
@@ -24,13 +29,16 @@ function head(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt {
         undealt += `|${F.extractText(value)}`;
     });
 
-    const dealtNamed = [
-        { name: "head" }
-    ];
-    _.pullAllBy(named, dealtNamed, "name").forEach((pair: AST.Parameter<AST.Inline>) => {
-        undealt += `|${pair.name} = ${F.extractText(F.fold([], pair.value, word))}`;
-    })
+    const undealtNames = named
+        .filter((pair) => !_.includes(dealtNames, pair.name))
+        .map((pair) => pair.name);
+    find(named, undealtNames, (value, key) => {
+        undealt += `|${key} = ${F.extractText(value)}`;
+    });
+
     undealt += `}}`;
+    if (undealt !== '{{head}}')
+        result = F.add(result, undealt);
 
     return result
 }

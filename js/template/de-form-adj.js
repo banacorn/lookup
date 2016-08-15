@@ -1,7 +1,7 @@
-System.register(["lodash", "../fmt"], function(exports_1, context_1) {
+System.register(["lodash", "../fmt", "../template"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, F;
+    var _, F, template_1;
     // https://en.wiktionary.org/wiki/Template:de-form-adj
     // {{de-form-adj|s|m|g|bestimmt|nocat=1}}
     function deFormAdj(word, named, unnamed) {
@@ -13,8 +13,8 @@ System.register(["lodash", "../fmt"], function(exports_1, context_1) {
         var gender = F.extractText(otherParams[1]);
         var fall = F.extractText(otherParams[2]);
         // degree
-        if (degree && F.extractText(degree.value)) {
-            switch (F.extractText(degree.value)) {
+        template_1.find(named, "deg", function (value) {
+            switch (F.extractText(value)) {
                 case "c":
                     result = F.add(result, "comparative ", true);
                     break;
@@ -25,7 +25,7 @@ System.register(["lodash", "../fmt"], function(exports_1, context_1) {
                     result = F.add(result, "unknown degree ", true);
                     break;
             }
-        }
+        });
         //  declension
         if (declension) {
             switch (declension) {
@@ -128,6 +128,9 @@ System.register(["lodash", "../fmt"], function(exports_1, context_1) {
             },
             function (F_1) {
                 F = F_1;
+            },
+            function (template_1_1) {
+                template_1 = template_1_1;
             }],
         execute: function() {
             exports_1("default",deFormAdj);

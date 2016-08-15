@@ -45,18 +45,18 @@ function prefix(word: string, named: AST.Parameter<Seg>[], unnamed: Fmt[]): Fmt 
         prefixMiscComma = true;
     })
 
-    prefixMisc = F.add(prefixMisc, `)`);
+    prefixMisc = F.add(prefixMisc, `) `);
 
-    if (F.extractText(prefixMisc) !== "()")
+    if (F.extractText(prefixMisc) !== "() ")
         result = F.concat(result, prefixMisc);
 
     // displayed root
     find(named, "alt2", (value) => {
         // alternation found
-        result = F.add(result, ` + ${F.extractText(value)} `, false, true);
+        result = F.add(result, `+ ${F.extractText(value)} `, false, true);
     }, () => {
         // alternation not found
-        result = F.add(result, ` + ${root} `, false, true);
+        result = F.add(result, `+ ${root} `, false, true);
     })
 
     let rootMisc = [F.seg(`(`)];

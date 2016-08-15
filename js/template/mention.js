@@ -1,75 +1,79 @@
-System.register(["lodash", "../fmt"], function(exports_1, context_1) {
+System.register(["../fmt", "../template"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _, F;
+    var F, template_1;
+    // https://en.wiktionary.org/wiki/Template:mention
     // {{m|language|link|link_text|translation|tr=transliteration|lit=literal_translation|pos=part_of_speech}}
     function mention(word, named, unnamed) {
         var language = unnamed[0];
         var link = unnamed[1];
         var linkText = unnamed[2];
         var translation = unnamed[3];
-        var transliteration = _.find(named, ["name", "tr"]);
-        var partOfSpeech = _.find(named, ["name", "pos"]);
         var showedText = [];
         // showed text
         if (F.extractText(linkText))
             showedText = F.concat(showedText, F.link(F.italic(linkText)));
         else if (F.extractText(link))
             showedText = F.concat(showedText, F.link(F.italic(link)));
-        var inParentheses = [F.seg(" (")];
+        var misc = [F.seg(" (")];
+        var miscComma = false;
         // transliteration
-        if (transliteration && F.extractText(transliteration.value)) {
-            inParentheses = F.add(inParentheses, "" + F.extractText(transliteration.value));
-        }
+        template_1.find(named, "tr", function (value) {
+            misc = F.add(misc, "" + F.extractText(value));
+            miscComma = true;
+        });
         // translation
         if (F.extractText(translation)) {
-            if (inParentheses.length > 1)
-                inParentheses = F.add(inParentheses, ", ");
-            inParentheses = F.add(inParentheses, "\u201C");
-            inParentheses = F.concat(inParentheses, F.italic(translation));
-            inParentheses = F.add(inParentheses, "\u201D");
+            if (miscComma)
+                misc = F.add(misc, ", ");
+            misc = F.add(misc, "\u201C");
+            misc = F.concat(misc, F.italic(translation));
+            misc = F.add(misc, "\u201D");
+            miscComma = true;
         }
         // part of speech
-        if (partOfSpeech && F.extractText(partOfSpeech.value)) {
-            if (inParentheses.length > 1)
-                inParentheses = F.add(inParentheses, ", ");
-            switch (F.extractText(partOfSpeech.value)) {
+        template_1.find(named, "pos", function (value) {
+            if (miscComma)
+                misc = F.add(misc, ", ");
+            switch (F.extractText(value)) {
                 case "a":
-                    inParentheses = F.add(inParentheses, "adj");
+                    misc = F.add(misc, "adj");
                     break;
                 case "adv":
-                    inParentheses = F.add(inParentheses, "adv");
+                    misc = F.add(misc, "adv");
                     break;
                 case "n":
-                    inParentheses = F.add(inParentheses, "noun");
+                    misc = F.add(misc, "noun");
                     break;
                 case "verb":
-                    inParentheses = F.add(inParentheses, "verb");
+                    misc = F.add(misc, "verb");
                     break;
                 default:
-                    inParentheses = F.add(inParentheses, F.extractText(partOfSpeech.value));
+                    misc = F.add(misc, F.extractText(value));
                     break;
             }
-        }
-        // // literal translation
-        if (transliteration && F.extractText(transliteration.value)) {
-            if (inParentheses.length > 1)
-                inParentheses = F.add(inParentheses, ", ");
-            inParentheses = F.add(inParentheses, "literally \u201C" + F.extractText(transliteration.value) + "\u201C");
-        }
-        inParentheses = F.add(inParentheses, ")");
-        if (F.extractText(inParentheses) !== " ()")
-            return F.concat(showedText, inParentheses);
+            miscComma = true;
+        });
+        // literal translation
+        template_1.find(named, "lit", function (value) {
+            if (miscComma)
+                misc = F.add(misc, ", ");
+            misc = F.add(misc, "literally \u201C" + F.extractText(value) + "\u201C");
+            miscComma = true;
+        });
+        misc = F.add(misc, ")");
+        if (F.extractText(misc) !== " ()")
+            return F.concat(showedText, misc);
         else
             return showedText;
     }
     return {
         setters:[
-            function (_1) {
-                _ = _1;
-            },
             function (F_1) {
                 F = F_1;
+            },
+            function (template_1_1) {
+                template_1 = template_1_1;
             }],
         execute: function() {
             exports_1("default",mention);

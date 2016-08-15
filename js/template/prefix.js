@@ -37,16 +37,16 @@ System.register(["../fmt", "../template"], function(exports_1, context_1) {
             prefixMisc = F.add(prefixMisc, "" + F.extractText(value));
             prefixMiscComma = true;
         });
-        prefixMisc = F.add(prefixMisc, ")");
-        if (F.extractText(prefixMisc) !== "()")
+        prefixMisc = F.add(prefixMisc, ") ");
+        if (F.extractText(prefixMisc) !== "() ")
             result = F.concat(result, prefixMisc);
         // displayed root
         template_1.find(named, "alt2", function (value) {
             // alternation found
-            result = F.add(result, " + " + F.extractText(value) + " ", false, true);
+            result = F.add(result, "+ " + F.extractText(value) + " ", false, true);
         }, function () {
             // alternation not found
-            result = F.add(result, " + " + root + " ", false, true);
+            result = F.add(result, "+ " + root + " ", false, true);
         });
         var rootMisc = [F.seg("(")];
         var rootMiscComma = false;
