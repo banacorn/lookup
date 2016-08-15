@@ -9,5 +9,12 @@
         "tabs",
         "http://*/*",
         "https://*/*"
-    ]
+    ],
+    "page_action": {
+        "default_title": "Lookup"
+    },
+    "background": {
+        "scripts": ["chrome/background.js"],
+        "persistent": false
+    }
 }
