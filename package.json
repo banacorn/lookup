@@ -1,29 +1,20 @@
 {
-  "name": "lookup",
-  "version": "1.0.0",
-  "description": "a chrome extention for fast wiktionary lookup",
-  "main": "config.js",
-  "dependencies": {
-    "systemjs": "^0.19.36"
-  },
-  "devDependencies": {
-    "mocha": "^3.0.2"
-  },
-  "scripts": {
-    "test": "mocha js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/banacorn/lookup.git"
-  },
-  "keywords": [
-    "chrome",
-    "extention"
-  ],
-  "author": "Tîng-Giān Luā",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/banacorn/lookup/issues"
-  },
-  "homepage": "https://github.com/banacorn/lookup#readme"
+    "name": "lookup",
+    "version": "1.0.0",
+    "description": "a chrome extention for fast wiktionary lookup",
+    "main": "config.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/banacorn/lookup.git"
+    },
+    "keywords": [
+        "chrome",
+        "extention"
+    ],
+    "author": "Tîng-Giān Luā",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/banacorn/lookup/issues"
+    },
+    "homepage": "https://github.com/banacorn/lookup#readme"
 }

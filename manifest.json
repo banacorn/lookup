@@ -4,34 +4,10 @@
     "name": "Lookup",
     "description": "Lookup articles in wiktionary",
     "version": "1.0",
+    "devtools_page": "devtools.html",
     "permissions": [
-        "activeTab",
         "tabs",
-        "storage"
-    ],
-
-    "page_action": {
-        "default_title": "Lookup"
-    },
-
-    "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*"],
-        "js": [
-            "bower_components/system.js/dist/system.js",
-            "config.js"
-        ]
-    }],
-    "background": {
-        "scripts": ["js/background.js"],
-        "persistent": false
-    },
-
-    "options_ui": {
-        "page": "html/settings.html"
-    },
-
-    "web_accessible_resources": [
-        "bower_components/*",
-        "js/*.js"
+        "http://*/*",
+        "https://*/*"
     ]
 }
