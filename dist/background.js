@@ -60,14 +60,17 @@
 	        configurable: true
 	    });
 	    // connected tabs
-	    Status.prototype.register = function (id) {
-	        this.connected[id] = true;
+	    Status.prototype.register = function (id, conn) {
+	        this.connected[id] = conn;
 	    };
 	    Status.prototype.unregister = function (id) {
 	        delete this.connected[id];
 	    };
 	    Status.prototype.shouldReInject = function (id) {
-	        return this.connected[id] === true;
+	        return this.connected[id] !== undefined;
+	    };
+	    Status.prototype.getConn = function (id) {
+	        return this.connected[id];
 	    };
 	    return Status;
 	}());
@@ -96,7 +99,7 @@
 	        console.info(message.tabId, "injected");
 	        injectScript(message.tabId);
 	        tabID = message.tabId;
-	        connectionStatus.register(tabID);
+	        connectionStatus.register(tabID, conn);
 	    };
 	    conn.onMessage.addListener(onMessage);
 	    conn.onDisconnect.addListener(function () {
@@ -109,6 +112,8 @@
 	    var tabID = connectionStatus.tabID;
 	    // assign the listener function to a variable so we can remove it later
 	    var onMessage = function (message) {
+	        console.log(message);
+	        connectionStatus.getConn(tabID).postMessage(message);
 	    };
 	    conn.onMessage.addListener(onMessage);
 	    conn.onDisconnect.addListener(function () {

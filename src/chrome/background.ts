@@ -17,14 +17,18 @@ class Status {
     }
 
     // connected tabs
-    register(id: TabID) {
-        this.connected[id] = true;
+    register(id: TabID, conn: any) {
+        this.connected[id] = conn;
     }
     unregister(id: TabID) {
         delete this.connected[id]
     }
     shouldReInject(id: TabID): boolean {
-        return this.connected[id] === true;
+        return this.connected[id] !== undefined;
+    }
+
+    getConn(id: TabID): any {
+        return this.connected[id];
     }
 }
 
@@ -56,7 +60,7 @@ const panelListener = (conn: any) => {
         console.info(message.tabId, "injected");
         injectScript(message.tabId);
         tabID = message.tabId;
-        connectionStatus.register(tabID);
+        connectionStatus.register(tabID, conn);
     };
     conn.onMessage.addListener(onMessage);
     conn.onDisconnect.addListener(() => {
@@ -70,6 +74,8 @@ const injectedListener = (conn: any) => {
     const tabID = connectionStatus.tabID;
     // assign the listener function to a variable so we can remove it later
     const onMessage = (message: any) => {
+        console.log(message);
+        connectionStatus.getConn(tabID).postMessage(message);
     };
     conn.onMessage.addListener(onMessage);
     conn.onDisconnect.addListener(() => {

@@ -44,14 +44,21 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	console.clear();
-	console.log(chrome);
+	// establish connection with the background page
 	var backgroundConn = chrome.runtime.connect({
 	    name: "woerterbuch-injected"
 	});
-	backgroundConn.postMessage({
-	    message: "hey"
-	});
+	var lastWord = undefined;
+	// listens to text selection events
+	document.addEventListener("mouseup", function () {
+	    var word = window.getSelection().toString().trim();
+	    var repeated = word === lastWord;
+	    lastWord = word;
+	    if (word && !repeated) {
+	        // sends request to the background when there's a non-trivial selection
+	        backgroundConn.postMessage(word);
+	    }
+	}, false);
 
 
 /***/ }
