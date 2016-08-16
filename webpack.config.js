@@ -1,7 +1,15 @@
+var path = require("path");
+
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: {
+        panel: "./src/index.tsx",
+        background: "./src/chrome/background.ts",
+        injected: "./src/chrome/injected.ts",
+        devtools: "./src/chrome/devtools.ts"
+    },
     output: {
-        filename: "./dist/bundle.js",
+        path: path.join(__dirname, "dist"),
+        filename: "[name].js"
     },
 
     // Enable sourcemaps for debugging webpack's output.

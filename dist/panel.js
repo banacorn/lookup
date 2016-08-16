@@ -48,7 +48,17 @@
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(2);
 	var Hello_1 = __webpack_require__(3);
-	ReactDOM.render(React.createElement(Hello_1.Hello, {compiler: "TypeScript", framework: "React"}), document.getElementById("example"));
+	ReactDOM.render(React.createElement(Hello_1.Hello, {compiler: "TypeScript", framework: "Fuck"}), document.getElementById("example"));
+	connectBackground();
+	function connectBackground() {
+	    var backgroundConn = chrome.runtime.connect({
+	        name: "woerterbuch-panel"
+	    });
+	    backgroundConn.postMessage({
+	        tabId: chrome.devtools.inspectedWindow.tabId
+	    });
+	}
+	;
 
 
 /***/ },
@@ -80,7 +90,7 @@
 	        _super.apply(this, arguments);
 	    }
 	    Hello.prototype.render = function () {
-	        return React.createElement("h1", null, "Hello from ", this.props.compiler, " and ", this.props.framework, "!!!!");
+	        return React.createElement("h1", null, "Hello from ", this.props.compiler, " and ", this.props.framework);
 	    };
 	    return Hello;
 	}(React.Component));
@@ -89,4 +99,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=panel.js.map

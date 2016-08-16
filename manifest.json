@@ -8,19 +8,14 @@
     "permissions": [
         "tabs",
         "http://*/*",
-        "https://*/*"
+        "https://*/*",
+        "file://*/*"
     ],
     "page_action": {
         "default_title": "Lookup"
     },
     "background": {
-        "scripts": ["chrome/background.js"],
+        "scripts": ["dist/background.js"],
         "persistent": false
-    },
-    "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*", "file://*/*"],
-        "js": [
-            "chrome/content.js"
-        ]
-    }]
+    }
 }

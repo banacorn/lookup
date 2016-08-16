@@ -7,6 +7,12 @@
         "target": "es5",
         "jsx": "react"
     },
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "typings/main.d.ts",
+        "!node_modules/**"
+    ],
     "files": [
         "./typings/index.d.ts",
         "./src/components/Hello.tsx",
