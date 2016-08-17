@@ -7,7 +7,8 @@ import { createStore } from "redux";
 
 import Entry from "./components/Entry";
 import { display } from "./reducers/index";
-import { Action } from "./types"
+import { A } from "./types"
+import { jump, render } from "./actions"
 
 declare var chrome: any;
 
@@ -32,9 +33,13 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener((message: any) => {
-        store.dispatch({
-            type: Action.DISPLAY,
-            word: message
-        });
-    })
+        switch (message.type) {
+            case "jump":
+                store.dispatch(jump(message.payload));
+                break;
+            case "render":
+                store.dispatch(render(message.payload));
+                break;
+        }
+    });
 }

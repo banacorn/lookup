@@ -109,9 +109,18 @@
 	        var _this = this;
 	        var id = this.injectedID;
 	        // assign the listener function to a variable so we can remove it later
-	        var onMessage = function (message) {
-	            console.log("message:", message);
-	            _this.messageUpstream(id, message);
+	        var onMessage = function (word) {
+	            console.log("word:", word);
+	            _this.messageUpstream(id, {
+	                type: "jump",
+	                payload: word
+	            });
+	            fetch(word, function (body) {
+	                _this.messageUpstream(id, {
+	                    type: "render",
+	                    payload: body
+	                });
+	            });
 	        };
 	        var onDisconnect = function () {
 	            _this.killDownstream(id);
@@ -250,6 +259,16 @@
 	    return Operator;
 	}());
 	new Operator;
+	function fetch(word, callback) {
+	    var xhr = new XMLHttpRequest();
+	    xhr.open("GET", "https://en.wiktionary.org/w/index.php?title=" + word + "&printable=yes", true);
+	    xhr.onreadystatechange = function () {
+	        if (xhr.readyState == 4) {
+	            callback(xhr.responseText);
+	        }
+	    };
+	    xhr.send();
+	}
 
 
 /***/ },

@@ -14,6 +14,8 @@ type Connection = {
     }
 };
 
+
+
 // upstream  : connetion from devtools panel
 // downstream: connetion from injected webpage
 class Operator {
@@ -86,9 +88,18 @@ class Operator {
     handleDownstreamConnection(connection: any) {
         const id = this.injectedID;
         // assign the listener function to a variable so we can remove it later
-        const onMessage = (message: any) => {
-            console.log("message:", message);
-            this.messageUpstream(id, message);
+        const onMessage = (word: any) => {
+            console.log("word:", word);
+            this.messageUpstream(id, {
+                type: "jump",
+                payload: word
+            });
+            fetch(word, (body) => {
+                this.messageUpstream(id, {
+                    type: "render",
+                    payload: body
+                });
+            });
         };
         const onDisconnect = () => {
             this.killDownstream(id);
@@ -241,3 +252,15 @@ class Operator {
 }
 
 new Operator;
+
+
+function fetch(word: string, callback: (word: string) => any) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://en.wiktionary.org/w/index.php?title=" + word + "&printable=yes", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            callback(xhr.responseText);
+        }
+    };
+    xhr.send();
+}
