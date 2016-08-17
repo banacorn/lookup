@@ -8,8 +8,8 @@ import { createStore } from 'redux';
 
 import Entry from './components/Entry';
 import reducer from './reducers/index';
-// import { A } from './types'
 import { jump, render } from './actions'
+import { parseString } from 'xml2js';
 
 declare var chrome: any;
 

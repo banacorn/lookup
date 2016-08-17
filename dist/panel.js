@@ -51,7 +51,6 @@
 	var redux_1 = __webpack_require__(13);
 	var Entry_1 = __webpack_require__(34);
 	var index_1 = __webpack_require__(35);
-	// import { A } from './types'
 	var actions_1 = __webpack_require__(36);
 	var store = redux_1.createStore(index_1.default);
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));

@@ -24,7 +24,8 @@
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",
     "redux": "^3.5.2",
-    "redux-actions": "^0.10.1"
+    "redux-actions": "^0.10.1",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "source-map-loader": "^0.1.5",
