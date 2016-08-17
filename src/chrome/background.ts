@@ -40,12 +40,8 @@ class Operator {
         // when some tabs got removed
         chrome.tabs.onRemoved.addListener((id: ID) => {
             console.info(id, "tab X");
-        });
 
-        // message from the injected script
-        // chrome.runtime.onMessage.addListener((message: any, sender: any) => {
-        //     console.info("message from tab", message, sender.tab.);
-        // })
+        });
     }
 
     inject(id: ID) {
@@ -73,18 +69,12 @@ class Operator {
                 connection.onMessage.removeListener(onMessage);
                 connection.onDisconnect.removeListener(onDisconnect);
             });
-            console.log(message.tabId, "upstream O");
             connection.id = message.tabId;
+            console.log(connection.id, "upstream O");
             this.inject(message.tabId);
-            chrome.tabs.connect(message.tabId, {
-                name: "woerterbuch-injected"
-            });
         };
         const onDisconnect = () => {
-            console.log(connection.id, "upstream X");
-            this.showConnection(connection.id);
             this.removeUpstream(connection.id);
-            this.showConnection(connection.id)
         };
         connection.onMessage.addListener(onMessage);
         connection.onDisconnect.addListener(onDisconnect);
@@ -97,11 +87,8 @@ class Operator {
             console.log("message:", message)
         };
         const onDisconnect = () => {
-            console.log(id, "downstream X");
-            this.showConnection(id);
-            this.removeDownstream(id, true);
+            this.removeDownstream(id);
             this.reinject(id);
-            this.showConnection(id)
         };
         // register connection
         this.setDownstream(id, connection, () => {
@@ -157,37 +144,37 @@ class Operator {
     }
 
     removeUpstream(id: ID) {
-        console.info(id, "upstream removed")
+        console.info(id, "removing upstream")
+        this.showConnection(id);
         const existing = _.findIndex(this.switchboard, ["id", id]);
         if (existing !== -1) {
             this.switchboard[existing].upstream.destructor();
             this.switchboard[existing].upstream = null;
-        }
+            console.info(id, "upstream XXX")
 
-        this.removeDownstream(id, false);
+            // ask downstream to disconnect
+            this.switchboard[existing].downstream.connection.postMessage("decommission");
+        }
     }
 
-    removeDownstream(id: ID, byDownstream: boolean) {
-        console.info(id, "downstream removed")
+    removeDownstream(id: ID) {
+        console.info(id, `removing downstream`)
+        this.showConnection(id);
 
         const existing = _.findIndex(this.switchboard, ["id", id]);
         if (existing !== -1) {
-            const downstream = this.switchboard[existing].downstream;
-            if (downstream) {
-                if (!byDownstream)
-                    downstream.connection.postMessage("decommission")
-                downstream.destructor();
-            }
+            this.switchboard[existing].downstream.destructor();
             this.switchboard[existing].downstream = null;
+            console.info(id, "downstream XXX")
         }
     }
 
-    removeConnection(id: ID) {
-        const existing = _.findIndex(this.switchboard, ["id", id]);
-        if (existing !== -1) {
-            this.switchboard = _.pullAt(this.switchboard, existing);
-        }
-    }
+    // removeConnection(id: ID) {
+    //     const existing = _.findIndex(this.switchboard, ["id", id]);
+    //     if (existing !== -1) {
+    //         this.switchboard = _.pullAt(this.switchboard, existing);
+    //     }
+    // }
 
     showConnection(id: ID) {
         const existing = _.findIndex(this.switchboard, ["id", id]);

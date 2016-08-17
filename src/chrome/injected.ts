@@ -3,29 +3,14 @@ declare var chrome: any;
 console.log("injected")
 
 
-// handles all incoming connections
-// chrome.runtime.onConnect.addListener((connection: any) => {
-//     console.log(connection)
-// });
 
 // establish connection with the background page
 var backgroundConn = chrome.runtime.connect({
     name: "woerterbuch-injected"
 });
 
-// backgroundConn.onDisconnect.addListener((message: any) => {
-//     console.log("disconnected!!!!");
-// })
-//
-// backgroundConn.onMessage.addListener((message: any) => {
-//     if (message === "decommission") {
-//         document.removeEventListener("mouseup", onMouseup);
-//         console.log("decommission!!!!");
-//     }
-// })
 
 let lastWord: string = undefined;
-
 const onMouseup = () => {
     const word = window.getSelection().toString().trim();
     const repeated = word === lastWord;
@@ -35,6 +20,16 @@ const onMouseup = () => {
         backgroundConn.postMessage(word);
     }
 };
+
+
+backgroundConn.onMessage.addListener((message: any) => {
+    // asked by the background page to disconnect with her
+    if (message === "decommission") {
+        document.removeEventListener("mouseup", onMouseup);
+        backgroundConn.disconnect();
+    }
+})
+
 
 // listens to text selection events
 document.addEventListener("mouseup", onMouseup, false);
