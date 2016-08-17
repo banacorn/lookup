@@ -40,9 +40,6 @@ ReactDOM.render(
     document.getElementById('example')
 )
 
-setTimeout(() => {
-    store.dispatch({ type: "INCREMENT" });
-}, 1000)
 
 // detect whether we are in normal webpage or chrome devtools
 // so that we can develop in both environments
@@ -56,5 +53,6 @@ if (inDevtools) {
     });
     backgroundConn.onMessage.addListener((message: any) => {
         console.log(message);
+        store.dispatch({ type: "INCREMENT" });
     })
 }
