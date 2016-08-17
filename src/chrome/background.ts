@@ -1,4 +1,7 @@
+import * as Promise from 'bluebird'
 import * as _ from 'lodash'
+import { parseString } from 'xml2js';
+import { jump, render, parseError } from '../actions';
 
 type ID = number;
 type Connection = {
@@ -90,15 +93,18 @@ class Operator {
         // assign the listener function to a variable so we can remove it later
         const onMessage = (word: any) => {
             console.log('word:', word);
-            this.messageUpstream(id, {
-                type: 'jump',
-                payload: word
-            });
-            fetch(word, (body) => {
-                this.messageUpstream(id, {
-                    type: 'render',
-                    payload: body
-                });
+
+            // action: JUMP
+            this.messageUpstream(id, jump(word));
+
+            fetch(word, (raw) => {
+                Promise.promisify(parseString)(raw).then(
+                    result => {
+                        // action: RENDER
+                        this.messageUpstream(id, render(JSON.stringify(result)))
+                    },
+                    error => this.messageUpstream(id, parseError(error))
+                );
             });
         };
         const onDisconnect = () => {
@@ -252,7 +258,6 @@ class Operator {
 }
 
 new Operator;
-
 
 function fetch(word: string, callback: (word: string) => any) {
     var xhr = new XMLHttpRequest();
