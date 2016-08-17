@@ -14,7 +14,7 @@ type Connection = {
     }
 };
 
-// upstream: connetion from devtools panel
+// upstream  : connetion from devtools panel
 // downstream: connetion from injected webpage
 class Operator {
 
@@ -41,8 +41,7 @@ class Operator {
         // when some tabs got removed
         chrome.tabs.onRemoved.addListener((id: ID) => {
             console.info(id, "tab X");
-            this.closeTab(id);
-
+            this.markTabClosed(id);
         });
     }
 
@@ -78,7 +77,7 @@ class Operator {
             this.inject(message.tabId);
         };
         const onDisconnect = () => {
-            this.removeUpstream(connection.id);
+            this.killUpstream(connection.id);
         };
         connection.onMessage.addListener(onMessage);
         connection.onDisconnect.addListener(onDisconnect);
@@ -91,7 +90,7 @@ class Operator {
             console.log("message:", message)
         };
         const onDisconnect = () => {
-            this.removeDownstream(id);
+            this.killDownstream(id);
             this.reinject(id);
         };
         // register connection
@@ -129,7 +128,7 @@ class Operator {
         }
     }
 
-    closeTab(id: ID) {
+    markTabClosed(id: ID) {
         const existing = _.findIndex(this.switchboard, ["id", id]);
         if (existing !== -1) {
             this.switchboard[existing].tabClosed = true;
@@ -156,7 +155,7 @@ class Operator {
         }
     }
 
-    removeUpstream(id: ID) {
+    killUpstream(id: ID) {
         console.info(id, "removing upstream")
         this.showConnection(id);
         const existing = _.findIndex(this.switchboard, ["id", id]);
@@ -171,7 +170,7 @@ class Operator {
         }
     }
 
-    removeDownstream(id: ID) {
+    killDownstream(id: ID) {
         console.info(id, `removing downstream`)
         this.showConnection(id);
 
@@ -182,13 +181,6 @@ class Operator {
             console.info(id, "downstream XXX")
         }
     }
-
-    // removeConnection(id: ID) {
-    //     const existing = _.findIndex(this.switchboard, ["id", id]);
-    //     if (existing !== -1) {
-    //         this.switchboard = _.pullAt(this.switchboard, existing);
-    //     }
-    // }
 
     showConnection(id: ID) {
         const existing = _.findIndex(this.switchboard, ["id", id]);

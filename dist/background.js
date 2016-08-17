@@ -46,7 +46,7 @@
 
 	"use strict";
 	var _ = __webpack_require__(1);
-	// upstream: connetion from devtools panel
+	// upstream  : connetion from devtools panel
 	// downstream: connetion from injected webpage
 	var Operator = (function () {
 	    function Operator() {
@@ -66,7 +66,7 @@
 	        // when some tabs got removed
 	        chrome.tabs.onRemoved.addListener(function (id) {
 	            console.info(id, "tab X");
-	            _this.closeTab(id);
+	            _this.markTabClosed(id);
 	        });
 	    }
 	    Operator.prototype.inject = function (id) {
@@ -100,7 +100,7 @@
 	            _this.inject(message.tabId);
 	        };
 	        var onDisconnect = function () {
-	            _this.removeUpstream(connection.id);
+	            _this.killUpstream(connection.id);
 	        };
 	        connection.onMessage.addListener(onMessage);
 	        connection.onDisconnect.addListener(onDisconnect);
@@ -113,7 +113,7 @@
 	            console.log("message:", message);
 	        };
 	        var onDisconnect = function () {
-	            _this.removeDownstream(id);
+	            _this.killDownstream(id);
 	            _this.reinject(id);
 	        };
 	        // register connection
@@ -149,7 +149,7 @@
 	            });
 	        }
 	    };
-	    Operator.prototype.closeTab = function (id) {
+	    Operator.prototype.markTabClosed = function (id) {
 	        var existing = _.findIndex(this.switchboard, ["id", id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].tabClosed = true;
@@ -175,7 +175,7 @@
 	            });
 	        }
 	    };
-	    Operator.prototype.removeUpstream = function (id) {
+	    Operator.prototype.killUpstream = function (id) {
 	        console.info(id, "removing upstream");
 	        this.showConnection(id);
 	        var existing = _.findIndex(this.switchboard, ["id", id]);
@@ -188,7 +188,7 @@
 	                this.switchboard[existing].downstream.connection.postMessage("decommission");
 	        }
 	    };
-	    Operator.prototype.removeDownstream = function (id) {
+	    Operator.prototype.killDownstream = function (id) {
 	        console.info(id, "removing downstream");
 	        this.showConnection(id);
 	        var existing = _.findIndex(this.switchboard, ["id", id]);
@@ -198,12 +198,6 @@
 	            console.info(id, "downstream XXX");
 	        }
 	    };
-	    // removeConnection(id: ID) {
-	    //     const existing = _.findIndex(this.switchboard, ["id", id]);
-	    //     if (existing !== -1) {
-	    //         this.switchboard = _.pullAt(this.switchboard, existing);
-	    //     }
-	    // }
 	    Operator.prototype.showConnection = function (id) {
 	        var existing = _.findIndex(this.switchboard, ["id", id]);
 	        var upConn = false;
