@@ -1,6 +1,6 @@
-import * as React from "react"
-import { connect } from "react-redux";
-import { State, A } from "../types"
+import * as React from 'react'
+import { connect } from 'react-redux';
+import { State } from '../types'
 
 interface EntryProps extends React.Props<any> {
     word: string;

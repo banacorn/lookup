@@ -1,11 +1,22 @@
-import { A } from "./types";
+import { createAction, handleAction, handleActions, Action } from 'redux-actions';
+import { State } from './types';
 
-export const jump = (word: string) => ({
-    type: A.JUMP,
-    word: word
-})
+export const JUMP = 'JUMP';
+export type JUMP = {
+    word: string
+};
+export const RENDER = 'RENDER';
+export type RENDER = {
+    body: string
+};
 
-export const render = (body: string) => ({
-    type: A.RENDER,
-    body: body
-})
+let b = createAction;
+
+
+export const jump = createAction<string, JUMP>(JUMP, (s: string) => ({
+    word: s
+}));
+
+export const render = createAction<string, RENDER>(RENDER, (s: string) => ({
+    body: s
+}));

@@ -51,25 +51,26 @@
 	var redux_1 = __webpack_require__(13);
 	var Entry_1 = __webpack_require__(37);
 	var index_1 = __webpack_require__(35);
+	// import { A } from './types'
 	var actions_1 = __webpack_require__(38);
-	var store = redux_1.createStore(index_1.display);
-	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById("entry"));
+	var store = redux_1.createStore(index_1.default);
+	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	var inDevtools = chrome.devtools !== undefined;
 	if (inDevtools) {
 	    var backgroundConn = chrome.runtime.connect({
-	        name: "woerterbuch-panel"
+	        name: 'woerterbuch-panel'
 	    });
 	    backgroundConn.postMessage({
 	        tabId: chrome.devtools.inspectedWindow.tabId
 	    });
 	    backgroundConn.onMessage.addListener(function (message) {
 	        switch (message.type) {
-	            case "jump":
+	            case 'jump':
 	                store.dispatch(actions_1.jump(message.payload));
 	                break;
-	            case "render":
+	            case 'render':
 	                store.dispatch(actions_1.render(message.payload));
 	                break;
 	        }
@@ -18752,42 +18753,28 @@
 
 	"use strict";
 	var _ = __webpack_require__(1);
-	var types_1 = __webpack_require__(36);
-	var initialState = {
-	    word: ":D",
-	    body: ":D"
+	var actions_1 = __webpack_require__(38);
+	var redux_actions_1 = __webpack_require__(39);
+	var defaultState = {
+	    word: ':D',
+	    body: ':D'
 	};
-	function display(state, action) {
-	    if (state === void 0) { state = initialState; }
-	    switch (action.type) {
-	        case types_1.A.JUMP:
-	            return _.assign({}, state, {
-	                word: action.word
-	            });
-	        case types_1.A.RENDER:
-	            return _.assign({}, state, {
-	                body: action.body
-	            });
-	        default:
-	            return state;
-	    }
-	}
-	exports.display = display;
+	var reducer = redux_actions_1.handleActions((_a = {},
+	    _a[actions_1.JUMP] = function (state, action) { return _.assign({}, state, {
+	        word: action.payload.word
+	    }); },
+	    _a[actions_1.RENDER] = function (state, action) { return _.assign({}, state, {
+	        body: action.payload.body
+	    }); },
+	    _a
+	), defaultState);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = reducer;
+	var _a;
 
 
 /***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var A;
-	(function (A) {
-	    A.JUMP = "JUMP";
-	    A.RENDER = "RENDER";
-	})(A = exports.A || (exports.A = {}));
-
-
-/***/ },
+/* 36 */,
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -18826,16 +18813,219 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var types_1 = __webpack_require__(36);
-	exports.jump = function (word) { return ({
-	    type: types_1.A.JUMP,
-	    word: word
-	}); };
-	exports.render = function (body) { return ({
-	    type: types_1.A.RENDER,
-	    body: body
-	}); };
+	var redux_actions_1 = __webpack_require__(39);
+	exports.JUMP = 'JUMP';
+	exports.RENDER = 'RENDER';
+	var b = redux_actions_1.createAction;
+	exports.jump = redux_actions_1.createAction(exports.JUMP, function (s) { return ({
+	    word: s
+	}); });
+	exports.render = redux_actions_1.createAction(exports.RENDER, function (s) { return ({
+	    body: s
+	}); });
 
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.handleActions = exports.handleAction = exports.createAction = undefined;
+	
+	var _createAction = __webpack_require__(40);
+	
+	var _createAction2 = _interopRequireDefault(_createAction);
+	
+	var _handleAction = __webpack_require__(41);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _handleActions = __webpack_require__(42);
+	
+	var _handleActions2 = _interopRequireDefault(_handleActions);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.createAction = _createAction2.default;
+	exports.handleAction = _handleAction2.default;
+	exports.handleActions = _handleActions2.default;
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = createAction;
+	function identity(t) {
+	  return t;
+	}
+	
+	function createAction(type, actionCreator, metaCreator) {
+	  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
+	
+	  var actionHandler = function actionHandler() {
+	    var hasError = (arguments.length <= 0 ? undefined : arguments[0]) instanceof Error;
+	
+	    var action = {
+	      type: type
+	    };
+	
+	    var payload = hasError ? arguments.length <= 0 ? undefined : arguments[0] : finalActionCreator.apply(undefined, arguments);
+	    if (!(payload === null || payload === undefined)) {
+	      action.payload = payload;
+	    }
+	
+	    if (hasError) {
+	      // Handle FSA errors where the payload is an Error object. Set error.
+	      action.error = true;
+	    }
+	
+	    if (typeof metaCreator === 'function') {
+	      action.meta = metaCreator.apply(undefined, arguments);
+	    }
+	
+	    return action;
+	  };
+	
+	  actionHandler.toString = function () {
+	    return type;
+	  };
+	
+	  return actionHandler;
+	}
+
+/***/ },
+/* 41 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleAction;
+	function isFunction(val) {
+	  return typeof val === 'function';
+	}
+	
+	function handleAction(type, reducers, defaultState) {
+	  var typeValue = isFunction(type) ? type.toString() : type;
+	
+	  return function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	
+	    // If action type does not match, return previous state
+	    if (action.type !== typeValue) return state;
+	
+	    var handlerKey = action.error === true ? 'throw' : 'next';
+	
+	    // If function is passed instead of map, use as reducer
+	    if (isFunction(reducers)) {
+	      reducers.next = reducers.throw = reducers;
+	    }
+	
+	    // Otherwise, assume an action map was passed
+	    var reducer = reducers[handlerKey];
+	
+	    return isFunction(reducer) ? reducer(state, action) : state;
+	  };
+	}
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleActions;
+	
+	var _handleAction = __webpack_require__(41);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _ownKeys = __webpack_require__(43);
+	
+	var _ownKeys2 = _interopRequireDefault(_ownKeys);
+	
+	var _reduceReducers = __webpack_require__(44);
+	
+	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function handleActions(handlers, defaultState) {
+	  var reducers = (0, _ownKeys2.default)(handlers).map(function (type) {
+	    return (0, _handleAction2.default)(type, handlers[type]);
+	  });
+	  var reducer = _reduceReducers2.default.apply(undefined, _toConsumableArray(reducers));
+	
+	  return typeof defaultState !== 'undefined' ? function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	    return reducer(state, action);
+	  } : reducer;
+	}
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = ownKeys;
+	function ownKeys(object) {
+	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+	    return Reflect.ownKeys(object);
+	  }
+	
+	  var keys = Object.getOwnPropertyNames(object);
+	
+	  if (typeof Object.getOwnPropertySymbols === 'function') {
+	    keys = keys.concat(Object.getOwnPropertySymbols(object));
+	  }
+	
+	  return keys;
+	}
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = reduceReducers;
+	
+	function reduceReducers() {
+	  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
+	    reducers[_key] = arguments[_key];
+	  }
+	
+	  return function (previous, current) {
+	    return reducers.reduce(function (p, r) {
+	      return r(p, current);
+	    }, previous);
+	  };
+	}
+	
+	module.exports = exports["default"];
 
 /***/ }
 /******/ ]);

@@ -2,7 +2,7 @@ declare var chrome: any;
 
 // establish connection with the background page
 var backgroundConn = chrome.runtime.connect({
-    name: "woerterbuch-injected"
+    name: 'woerterbuch-injected'
 });
 
 
@@ -20,11 +20,11 @@ const onMouseup = () => {
 
 backgroundConn.onMessage.addListener((message: any) => {
     // asked by the background page to disconnect with her
-    if (message === "decommission") {
-        document.removeEventListener("mouseup", onMouseup);
+    if (message === 'decommission') {
+        document.removeEventListener('mouseup', onMouseup);
         backgroundConn.disconnect();
     }
 })
 
 // listens to text selection events
-document.addEventListener("mouseup", onMouseup, false);
+document.addEventListener('mouseup', onMouseup, false);

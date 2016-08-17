@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	chrome.devtools.panels.create("Lookup", null, "./chrome/panel.html");
+	chrome.devtools.panels.create('Lookup', null, './chrome/panel.html');
 
 
 /***/ }

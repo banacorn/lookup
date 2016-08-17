@@ -46,7 +46,7 @@
 
 	// establish connection with the background page
 	var backgroundConn = chrome.runtime.connect({
-	    name: "woerterbuch-injected"
+	    name: 'woerterbuch-injected'
 	});
 	var lastWord = undefined;
 	var onMouseup = function () {
@@ -60,13 +60,13 @@
 	};
 	backgroundConn.onMessage.addListener(function (message) {
 	    // asked by the background page to disconnect with her
-	    if (message === "decommission") {
-	        document.removeEventListener("mouseup", onMouseup);
+	    if (message === 'decommission') {
+	        document.removeEventListener('mouseup', onMouseup);
 	        backgroundConn.disconnect();
 	    }
 	});
 	// listens to text selection events
-	document.addEventListener("mouseup", onMouseup, false);
+	document.addEventListener('mouseup', onMouseup, false);
 
 
 /***/ }

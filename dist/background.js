@@ -55,35 +55,35 @@
 	        // starts listening to all incoming connections
 	        chrome.runtime.onConnect.addListener(function (connection) {
 	            switch (connection.name) {
-	                case "woerterbuch-panel":
+	                case 'woerterbuch-panel':
 	                    _this.handleUpstreamConnection(connection);
 	                    break;
-	                case "woerterbuch-injected":
+	                case 'woerterbuch-injected':
 	                    _this.handleDownstreamConnection(connection);
 	                    break;
 	            }
 	        });
 	        // when some tabs got removed
 	        chrome.tabs.onRemoved.addListener(function (id) {
-	            console.info(id, "tab X");
+	            console.info(id, 'tab X');
 	            _this.markTabClosed(id);
 	        });
 	    }
 	    Operator.prototype.inject = function (id) {
 	        var _this = this;
 	        chrome.tabs.get(id, function () {
-	            chrome.tabs.executeScript(id, { file: "./dist/injected.js" });
+	            chrome.tabs.executeScript(id, { file: './dist/injected.js' });
 	            _this.injectedID = id;
 	        });
 	    };
 	    // re-inject script if the upstream is still good but the downstream is dead
 	    Operator.prototype.reinject = function (id) {
-	        console.info("attemping to reinject");
+	        console.info('attemping to reinject');
 	        var connection = this.getConnection(id);
 	        if (connection) {
 	            if (connection.upstream && !connection.downstream && !connection.tabClosed) {
 	                this.inject(id);
-	                console.info("reinjected!");
+	                console.info('reinjected!');
 	            }
 	        }
 	    };
@@ -96,7 +96,7 @@
 	                connection.onDisconnect.removeListener(onDisconnect);
 	            });
 	            connection.id = message.tabId;
-	            console.log(connection.id, "upstream O");
+	            console.log(connection.id, 'upstream O');
 	            _this.inject(message.tabId);
 	        };
 	        var onDisconnect = function () {
@@ -110,14 +110,14 @@
 	        var id = this.injectedID;
 	        // assign the listener function to a variable so we can remove it later
 	        var onMessage = function (word) {
-	            console.log("word:", word);
+	            console.log('word:', word);
 	            _this.messageUpstream(id, {
-	                type: "jump",
+	                type: 'jump',
 	                payload: word
 	            });
 	            fetch(word, function (body) {
 	                _this.messageUpstream(id, {
-	                    type: "render",
+	                    type: 'render',
 	                    payload: body
 	                });
 	            });
@@ -131,16 +131,16 @@
 	            connection.onMessage.removeListener(onMessage);
 	            connection.onMessage.removeListener(onDisconnect);
 	        });
-	        console.log(id, "downstream O");
+	        console.log(id, 'downstream O');
 	        connection.onMessage.addListener(onMessage);
 	        connection.onDisconnect.addListener(onDisconnect);
 	    };
 	    // switchboard
 	    Operator.prototype.getConnection = function (id) {
-	        return _.find(this.switchboard, ["id", id]);
+	        return _.find(this.switchboard, ['id', id]);
 	    };
 	    Operator.prototype.setUpstream = function (id, connection, destructor) {
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].upstream = {
 	                connection: connection,
@@ -160,13 +160,13 @@
 	        }
 	    };
 	    Operator.prototype.markTabClosed = function (id) {
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].tabClosed = true;
 	        }
 	    };
 	    Operator.prototype.setDownstream = function (id, connection, destructor) {
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].downstream = {
 	                connection: connection,
@@ -186,25 +186,25 @@
 	        }
 	    };
 	    Operator.prototype.killUpstream = function (id) {
-	        console.info(id, "removing upstream");
+	        console.info(id, 'removing upstream');
 	        this.showConnection(id);
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].upstream.destructor();
 	            this.switchboard[existing].upstream = null;
-	            console.info(id, "upstream XXX");
+	            console.info(id, 'upstream XXX');
 	            // ask downstream to disconnect (if it still exists)
-	            this.messageDownstream(id, "decommission");
+	            this.messageDownstream(id, 'decommission');
 	        }
 	    };
 	    Operator.prototype.killDownstream = function (id) {
 	        console.info(id, "removing downstream");
 	        this.showConnection(id);
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        if (existing !== -1) {
 	            this.switchboard[existing].downstream.destructor();
 	            this.switchboard[existing].downstream = null;
-	            console.info(id, "downstream XXX");
+	            console.info(id, 'downstream XXX');
 	        }
 	    };
 	    Operator.prototype.messageUpstream = function (id, message) {
@@ -220,7 +220,7 @@
 	        }
 	    };
 	    Operator.prototype.showConnection = function (id) {
-	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        var existing = _.findIndex(this.switchboard, ['id', id]);
 	        var upConn = false;
 	        var upDstr = false;
 	        var downConn = false;
@@ -239,20 +239,20 @@
 	                    downDstr = true;
 	            }
 	        }
-	        var message = "";
-	        message += "up: ";
+	        var message = '';
+	        message += 'up: ';
 	        if (upConn) {
-	            message += "📶 ";
+	            message += '📶 ';
 	        }
 	        if (upConn) {
-	            message += "💣 ";
+	            message += '💣 ';
 	        }
-	        message += " down: ";
+	        message += ' down: ';
 	        if (downConn) {
-	            message += "📶 ";
+	            message += '📶 ';
 	        }
 	        if (downDstr) {
-	            message += "💣 ";
+	            message += '💣 ';
 	        }
 	        console.info(message);
 	    };
@@ -261,7 +261,7 @@
 	new Operator;
 	function fetch(word, callback) {
 	    var xhr = new XMLHttpRequest();
-	    xhr.open("GET", "https://en.wiktionary.org/w/index.php?title=" + word + "&printable=yes", true);
+	    xhr.open('GET', 'https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes', true);
 	    xhr.onreadystatechange = function () {
 	        if (xhr.readyState == 4) {
 	            callback(xhr.responseText);
