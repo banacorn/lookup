@@ -49,10 +49,10 @@
 	var ReactDOM = __webpack_require__(4);
 	var react_redux_1 = __webpack_require__(5);
 	var redux_1 = __webpack_require__(13);
-	var Entry_1 = __webpack_require__(37);
+	var Entry_1 = __webpack_require__(34);
 	var index_1 = __webpack_require__(35);
 	// import { A } from './types'
-	var actions_1 = __webpack_require__(38);
+	var actions_1 = __webpack_require__(36);
 	var store = redux_1.createStore(index_1.default);
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
@@ -18747,35 +18747,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 34 */,
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var _ = __webpack_require__(1);
-	var actions_1 = __webpack_require__(38);
-	var redux_actions_1 = __webpack_require__(39);
-	var defaultState = {
-	    word: ':D',
-	    body: ':D'
-	};
-	var reducer = redux_actions_1.handleActions((_a = {},
-	    _a[actions_1.JUMP] = function (state, action) { return _.assign({}, state, {
-	        word: action.payload.word
-	    }); },
-	    _a[actions_1.RENDER] = function (state, action) { return _.assign({}, state, {
-	        body: action.payload.body
-	    }); },
-	    _a
-	), defaultState);
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = reducer;
-	var _a;
-
-
-/***/ },
-/* 36 */,
-/* 37 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18809,11 +18781,37 @@
 
 
 /***/ },
-/* 38 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var redux_actions_1 = __webpack_require__(39);
+	var _ = __webpack_require__(1);
+	var actions_1 = __webpack_require__(36);
+	var redux_actions_1 = __webpack_require__(37);
+	var defaultState = {
+	    word: ':D',
+	    body: ':D'
+	};
+	var reducer = redux_actions_1.handleActions((_a = {},
+	    _a[actions_1.JUMP] = function (state, action) { return _.assign({}, state, {
+	        word: action.payload.word
+	    }); },
+	    _a[actions_1.RENDER] = function (state, action) { return _.assign({}, state, {
+	        body: action.payload.body
+	    }); },
+	    _a
+	), defaultState);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = reducer;
+	var _a;
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var redux_actions_1 = __webpack_require__(37);
 	exports.JUMP = 'JUMP';
 	exports.RENDER = 'RENDER';
 	var b = redux_actions_1.createAction;
@@ -18826,7 +18824,7 @@
 
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18836,15 +18834,15 @@
 	});
 	exports.handleActions = exports.handleAction = exports.createAction = undefined;
 	
-	var _createAction = __webpack_require__(40);
+	var _createAction = __webpack_require__(38);
 	
 	var _createAction2 = _interopRequireDefault(_createAction);
 	
-	var _handleAction = __webpack_require__(41);
+	var _handleAction = __webpack_require__(39);
 	
 	var _handleAction2 = _interopRequireDefault(_handleAction);
 	
-	var _handleActions = __webpack_require__(42);
+	var _handleActions = __webpack_require__(40);
 	
 	var _handleActions2 = _interopRequireDefault(_handleActions);
 	
@@ -18855,7 +18853,7 @@
 	exports.handleActions = _handleActions2.default;
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18903,7 +18901,7 @@
 	}
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18941,7 +18939,7 @@
 	}
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18951,15 +18949,15 @@
 	});
 	exports.default = handleActions;
 	
-	var _handleAction = __webpack_require__(41);
+	var _handleAction = __webpack_require__(39);
 	
 	var _handleAction2 = _interopRequireDefault(_handleAction);
 	
-	var _ownKeys = __webpack_require__(43);
+	var _ownKeys = __webpack_require__(41);
 	
 	var _ownKeys2 = _interopRequireDefault(_ownKeys);
 	
-	var _reduceReducers = __webpack_require__(44);
+	var _reduceReducers = __webpack_require__(42);
 	
 	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
 	
@@ -18981,7 +18979,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -19005,7 +19003,7 @@
 	}
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports) {
 
 	"use strict";
