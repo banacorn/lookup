@@ -87,7 +87,8 @@ class Operator {
         const id = this.injectedID;
         // assign the listener function to a variable so we can remove it later
         const onMessage = (message: any) => {
-            console.log("message:", message)
+            console.log("message:", message);
+            this.messageUpstream(id, message);
         };
         const onDisconnect = () => {
             this.killDownstream(id);
@@ -165,8 +166,7 @@ class Operator {
             console.info(id, "upstream XXX")
 
             // ask downstream to disconnect (if it still exists)
-            if (this.switchboard[existing].downstream && this.switchboard[existing].downstream.connection)
-                this.switchboard[existing].downstream.connection.postMessage("decommission");
+            this.messageDownstream(id, "decommission");
         }
     }
 
@@ -179,6 +179,19 @@ class Operator {
             this.switchboard[existing].downstream.destructor();
             this.switchboard[existing].downstream = null;
             console.info(id, "downstream XXX")
+        }
+    }
+
+    messageUpstream(id: ID, message: any) {
+        const connection = this.getConnection(id);
+        if (connection && connection.upstream) {
+            connection.upstream.connection.postMessage(message);
+        }
+    }
+    messageDownstream(id: ID, message: any) {
+        const connection = this.getConnection(id);
+        if (connection && connection.downstream) {
+            connection.downstream.connection.postMessage(message);
         }
     }
 

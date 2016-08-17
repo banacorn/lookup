@@ -1,9 +1,5 @@
 declare var chrome: any;
 
-console.log("injected")
-
-
-
 // establish connection with the background page
 var backgroundConn = chrome.runtime.connect({
     name: "woerterbuch-injected"
@@ -29,7 +25,6 @@ backgroundConn.onMessage.addListener((message: any) => {
         backgroundConn.disconnect();
     }
 })
-
 
 // listens to text selection events
 document.addEventListener("mouseup", onMouseup, false);

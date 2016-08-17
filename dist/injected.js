@@ -44,7 +44,6 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	console.log("injected");
 	// establish connection with the background page
 	var backgroundConn = chrome.runtime.connect({
 	    name: "woerterbuch-injected"

@@ -111,6 +111,7 @@
 	        // assign the listener function to a variable so we can remove it later
 	        var onMessage = function (message) {
 	            console.log("message:", message);
+	            _this.messageUpstream(id, message);
 	        };
 	        var onDisconnect = function () {
 	            _this.killDownstream(id);
@@ -184,8 +185,7 @@
 	            this.switchboard[existing].upstream = null;
 	            console.info(id, "upstream XXX");
 	            // ask downstream to disconnect (if it still exists)
-	            if (this.switchboard[existing].downstream && this.switchboard[existing].downstream.connection)
-	                this.switchboard[existing].downstream.connection.postMessage("decommission");
+	            this.messageDownstream(id, "decommission");
 	        }
 	    };
 	    Operator.prototype.killDownstream = function (id) {
@@ -196,6 +196,18 @@
 	            this.switchboard[existing].downstream.destructor();
 	            this.switchboard[existing].downstream = null;
 	            console.info(id, "downstream XXX");
+	        }
+	    };
+	    Operator.prototype.messageUpstream = function (id, message) {
+	        var connection = this.getConnection(id);
+	        if (connection && connection.upstream) {
+	            connection.upstream.connection.postMessage(message);
+	        }
+	    };
+	    Operator.prototype.messageDownstream = function (id, message) {
+	        var connection = this.getConnection(id);
+	        if (connection && connection.downstream) {
+	            connection.downstream.connection.postMessage(message);
 	        }
 	    };
 	    Operator.prototype.showConnection = function (id) {
