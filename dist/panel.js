@@ -49,22 +49,11 @@
 	var ReactDOM = __webpack_require__(4);
 	var react_redux_1 = __webpack_require__(5);
 	var redux_1 = __webpack_require__(13);
-	var Counter_1 = __webpack_require__(34);
+	var Entry_1 = __webpack_require__(37);
 	var index_1 = __webpack_require__(35);
-	var mapStateToProps = function (state) {
-	    return {
-	        value: state
-	    };
-	};
-	var mapDispatchToProps = function (dispatch) {
-	    return {
-	        onIncrement: function () { return dispatch({ type: 'INCREMENT' }); },
-	        onDecrement: function () { return dispatch({ type: 'DECREMENT' }); },
-	    };
-	};
-	var store = redux_1.createStore(index_1.default);
-	var Cntr = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Counter_1.default);
-	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Cntr, null)), document.getElementById('example'));
+	var types_1 = __webpack_require__(36);
+	var store = redux_1.createStore(index_1.display);
+	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('example'));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	var inDevtools = chrome.devtools !== undefined;
@@ -77,7 +66,10 @@
 	    });
 	    backgroundConn.onMessage.addListener(function (message) {
 	        console.log(message);
-	        store.dispatch({ type: "INCREMENT" });
+	        store.dispatch({
+	            type: types_1.Action.DISPLAY,
+	            word: message
+	        });
 	    });
 	}
 
@@ -1997,7 +1989,39 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 34 */
+/* 34 */,
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var types_1 = __webpack_require__(36);
+	function display(state, action) {
+	    if (state === void 0) { state = { word: "Eis" }; }
+	    switch (action.type) {
+	        case types_1.Action.DISPLAY:
+	            return {
+	                word: action.word
+	            };
+	        default:
+	            return state;
+	    }
+	}
+	exports.display = display;
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Action;
+	(function (Action) {
+	    Action.DISPLAY = "DISPLAY";
+	})(Action = exports.Action || (exports.Action = {}));
+
+
+/***/ },
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2007,50 +2031,29 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(3);
+	var react_redux_1 = __webpack_require__(5);
 	;
-	var Counter = (function (_super) {
-	    __extends(Counter, _super);
-	    function Counter(props) {
-	        _super.call(this, props);
-	        this.incrementAsync = this.incrementAsync.bind(this);
-	        this.incrementIfOdd = this.incrementIfOdd.bind(this);
+	var mapStateToProps = function (state) {
+	    return {
+	        word: state.word
+	    };
+	};
+	var mapDispatchToProps = function (dispatch) {
+	    return {};
+	};
+	var Entry = (function (_super) {
+	    __extends(Entry, _super);
+	    function Entry() {
+	        _super.apply(this, arguments);
 	    }
-	    Counter.prototype.incrementIfOdd = function () {
-	        if (this.props.value % 2 !== 0) {
-	            this.props.onIncrement();
-	        }
+	    Entry.prototype.render = function () {
+	        var word = this.props.word;
+	        return (React.createElement("article", null, React.createElement("h1", null, word)));
 	    };
-	    Counter.prototype.incrementAsync = function () {
-	        setTimeout(this.props.onIncrement, 1000);
-	    };
-	    Counter.prototype.render = function () {
-	        var _a = this.props, value = _a.value, onIncrement = _a.onIncrement, onDecrement = _a.onDecrement;
-	        return (React.createElement("p", null, "Clicked: ", value, " times", " ", React.createElement("button", {onClick: onIncrement}, "+"), " ", React.createElement("button", {onClick: onDecrement}, "-"), " ", React.createElement("button", {onClick: this.incrementIfOdd}, "Increment if odd"), " ", React.createElement("button", {onClick: this.incrementAsync}, "Increment async")));
-	    };
-	    return Counter;
+	    return Entry;
 	}(React.Component));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Counter;
-
-
-/***/ },
-/* 35 */
-/***/ function(module, exports) {
-
-	"use strict";
-	function counter(state, action) {
-	    if (state === void 0) { state = 0; }
-	    switch (action.type) {
-	        case 'INCREMENT':
-	            return state + 1;
-	        case 'DECREMENT':
-	            return state - 1;
-	        default:
-	            return state;
-	    }
-	}
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = counter;
+	exports.default = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Entry);
 
 
 /***/ }

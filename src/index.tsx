@@ -5,37 +5,17 @@ import { Provider, connect } from "react-redux";
 import { createStore } from "redux";
 
 
-import { Hello } from "./components/Hello";
-import Counter from "./components/Counter";
-import counter from "./reducers/index";
+import Entry from "./components/Entry";
+import { display } from "./reducers/index";
+import { Action } from "./types"
 
 declare var chrome: any;
 
-
-const mapStateToProps = (state: number) => {
-    return {
-        value: state
-    }
-}
-
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-        onIncrement: () => dispatch({ type: 'INCREMENT' }),
-        onDecrement: () => dispatch({ type: 'DECREMENT' }),
-    }
-}
-
-const store = createStore(counter)
-
-const Cntr = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Counter);
-
+const store = createStore(display)
 
 ReactDOM.render(
     <Provider store={store}>
-        <Cntr />
+        <Entry />
     </Provider>,
     document.getElementById('example')
 )
@@ -53,6 +33,9 @@ if (inDevtools) {
     });
     backgroundConn.onMessage.addListener((message: any) => {
         console.log(message);
-        store.dispatch({ type: "INCREMENT" });
+        store.dispatch({
+            type: Action.DISPLAY,
+            word: message
+        });
     })
 }

@@ -1,10 +1,16 @@
-export default function counter(state = 0, action: any) {
+import { Action } from "../types"
+
+function display(state = { word: "Eis" }, action: any) {
     switch (action.type) {
-        case 'INCREMENT':
-            return state + 1
-        case 'DECREMENT':
-            return state - 1
+        case Action.DISPLAY:
+            return {
+                word: action.word
+            }
         default:
             return state
     }
+}
+
+export {
+    display
 }
