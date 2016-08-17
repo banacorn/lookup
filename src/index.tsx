@@ -22,6 +22,39 @@ ReactDOM.render(
     document.getElementById('entry')
 )
 
+var parseStringP = Promise.promisify(parseString);
+//
+//
+// function parseXML({ dispatch }) {
+//     return (next: any) => (action: any) => {
+//         if (action.type === "RENDER") {
+//             // Call the next dispatch method in the middleware chain.
+//             // let returnValue = next(action)
+//
+//             // console.log('state aftesr dispatch', getState())
+//
+//             // This will likely be the action itself, unless
+//             // a middleware further in chain changed it.
+//             // return returnValue;
+//             return parseStringP(action.payload.body).then(
+//                 result => {
+//                     dispatch({
+//                         type: "RENNDER",
+//                         payload: result
+//                     });
+//                 },
+//                 error => {
+//                     dispatch({
+//                         type: "RENNDER",
+//                         payload: error
+//                     });
+//                 }
+//             )
+//         } else {
+//             return next(action);
+//         }
+//     }
+// }
 
 // detect whether we are in normal webpage or chrome devtools
 // so that we can develop in both environments

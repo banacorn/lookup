@@ -1,4 +1,5 @@
 var path = require("path");
+var webpack = require("webpack");
 
 module.exports = {
     entry: {
@@ -31,6 +32,13 @@ module.exports = {
             { test: /\.js$/, loader: "source-map-loader" }
         ]
     },
+
+     plugins: [
+        new webpack.IgnorePlugin(
+          /\.\/(timers|any|race|call_get|filter|generators|map|nodeify|promisify|props|reduce|settle|some|progress|cancel)\.js/,
+          /node_modules\/bluebird\/js\/main/
+        ),
+    ],
 
     // When importing a module whose path matches one of the following, just
     // assume a corresponding global variable exists and use that instead.
