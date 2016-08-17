@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as Promise from "bluebird";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider, connect } from 'react-redux';
