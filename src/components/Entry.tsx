@@ -12,23 +12,17 @@ const mapStateToProps = (state: State) => {
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-    }
-}
-
 class Entry extends React.Component<EntryProps, void> {
     render() {
         const { word } = this.props;
         return (
-            <article>
+            <section>
                 <h1>{ word }</h1>
-            </article>
+            </section>
         )
     }
 }
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
 )(Entry);

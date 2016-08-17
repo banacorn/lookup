@@ -53,7 +53,7 @@
 	var index_1 = __webpack_require__(35);
 	var types_1 = __webpack_require__(36);
 	var store = redux_1.createStore(index_1.display);
-	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('example'));
+	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById("entry"));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	var inDevtools = chrome.devtools !== undefined;
@@ -65,7 +65,6 @@
 	        tabId: chrome.devtools.inspectedWindow.tabId
 	    });
 	    backgroundConn.onMessage.addListener(function (message) {
-	        console.log(message);
 	        store.dispatch({
 	            type: types_1.Action.DISPLAY,
 	            word: message
@@ -2038,9 +2037,6 @@
 	        word: state.word
 	    };
 	};
-	var mapDispatchToProps = function (dispatch) {
-	    return {};
-	};
 	var Entry = (function (_super) {
 	    __extends(Entry, _super);
 	    function Entry() {
@@ -2048,12 +2044,12 @@
 	    }
 	    Entry.prototype.render = function () {
 	        var word = this.props.word;
-	        return (React.createElement("article", null, React.createElement("h1", null, word)));
+	        return (React.createElement("section", null, React.createElement("h1", null, word)));
 	    };
 	    return Entry;
 	}(React.Component));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Entry);
+	exports.default = react_redux_1.connect(mapStateToProps)(Entry);
 
 
 /***/ }

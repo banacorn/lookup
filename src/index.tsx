@@ -17,7 +17,7 @@ ReactDOM.render(
     <Provider store={store}>
         <Entry />
     </Provider>,
-    document.getElementById('example')
+    document.getElementById("entry")
 )
 
 
@@ -32,7 +32,6 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener((message: any) => {
-        console.log(message);
         store.dispatch({
             type: Action.DISPLAY,
             word: message
