@@ -66,6 +66,7 @@
 	        // when some tabs got removed
 	        chrome.tabs.onRemoved.addListener(function (id) {
 	            console.info(id, "tab X");
+	            _this.closeTab(id);
 	        });
 	    }
 	    Operator.prototype.inject = function (id) {
@@ -77,10 +78,12 @@
 	    };
 	    // re-inject script if the upstream is still good but the downstream is dead
 	    Operator.prototype.reinject = function (id) {
+	        console.info("attemping to reinject");
 	        var connection = this.getConnection(id);
 	        if (connection) {
-	            if (connection.upstream && !connection.downstream) {
+	            if (connection.upstream && !connection.downstream && !connection.tabClosed) {
 	                this.inject(id);
+	                console.info("reinjected!");
 	            }
 	        }
 	    };
@@ -137,12 +140,19 @@
 	        else {
 	            this.switchboard.push({
 	                id: id,
+	                tabClosed: false,
 	                upstream: {
 	                    connection: connection,
 	                    destructor: destructor
 	                },
 	                downstream: null
 	            });
+	        }
+	    };
+	    Operator.prototype.closeTab = function (id) {
+	        var existing = _.findIndex(this.switchboard, ["id", id]);
+	        if (existing !== -1) {
+	            this.switchboard[existing].tabClosed = true;
 	        }
 	    };
 	    Operator.prototype.setDownstream = function (id, connection, destructor) {
@@ -156,6 +166,7 @@
 	        else {
 	            this.switchboard.push({
 	                id: id,
+	                tabClosed: false,
 	                upstream: null,
 	                downstream: {
 	                    connection: connection,
@@ -172,8 +183,9 @@
 	            this.switchboard[existing].upstream.destructor();
 	            this.switchboard[existing].upstream = null;
 	            console.info(id, "upstream XXX");
-	            // ask downstream to disconnect
-	            this.switchboard[existing].downstream.connection.postMessage("decommission");
+	            // ask downstream to disconnect (if it still exists)
+	            if (this.switchboard[existing].downstream && this.switchboard[existing].downstream.connection)
+	                this.switchboard[existing].downstream.connection.postMessage("decommission");
 	        }
 	    };
 	    Operator.prototype.removeDownstream = function (id) {

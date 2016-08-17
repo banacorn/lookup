@@ -3,6 +3,7 @@ import * as _ from "lodash"
 type ID = number;
 type Connection = {
     id: ID,
+    tabClosed: boolean,
     upstream: {
         connection: any,
         destructor: () => void
@@ -40,6 +41,7 @@ class Operator {
         // when some tabs got removed
         chrome.tabs.onRemoved.addListener((id: ID) => {
             console.info(id, "tab X");
+            this.closeTab(id);
 
         });
     }
@@ -53,10 +55,12 @@ class Operator {
 
     // re-inject script if the upstream is still good but the downstream is dead
     reinject(id: ID) {
+        console.info("attemping to reinject")
         const connection = this.getConnection(id);
         if (connection) {
-            if (connection.upstream && !connection.downstream) {
+            if (connection.upstream && !connection.downstream && !connection.tabClosed) {
                 this.inject(id);
+                console.info("reinjected!")
             }
         }
     }
@@ -115,12 +119,20 @@ class Operator {
         } else {
             this.switchboard.push({
                 id: id,
+                tabClosed: false,
                 upstream: {
                     connection: connection,
                     destructor: destructor
                 },
                 downstream: null
             });
+        }
+    }
+
+    closeTab(id: ID) {
+        const existing = _.findIndex(this.switchboard, ["id", id]);
+        if (existing !== -1) {
+            this.switchboard[existing].tabClosed = true;
         }
     }
 
@@ -134,6 +146,7 @@ class Operator {
         } else {
             this.switchboard.push({
                 id: id,
+                tabClosed: false,
                 upstream: null,
                 downstream: {
                     connection: connection,
@@ -152,8 +165,9 @@ class Operator {
             this.switchboard[existing].upstream = null;
             console.info(id, "upstream XXX")
 
-            // ask downstream to disconnect
-            this.switchboard[existing].downstream.connection.postMessage("decommission");
+            // ask downstream to disconnect (if it still exists)
+            if (this.switchboard[existing].downstream && this.switchboard[existing].downstream.connection)
+                this.switchboard[existing].downstream.connection.postMessage("decommission");
         }
     }
 
