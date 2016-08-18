@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import { jump, render, parseError } from '../actions';
-import parser from '../parser';
+import parser from './parser';
 
 // import { parseString } from 'xml2js';
 

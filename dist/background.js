@@ -17249,10 +17249,36 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var _ = __webpack_require__(1);
 	var Promise = __webpack_require__(11);
 	var xml2js_1 = __webpack_require__(14);
+	// function group(input: any[], tag: string): Section[] {
+	//     let result: Section[] = [];
+	//
+	//     let section: Section = null;
+	//     input.forEach((node: any) => {
+	//         if (node['#name'] === tag && section === null) {
+	//             section = {
+	//                 name: node.span[0]._,
+	//                 body: "",
+	//                 subs: []
+	//             }
+	//         }
+	//     })
+	//     return result;
+	//     //
+	//     // let section
+	//     // if (node['#name'] === tag) {
+	//     //
+	//     // }
+	// }
+	//
 	function transform(input) {
 	    var nodes = input.html.body[0].div[2].div[2].div[3].$$;
+	    // trucates some nodes before the content parts
+	    nodes = _.drop(nodes, _.findIndex(nodes, ['#name', 'h2']));
+	    // removes <hr>s between language sections
+	    nodes = nodes.filter(function (node) { return node['#name'] !== 'hr'; });
 	    var result = [];
 	    nodes.forEach(function (node) {
 	        switch (node['#name']) {
