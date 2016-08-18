@@ -35495,10 +35495,10 @@
 
 	"use strict";
 	var Promise = __webpack_require__(1);
-	var xml2js = __webpack_require__(13);
+	var xml2js_1 = __webpack_require__(13);
 	function parseXMLPromise(raw) {
 	    return new Promise(function (resolve, reject) {
-	        xml2js.parseString(raw, {
+	        xml2js_1.parseString(raw, {
 	            explicitChildren: true,
 	            preserveChildrenOrder: true
 	        }, function (err, result) {
