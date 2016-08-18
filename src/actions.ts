@@ -1,5 +1,5 @@
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
-import { State } from './types';
+import { State, Section } from './types';
 
 export const JUMP = 'JUMP';
 export type JUMP = {
@@ -11,11 +11,11 @@ export type PARSE_ERROR = {
 };
 export const RENDER = 'RENDER';
 export type RENDER = {
-    body: any
+    body: Section[]
 };
 
 let b = createAction;
 
 export const jump = createAction<string, JUMP>(JUMP, word => ({ word }));
 export const parseError = createAction<any, PARSE_ERROR>(PARSE_ERROR, error => ({ error }));
-export const render = createAction<any, RENDER>(RENDER, body => ({ body }));
+export const render = createAction<Section[], RENDER>(RENDER, body => ({ body }));

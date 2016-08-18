@@ -1,19 +1,18 @@
 import * as _ from 'lodash';
-import { State } from '../types';
-import { JUMP, RENDER } from '../actions';
+import { State } from './types';
+import { JUMP, RENDER } from './actions';
 import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
 const defaultState: State = {
     word: ':D',
-    body: ':D'
+    body: []
 }
 
 function handleRender(state: State, action: Action<RENDER>): State {
-
     console.log(action.payload.body)
     return _.assign({}, state, {
-        body: JSON.stringify(action.payload.body)
+        body: action.payload.body
     });
 }
 

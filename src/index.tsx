@@ -5,7 +5,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 
 import Entry from './components/Entry';
-import reducer from './reducers/index';
+import reducer from './reducer';
 
 declare var chrome: any;
 
@@ -29,4 +29,4 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener(store.dispatch);
-} 
+}

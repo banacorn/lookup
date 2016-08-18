@@ -1,4 +1,10 @@
 export type State = {
     word: string,
-    body: string
+    body: Section[]
+}
+
+export type Section = {
+    name: string,
+    body: any,
+    subs: Section[]
 }
