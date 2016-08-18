@@ -40,17 +40,18 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var React = __webpack_require__(3);
-	var ReactDOM = __webpack_require__(4);
-	var react_redux_1 = __webpack_require__(5);
-	var redux_1 = __webpack_require__(13);
-	var Entry_1 = __webpack_require__(34);
-	var index_1 = __webpack_require__(35);
+	var React = __webpack_require__(179);
+	var ReactDOM = __webpack_require__(180);
+	var react_redux_1 = __webpack_require__(181);
+	var redux_1 = __webpack_require__(188);
+	var Entry_1 = __webpack_require__(209);
+	var index_1 = __webpack_require__(210);
 	var store = redux_1.createStore(index_1.default);
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
@@ -68,7 +69,175 @@
 
 
 /***/ },
-/* 1 */
+
+/***/ 2:
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	(function () {
+	    try {
+	        cachedSetTimeout = setTimeout;
+	    } catch (e) {
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
+	    }
+	    try {
+	        cachedClearTimeout = clearTimeout;
+	    } catch (e) {
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+
+/***/ 4:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -16805,10 +16974,11 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(2)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(5)(module)))
 
 /***/ },
-/* 2 */
+
+/***/ 5:
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -16824,19 +16994,246 @@
 
 
 /***/ },
-/* 3 */
+
+/***/ 6:
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var redux_actions_1 = __webpack_require__(7);
+	exports.JUMP = 'JUMP';
+	exports.PARSE_ERROR = 'PARSE_ERROR';
+	exports.RENDER = 'RENDER';
+	var b = redux_actions_1.createAction;
+	exports.jump = redux_actions_1.createAction(exports.JUMP, function (word) { return ({ word: word }); });
+	exports.parseError = redux_actions_1.createAction(exports.PARSE_ERROR, function (error) { return ({ error: error }); });
+	exports.render = redux_actions_1.createAction(exports.RENDER, function (body) { return ({ body: body }); });
+
+
+/***/ },
+
+/***/ 7:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.handleActions = exports.handleAction = exports.createAction = undefined;
+	
+	var _createAction = __webpack_require__(8);
+	
+	var _createAction2 = _interopRequireDefault(_createAction);
+	
+	var _handleAction = __webpack_require__(9);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _handleActions = __webpack_require__(10);
+	
+	var _handleActions2 = _interopRequireDefault(_handleActions);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.createAction = _createAction2.default;
+	exports.handleAction = _handleAction2.default;
+	exports.handleActions = _handleActions2.default;
+
+/***/ },
+
+/***/ 8:
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = createAction;
+	function identity(t) {
+	  return t;
+	}
+	
+	function createAction(type, actionCreator, metaCreator) {
+	  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
+	
+	  var actionHandler = function actionHandler() {
+	    var hasError = (arguments.length <= 0 ? undefined : arguments[0]) instanceof Error;
+	
+	    var action = {
+	      type: type
+	    };
+	
+	    var payload = hasError ? arguments.length <= 0 ? undefined : arguments[0] : finalActionCreator.apply(undefined, arguments);
+	    if (!(payload === null || payload === undefined)) {
+	      action.payload = payload;
+	    }
+	
+	    if (hasError) {
+	      // Handle FSA errors where the payload is an Error object. Set error.
+	      action.error = true;
+	    }
+	
+	    if (typeof metaCreator === 'function') {
+	      action.meta = metaCreator.apply(undefined, arguments);
+	    }
+	
+	    return action;
+	  };
+	
+	  actionHandler.toString = function () {
+	    return type;
+	  };
+	
+	  return actionHandler;
+	}
+
+/***/ },
+
+/***/ 9:
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleAction;
+	function isFunction(val) {
+	  return typeof val === 'function';
+	}
+	
+	function handleAction(type, reducers, defaultState) {
+	  var typeValue = isFunction(type) ? type.toString() : type;
+	
+	  return function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	
+	    // If action type does not match, return previous state
+	    if (action.type !== typeValue) return state;
+	
+	    var handlerKey = action.error === true ? 'throw' : 'next';
+	
+	    // If function is passed instead of map, use as reducer
+	    if (isFunction(reducers)) {
+	      reducers.next = reducers.throw = reducers;
+	    }
+	
+	    // Otherwise, assume an action map was passed
+	    var reducer = reducers[handlerKey];
+	
+	    return isFunction(reducer) ? reducer(state, action) : state;
+	  };
+	}
+
+/***/ },
+
+/***/ 10:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleActions;
+	
+	var _handleAction = __webpack_require__(9);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _ownKeys = __webpack_require__(11);
+	
+	var _ownKeys2 = _interopRequireDefault(_ownKeys);
+	
+	var _reduceReducers = __webpack_require__(12);
+	
+	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function handleActions(handlers, defaultState) {
+	  var reducers = (0, _ownKeys2.default)(handlers).map(function (type) {
+	    return (0, _handleAction2.default)(type, handlers[type]);
+	  });
+	  var reducer = _reduceReducers2.default.apply(undefined, _toConsumableArray(reducers));
+	
+	  return typeof defaultState !== 'undefined' ? function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	    return reducer(state, action);
+	  } : reducer;
+	}
+
+/***/ },
+
+/***/ 11:
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = ownKeys;
+	function ownKeys(object) {
+	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+	    return Reflect.ownKeys(object);
+	  }
+	
+	  var keys = Object.getOwnPropertyNames(object);
+	
+	  if (typeof Object.getOwnPropertySymbols === 'function') {
+	    keys = keys.concat(Object.getOwnPropertySymbols(object));
+	  }
+	
+	  return keys;
+	}
+
+/***/ },
+
+/***/ 12:
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = reduceReducers;
+	
+	function reduceReducers() {
+	  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
+	    reducers[_key] = arguments[_key];
+	  }
+	
+	  return function (previous, current) {
+	    return reducers.reduce(function (p, r) {
+	      return r(p, current);
+	    }, previous);
+	  };
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+
+/***/ 179:
 /***/ function(module, exports) {
 
 	module.exports = React;
 
 /***/ },
-/* 4 */
+
+/***/ 180:
 /***/ function(module, exports) {
 
 	module.exports = ReactDOM;
 
 /***/ },
-/* 5 */
+
+/***/ 181:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16844,11 +17241,11 @@
 	exports.__esModule = true;
 	exports.connect = exports.Provider = undefined;
 	
-	var _Provider = __webpack_require__(6);
+	var _Provider = __webpack_require__(182);
 	
 	var _Provider2 = _interopRequireDefault(_Provider);
 	
-	var _connect = __webpack_require__(10);
+	var _connect = __webpack_require__(185);
 	
 	var _connect2 = _interopRequireDefault(_connect);
 	
@@ -16858,7 +17255,8 @@
 	exports.connect = _connect2["default"];
 
 /***/ },
-/* 6 */
+
+/***/ 182:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -16866,13 +17264,13 @@
 	exports.__esModule = true;
 	exports["default"] = undefined;
 	
-	var _react = __webpack_require__(3);
+	var _react = __webpack_require__(179);
 	
-	var _storeShape = __webpack_require__(8);
+	var _storeShape = __webpack_require__(183);
 	
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 	
-	var _warning = __webpack_require__(9);
+	var _warning = __webpack_require__(184);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -16939,183 +17337,18 @@
 	Provider.childContextTypes = {
 	  store: _storeShape2["default"].isRequired
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
-/* 7 */
-/***/ function(module, exports) {
 
-	// shim for using process in browser
-	var process = module.exports = {};
-	
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-	
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-	
-	(function () {
-	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
-	        }
-	    }
-	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
-	        }
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-	
-	
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-	
-	
-	
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-	
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-	
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-	
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-	
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-	
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-	
-	function noop() {}
-	
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-	
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-	
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 8 */
+/***/ 183:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	exports.__esModule = true;
 	
-	var _react = __webpack_require__(3);
+	var _react = __webpack_require__(179);
 	
 	exports["default"] = _react.PropTypes.shape({
 	  subscribe: _react.PropTypes.func.isRequired,
@@ -17124,7 +17357,8 @@
 	});
 
 /***/ },
-/* 9 */
+
+/***/ 184:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17153,7 +17387,8 @@
 	}
 
 /***/ },
-/* 10 */
+
+/***/ 185:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -17163,33 +17398,33 @@
 	exports.__esModule = true;
 	exports["default"] = connect;
 	
-	var _react = __webpack_require__(3);
+	var _react = __webpack_require__(179);
 	
-	var _storeShape = __webpack_require__(8);
+	var _storeShape = __webpack_require__(183);
 	
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 	
-	var _shallowEqual = __webpack_require__(11);
+	var _shallowEqual = __webpack_require__(186);
 	
 	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
 	
-	var _wrapActionCreators = __webpack_require__(12);
+	var _wrapActionCreators = __webpack_require__(187);
 	
 	var _wrapActionCreators2 = _interopRequireDefault(_wrapActionCreators);
 	
-	var _warning = __webpack_require__(9);
+	var _warning = __webpack_require__(184);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
-	var _isPlainObject = __webpack_require__(27);
+	var _isPlainObject = __webpack_require__(202);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _hoistNonReactStatics = __webpack_require__(32);
+	var _hoistNonReactStatics = __webpack_require__(207);
 	
 	var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
 	
-	var _invariant = __webpack_require__(33);
+	var _invariant = __webpack_require__(208);
 	
 	var _invariant2 = _interopRequireDefault(_invariant);
 	
@@ -17549,10 +17784,11 @@
 	    return (0, _hoistNonReactStatics2["default"])(Connect, WrappedComponent);
 	  };
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
-/* 11 */
+
+/***/ 186:
 /***/ function(module, exports) {
 
 	"use strict";
@@ -17583,7 +17819,8 @@
 	}
 
 /***/ },
-/* 12 */
+
+/***/ 187:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17591,7 +17828,7 @@
 	exports.__esModule = true;
 	exports["default"] = wrapActionCreators;
 	
-	var _redux = __webpack_require__(13);
+	var _redux = __webpack_require__(188);
 	
 	function wrapActionCreators(actionCreators) {
 	  return function (dispatch) {
@@ -17600,7 +17837,8 @@
 	}
 
 /***/ },
-/* 13 */
+
+/***/ 188:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -17608,27 +17846,27 @@
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 	
-	var _createStore = __webpack_require__(14);
+	var _createStore = __webpack_require__(189);
 	
 	var _createStore2 = _interopRequireDefault(_createStore);
 	
-	var _combineReducers = __webpack_require__(22);
+	var _combineReducers = __webpack_require__(197);
 	
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 	
-	var _bindActionCreators = __webpack_require__(24);
+	var _bindActionCreators = __webpack_require__(199);
 	
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 	
-	var _applyMiddleware = __webpack_require__(25);
+	var _applyMiddleware = __webpack_require__(200);
 	
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 	
-	var _compose = __webpack_require__(26);
+	var _compose = __webpack_require__(201);
 	
 	var _compose2 = _interopRequireDefault(_compose);
 	
-	var _warning = __webpack_require__(23);
+	var _warning = __webpack_require__(198);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -17649,10 +17887,11 @@
 	exports.bindActionCreators = _bindActionCreators2["default"];
 	exports.applyMiddleware = _applyMiddleware2["default"];
 	exports.compose = _compose2["default"];
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
-/* 14 */
+
+/***/ 189:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17661,11 +17900,11 @@
 	exports.ActionTypes = undefined;
 	exports["default"] = createStore;
 	
-	var _isPlainObject = __webpack_require__(15);
+	var _isPlainObject = __webpack_require__(190);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _symbolObservable = __webpack_require__(20);
+	var _symbolObservable = __webpack_require__(195);
 	
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 	
@@ -17919,12 +18158,13 @@
 	}
 
 /***/ },
-/* 15 */
+
+/***/ 190:
 /***/ function(module, exports, __webpack_require__) {
 
-	var getPrototype = __webpack_require__(16),
-	    isHostObject = __webpack_require__(18),
-	    isObjectLike = __webpack_require__(19);
+	var getPrototype = __webpack_require__(191),
+	    isHostObject = __webpack_require__(193),
+	    isObjectLike = __webpack_require__(194);
 	
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -17995,10 +18235,11 @@
 
 
 /***/ },
-/* 16 */
+
+/***/ 191:
 /***/ function(module, exports, __webpack_require__) {
 
-	var overArg = __webpack_require__(17);
+	var overArg = __webpack_require__(192);
 	
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -18007,7 +18248,8 @@
 
 
 /***/ },
-/* 17 */
+
+/***/ 192:
 /***/ function(module, exports) {
 
 	/**
@@ -18028,7 +18270,8 @@
 
 
 /***/ },
-/* 18 */
+
+/***/ 193:
 /***/ function(module, exports) {
 
 	/**
@@ -18054,7 +18297,8 @@
 
 
 /***/ },
-/* 19 */
+
+/***/ 194:
 /***/ function(module, exports) {
 
 	/**
@@ -18089,18 +18333,20 @@
 
 
 /***/ },
-/* 20 */
+
+/***/ 195:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/* global window */
 	'use strict';
 	
-	module.exports = __webpack_require__(21)(global || window || this);
+	module.exports = __webpack_require__(196)(global || window || this);
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 21 */
+
+/***/ 196:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18125,7 +18371,8 @@
 
 
 /***/ },
-/* 22 */
+
+/***/ 197:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -18133,13 +18380,13 @@
 	exports.__esModule = true;
 	exports["default"] = combineReducers;
 	
-	var _createStore = __webpack_require__(14);
+	var _createStore = __webpack_require__(189);
 	
-	var _isPlainObject = __webpack_require__(15);
+	var _isPlainObject = __webpack_require__(190);
 	
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 	
-	var _warning = __webpack_require__(23);
+	var _warning = __webpack_require__(198);
 	
 	var _warning2 = _interopRequireDefault(_warning);
 	
@@ -18255,10 +18502,11 @@
 	    return hasChanged ? nextState : state;
 	  };
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
-/* 23 */
+
+/***/ 198:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18288,7 +18536,8 @@
 	}
 
 /***/ },
-/* 24 */
+
+/***/ 199:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18344,7 +18593,8 @@
 	}
 
 /***/ },
-/* 25 */
+
+/***/ 200:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18355,7 +18605,7 @@
 	
 	exports["default"] = applyMiddleware;
 	
-	var _compose = __webpack_require__(26);
+	var _compose = __webpack_require__(201);
 	
 	var _compose2 = _interopRequireDefault(_compose);
 	
@@ -18407,7 +18657,8 @@
 	}
 
 /***/ },
-/* 26 */
+
+/***/ 201:
 /***/ function(module, exports) {
 
 	"use strict";
@@ -18452,12 +18703,13 @@
 	}
 
 /***/ },
-/* 27 */
+
+/***/ 202:
 /***/ function(module, exports, __webpack_require__) {
 
-	var getPrototype = __webpack_require__(28),
-	    isHostObject = __webpack_require__(30),
-	    isObjectLike = __webpack_require__(31);
+	var getPrototype = __webpack_require__(203),
+	    isHostObject = __webpack_require__(205),
+	    isObjectLike = __webpack_require__(206);
 	
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -18528,10 +18780,11 @@
 
 
 /***/ },
-/* 28 */
+
+/***/ 203:
 /***/ function(module, exports, __webpack_require__) {
 
-	var overArg = __webpack_require__(29);
+	var overArg = __webpack_require__(204);
 	
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -18540,7 +18793,8 @@
 
 
 /***/ },
-/* 29 */
+
+/***/ 204:
 /***/ function(module, exports) {
 
 	/**
@@ -18561,7 +18815,8 @@
 
 
 /***/ },
-/* 30 */
+
+/***/ 205:
 /***/ function(module, exports) {
 
 	/**
@@ -18587,7 +18842,8 @@
 
 
 /***/ },
-/* 31 */
+
+/***/ 206:
 /***/ function(module, exports) {
 
 	/**
@@ -18622,7 +18878,8 @@
 
 
 /***/ },
-/* 32 */
+
+/***/ 207:
 /***/ function(module, exports) {
 
 	/**
@@ -18678,7 +18935,8 @@
 
 
 /***/ },
-/* 33 */
+
+/***/ 208:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18733,10 +18991,11 @@
 	
 	module.exports = invariant;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
-/* 34 */
+
+/***/ 209:
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18745,8 +19004,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var React = __webpack_require__(3);
-	var react_redux_1 = __webpack_require__(5);
+	var React = __webpack_require__(179);
+	var react_redux_1 = __webpack_require__(181);
 	;
 	var mapStateToProps = function (state) {
 	    return {
@@ -18770,248 +19029,37 @@
 
 
 /***/ },
-/* 35 */
+
+/***/ 210:
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var _ = __webpack_require__(1);
-	var actions_1 = __webpack_require__(36);
-	var redux_actions_1 = __webpack_require__(37);
+	var _ = __webpack_require__(4);
+	var actions_1 = __webpack_require__(6);
+	var redux_actions_1 = __webpack_require__(7);
 	var defaultState = {
 	    word: ':D',
 	    body: ':D'
 	};
-	var reducer = redux_actions_1.handleActions((_a = {},
+	function handleRender(state, action) {
+	    console.log(action.payload.body.html.body[0].div[2].div[2].div[3]);
+	    // console.log(action.payload.body)
+	    return _.assign({}, state, {
+	        body: JSON.stringify(action.payload.body.html.body[0].div[2].div[2].div[3])
+	    });
+	}
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.JUMP] = function (state, action) { return _.assign({}, state, {
 	        word: action.payload.word
 	    }); },
-	    _a[actions_1.RENDER] = function (state, action) { return _.assign({}, state, {
-	        body: action.payload.body
-	    }); },
+	    _a[actions_1.RENDER] = handleRender,
 	    _a
 	), defaultState);
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = reducer;
 	var _a;
 
 
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var redux_actions_1 = __webpack_require__(37);
-	exports.JUMP = 'JUMP';
-	exports.PARSE_ERROR = 'PARSE_ERROR';
-	exports.RENDER = 'RENDER';
-	var b = redux_actions_1.createAction;
-	exports.jump = redux_actions_1.createAction(exports.JUMP, function (word) { return ({ word: word }); });
-	exports.parseError = redux_actions_1.createAction(exports.PARSE_ERROR, function (error) { return ({ error: error }); });
-	exports.render = redux_actions_1.createAction(exports.RENDER, function (body) { return ({ body: body }); });
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.handleActions = exports.handleAction = exports.createAction = undefined;
-	
-	var _createAction = __webpack_require__(38);
-	
-	var _createAction2 = _interopRequireDefault(_createAction);
-	
-	var _handleAction = __webpack_require__(39);
-	
-	var _handleAction2 = _interopRequireDefault(_handleAction);
-	
-	var _handleActions = __webpack_require__(40);
-	
-	var _handleActions2 = _interopRequireDefault(_handleActions);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.createAction = _createAction2.default;
-	exports.handleAction = _handleAction2.default;
-	exports.handleActions = _handleActions2.default;
-
-/***/ },
-/* 38 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = createAction;
-	function identity(t) {
-	  return t;
-	}
-	
-	function createAction(type, actionCreator, metaCreator) {
-	  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
-	
-	  var actionHandler = function actionHandler() {
-	    var hasError = (arguments.length <= 0 ? undefined : arguments[0]) instanceof Error;
-	
-	    var action = {
-	      type: type
-	    };
-	
-	    var payload = hasError ? arguments.length <= 0 ? undefined : arguments[0] : finalActionCreator.apply(undefined, arguments);
-	    if (!(payload === null || payload === undefined)) {
-	      action.payload = payload;
-	    }
-	
-	    if (hasError) {
-	      // Handle FSA errors where the payload is an Error object. Set error.
-	      action.error = true;
-	    }
-	
-	    if (typeof metaCreator === 'function') {
-	      action.meta = metaCreator.apply(undefined, arguments);
-	    }
-	
-	    return action;
-	  };
-	
-	  actionHandler.toString = function () {
-	    return type;
-	  };
-	
-	  return actionHandler;
-	}
-
-/***/ },
-/* 39 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = handleAction;
-	function isFunction(val) {
-	  return typeof val === 'function';
-	}
-	
-	function handleAction(type, reducers, defaultState) {
-	  var typeValue = isFunction(type) ? type.toString() : type;
-	
-	  return function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
-	    var action = arguments[1];
-	
-	    // If action type does not match, return previous state
-	    if (action.type !== typeValue) return state;
-	
-	    var handlerKey = action.error === true ? 'throw' : 'next';
-	
-	    // If function is passed instead of map, use as reducer
-	    if (isFunction(reducers)) {
-	      reducers.next = reducers.throw = reducers;
-	    }
-	
-	    // Otherwise, assume an action map was passed
-	    var reducer = reducers[handlerKey];
-	
-	    return isFunction(reducer) ? reducer(state, action) : state;
-	  };
-	}
-
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = handleActions;
-	
-	var _handleAction = __webpack_require__(39);
-	
-	var _handleAction2 = _interopRequireDefault(_handleAction);
-	
-	var _ownKeys = __webpack_require__(41);
-	
-	var _ownKeys2 = _interopRequireDefault(_ownKeys);
-	
-	var _reduceReducers = __webpack_require__(42);
-	
-	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	function handleActions(handlers, defaultState) {
-	  var reducers = (0, _ownKeys2.default)(handlers).map(function (type) {
-	    return (0, _handleAction2.default)(type, handlers[type]);
-	  });
-	  var reducer = _reduceReducers2.default.apply(undefined, _toConsumableArray(reducers));
-	
-	  return typeof defaultState !== 'undefined' ? function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
-	    var action = arguments[1];
-	    return reducer(state, action);
-	  } : reducer;
-	}
-
-/***/ },
-/* 41 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = ownKeys;
-	function ownKeys(object) {
-	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
-	    return Reflect.ownKeys(object);
-	  }
-	
-	  var keys = Object.getOwnPropertyNames(object);
-	
-	  if (typeof Object.getOwnPropertySymbols === 'function') {
-	    keys = keys.concat(Object.getOwnPropertySymbols(object));
-	  }
-	
-	  return keys;
-	}
-
-/***/ },
-/* 42 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	exports.__esModule = true;
-	exports["default"] = reduceReducers;
-	
-	function reduceReducers() {
-	  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
-	    reducers[_key] = arguments[_key];
-	  }
-	
-	  return function (previous, current) {
-	    return reducers.reduce(function (p, r) {
-	      return r(p, current);
-	    }, previous);
-	  };
-	}
-	
-	module.exports = exports["default"];
-
 /***/ }
-/******/ ]);
+
+/******/ });
 //# sourceMappingURL=panel.js.map

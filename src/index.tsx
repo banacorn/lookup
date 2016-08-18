@@ -29,4 +29,4 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener(store.dispatch);
-}
+} 

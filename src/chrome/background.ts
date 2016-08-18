@@ -1,7 +1,8 @@
-import * as Promise from 'bluebird'
 import * as _ from 'lodash'
-import { parseString } from 'xml2js';
 import { jump, render, parseError } from '../actions';
+import parser from '../parser';
+
+// import { parseString } from 'xml2js';
 
 type ID = number;
 type Connection = {
@@ -98,10 +99,10 @@ class Operator {
             this.messageUpstream(id, jump(word));
 
             fetch(word, (raw) => {
-                Promise.promisify(parseString)(raw).then(
+                parser(raw).then(
                     result => {
                         // action: RENDER
-                        this.messageUpstream(id, render(JSON.stringify(result)))
+                        this.messageUpstream(id, render(result))
                     },
                     error => this.messageUpstream(id, parseError(error))
                 );

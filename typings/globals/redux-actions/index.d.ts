@@ -53,7 +53,8 @@ declare namespace ReduxActions {
 
     export function handleAction<State, Payload>(
         actionType: string,
-        reducer: Reducer<State, Payload> | ReducerMap<State, Payload>
+        reducer: Reducer<State, Payload> | ReducerMap<State, Payload>,
+        initialState?: State
     ): Reducer<State, Payload>;
 
     export function handleAction<State, Payload, Meta>(

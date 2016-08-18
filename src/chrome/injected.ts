@@ -1,5 +1,7 @@
 declare var chrome: any;
 
+
+
 // establish connection with the background page
 var backgroundConn = chrome.runtime.connect({
     name: 'woerterbuch-injected'
@@ -13,6 +15,8 @@ const onMouseup = () => {
     lastWord = word;
     if (word && !repeated) {
         // sends request to the background when there's a non-trivial selection
+        console.log('https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes')
+        console.log('https://en.m.wiktionary.org/wiki/' + word)
         backgroundConn.postMessage(word);
     }
 };
