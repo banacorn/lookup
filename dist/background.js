@@ -35497,11 +35497,19 @@
 	var Promise = __webpack_require__(1);
 	var xml2js = __webpack_require__(13);
 	function parseXMLPromise(raw) {
-	    var optionsAugemented = function (text, callback) { return xml2js.parseString(text, {
-	        explicitChildren: true,
-	        preserveChildrenOrder: true
-	    }, callback); };
-	    return Promise.promisify(optionsAugemented)(raw);
+	    return new Promise(function (resolve, reject) {
+	        xml2js.parseString(raw, {
+	            explicitChildren: true,
+	            preserveChildrenOrder: true
+	        }, function (err, result) {
+	            if (err) {
+	                reject(err);
+	            }
+	            else {
+	                resolve(result.html.body[0].div[2].div[2].div[3]);
+	            }
+	        });
+	    });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = parseXMLPromise;

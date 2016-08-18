@@ -19042,10 +19042,11 @@
 	    body: ':D'
 	};
 	function handleRender(state, action) {
-	    console.log(action.payload.body.html.body[0].div[2].div[2].div[3]);
-	    // console.log(action.payload.body)
+	    // console.log(action.payload.body.html.body[0].div[2].div[2].div[3])
+	    console.log(action.payload.body);
 	    return _.assign({}, state, {
-	        body: JSON.stringify(action.payload.body.html.body[0].div[2].div[2].div[3])
+	        // body: JSON.stringify(action.payload.body.html.body[0].div[2].div[2].div[3])
+	        body: JSON.stringify(action.payload.body)
 	    });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });

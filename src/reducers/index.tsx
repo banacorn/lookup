@@ -10,11 +10,12 @@ const defaultState: State = {
 }
 
 function handleRender(state: State, action: Action<RENDER>): State {
-    console.log(action.payload.body.html.body[0].div[2].div[2].div[3])
-    // console.log(action.payload.body)
+
+    // console.log(action.payload.body.html.body[0].div[2].div[2].div[3])
+    console.log(action.payload.body)
     return _.assign({}, state, {
-        body: JSON.stringify(action.payload.body.html.body[0].div[2].div[2].div[3])
-        // body: JSON.stringify(action.payload.body)
+        // body: JSON.stringify(action.payload.body.html.body[0].div[2].div[2].div[3])
+        body: JSON.stringify(action.payload.body)
     });
 }
 
