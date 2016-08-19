@@ -1348,7 +1348,8 @@ declare module _ {
          */
         findIndex<T>(
             array: List<T>,
-            predicate?: ListIterator<T, boolean>
+            predicate?: ListIterator<T, boolean>,
+            fromIndex?: number
         ): number;
 
         /**
@@ -1356,7 +1357,8 @@ declare module _ {
          */
         findIndex<T>(
             array: List<T>,
-            predicate?: string
+            predicate?: string,
+            fromIndex?: number
         ): number;
 
         /**
@@ -1364,7 +1366,8 @@ declare module _ {
          */
         findIndex<W, T>(
             array: List<T>,
-            predicate?: W
+            predicate?: W,
+            fromIndex?: number
         ): number;
     }
 

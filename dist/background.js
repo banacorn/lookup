@@ -116,7 +116,7 @@
 	            // action: JUMP
 	            _this.messageUpstream(id, actions_1.jump(word));
 	            fetch(word, function (raw) {
-	                parser_1.default(raw).then(function (result) {
+	                parser_1.parser(raw).then(function (result) {
 	                    // action: RENDER
 	                    _this.messageUpstream(id, actions_1.render(result));
 	                }, function (error) { return _this.messageUpstream(id, actions_1.parseError(error)); });
@@ -17252,27 +17252,69 @@
 	var _ = __webpack_require__(1);
 	var Promise = __webpack_require__(11);
 	var xml2js_1 = __webpack_require__(14);
-	// function group(input: any[], tag: string): Section[] {
-	//     let result: Section[] = [];
-	//
-	//     let section: Section = null;
-	//     input.forEach((node: any) => {
-	//         if (node['#name'] === tag && section === null) {
-	//             section = {
-	//                 name: node.span[0]._,
-	//                 body: "",
-	//                 subs: []
-	//             }
-	//         }
-	//     })
-	//     return result;
-	//     //
-	//     // let section
-	//     // if (node['#name'] === tag) {
-	//     //
-	//     // }
-	// }
-	//
+	function isHeader(s, level) {
+	    var match = s.match(/^h(\d)+$/);
+	    if (match) {
+	        if (level) {
+	            return parseInt(match[1]) === level;
+	        }
+	        else {
+	            return true;
+	        }
+	    }
+	    else {
+	        return false;
+	    }
+	}
+	// given a list of DOM elements, build a tree with headers as ineteral nodes
+	function groupByHeader(nodes, name, level) {
+	    var intervals = [];
+	    nodes.forEach(function (node, i) {
+	        if (node['#name'] && isHeader(node['#name'], level))
+	            intervals.push(i);
+	    });
+	    // console.log("looking for: h" + level);
+	    // console.log("intervals:", intervals)
+	    // console.log("total length:", nodes.length)
+	    if (intervals.length > 0) {
+	        var body = _.take(nodes, intervals[0]);
+	        var subs = intervals.map(function (start, i) {
+	            var name = nodes[start].$$[0]._;
+	            var interval;
+	            if (i === intervals.length - 1) {
+	                interval = [start + 1, nodes.length];
+	            }
+	            else {
+	                interval = [start + 1, intervals[i + 1]];
+	            }
+	            var segment = nodes.slice(interval[0], interval[1]);
+	            return groupByHeader(segment, name, level + 1);
+	        });
+	        return {
+	            name: name,
+	            body: body,
+	            subs: subs
+	        };
+	    }
+	    else {
+	        var body = nodes;
+	        return {
+	            name: name,
+	            body: body,
+	            subs: []
+	        };
+	    }
+	}
+	exports.groupByHeader = groupByHeader;
+	function truncate(input) {
+	    var nodes = input.html.body[0].div[2].div[2].div[3].$$;
+	    // trucates some nodes before the content parts
+	    nodes = _.drop(nodes, _.findIndex(nodes, ['#name', 'h2']));
+	    // removes <hr>s between language sections
+	    nodes = nodes.filter(function (node) { return node['#name'] !== 'hr'; });
+	    return nodes;
+	}
+	exports.truncate = truncate;
 	function transform(input) {
 	    var nodes = input.html.body[0].div[2].div[2].div[3].$$;
 	    // trucates some nodes before the content parts
@@ -17294,11 +17336,28 @@
 	    });
 	    return result;
 	}
-	function parseXMLPromise(raw) {
+	function parseXML(raw) {
 	    return new Promise(function (resolve, reject) {
 	        xml2js_1.parseString(raw, {
 	            explicitChildren: true,
 	            preserveChildrenOrder: true
+	        }, function (err, result) {
+	            if (err) {
+	                reject(err);
+	            }
+	            else {
+	                resolve(result);
+	            }
+	        });
+	    });
+	}
+	exports.parseXML = parseXML;
+	function parser(raw) {
+	    return new Promise(function (resolve, reject) {
+	        xml2js_1.parseString(raw, {
+	            explicitChildren: true,
+	            preserveChildrenOrder: true,
+	            ignoreAttrs: true
 	        }, function (err, result) {
 	            if (err) {
 	                reject(err);
@@ -17309,8 +17368,7 @@
 	        });
 	    });
 	}
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = parseXMLPromise;
+	exports.parser = parser;
 
 
 /***/ },

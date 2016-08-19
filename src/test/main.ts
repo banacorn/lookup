@@ -1,23 +1,38 @@
-import * as fs from "fs";
-import { inspect } from "util";
-import * as http from "http";
-import * as _ from "lodash";
-import "colors";
-var request = require("request");
-import parser from "../chrome/parser";
-import { Section } from "../types";
+import * as fs from 'fs';
+import { inspect } from 'util';
+import * as http from 'http';
+import * as _ from 'lodash';
+import 'colors';
+var request = require('request');
+import { parser, parseXML, groupByHeader, truncate } from '../chrome/parser';
+import { Section } from '../types';
 
 function debug(s: any) {
     const t: string = inspect(s, false, null);
     console.log(t.cyan)
 }
 
-const word = process.argv[2] || "Legierung";
+function debugGreen(s: any) {
+    const t: string = inspect(s, false, null);
+    console.log(t.green)
+}
+
+const word = process.argv[2] || 'Legierung';
+
+
 
 read(word, (body) => {
-    console.log("==================================================".magenta)
-    parser(body).then((result) => {
-        debug(result)
+    console.log('=================================================='.magenta)
+    console.time('parse')
+    parseXML(body).then((result) => {
+        // debugGreen(result)
+        // debug('done');
+        result = truncate(result);
+        console.timeEnd('parse')
+        console.time('group')
+        groupByHeader(result, 'languages', 2);
+        console.timeEnd('group')
+        // debug(groupByHeader(result, 'languages', 2));
     })
 })
 
