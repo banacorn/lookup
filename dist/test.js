@@ -46,9 +46,9 @@
 
 	"use strict";
 	var fs = __webpack_require__(1);
-	var util_1 = __webpack_require__(4);
-	__webpack_require__(2);
-	var request = __webpack_require__(3);
+	var util_1 = __webpack_require__(2);
+	__webpack_require__(3);
+	var request = __webpack_require__(4);
 	var parser_1 = __webpack_require__(5);
 	function debug(s) {
 	    var t = util_1.inspect(s, false, null);
@@ -62,16 +62,30 @@
 	read(word, function (body) {
 	    console.log('=================================================='.magenta);
 	    console.time('parse');
-	    parser_1.parseXML(body).then(function (result) {
-	        // debugGreen(result)
-	        // debug('done');
-	        result = parser_1.truncate(result);
-	        console.timeEnd('parse');
-	        console.time('group');
-	        parser_1.groupByHeader(result, 'languages', 2);
-	        console.timeEnd('group');
-	        // debug(groupByHeader(result, 'languages', 2));
-	    });
+	    var doc = parser_1.parseXML(body);
+	    console.timeEnd('parse');
+	    console.time('build');
+	    var section = parser_1.parseDocument(doc);
+	    console.timeEnd('build');
+	    console.log(section.subs[0].subs);
+	    // debug(section)
+	    // console.log(result.documentElement.childNodes[3].nodeName)
+	    // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
+	    // console.log(contentNodeList[1])
+	    // Array.prototype.slice.call(contentNodeList).forEach((node: Node) => {
+	    //     console.log(node.nodeName)
+	    // })
+	    // console.log(DOMParser)
+	    // parseXML(body).then((result) => {
+	    //     // debugGreen(result)
+	    //     // debug('done');
+	    //     result = truncate(result);
+	    //     console.timeEnd('parse')
+	    //     console.time('group')
+	    //     groupByHeader(result, 'languages', 2);
+	    //     console.timeEnd('group')
+	    //     // debug(groupByHeader(result, 'languages', 2));
+	    // })
 	});
 	function get(word, callback) {
 	    console.log(("fetching " + word).gray);
@@ -109,19 +123,19 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	module.exports = require("colors");
+	module.exports = require("util");
 
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = require("request");
+	module.exports = require("colors");
 
 /***/ },
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = require("util");
+	module.exports = require("request");
 
 /***/ },
 /* 5 */
@@ -129,8 +143,6 @@
 
 	"use strict";
 	var _ = __webpack_require__(6);
-	var Promise = __webpack_require__(7);
-	var xml2js_1 = __webpack_require__(8);
 	function isHeader(s, level) {
 	    var match = s.match(/^h(\d)+$/);
 	    if (match) {
@@ -145,29 +157,44 @@
 	        return false;
 	    }
 	}
-	// given a list of DOM elements, build a tree with headers as ineteral nodes
-	function groupByHeader(nodes, name, level) {
+	function parseXML(raw) {
+	    if (typeof window === 'undefined') {
+	        // in nodejs
+	        var DOMParser_1 = __webpack_require__(7).DOMParser;
+	        return new DOMParser_1().parseFromString(raw, 'text/html');
+	    }
+	    else {
+	        // in browser
+	        return new DOMParser().parseFromString(raw, 'text/html');
+	    }
+	}
+	exports.parseXML = parseXML;
+	function parseDocument(doc) {
+	    var contentNode = doc.getElementById('mw-content-text');
+	    var nodeList = Array.prototype.slice.call(contentNode.childNodes);
+	    return buildSection(nodeList, "Entry", 2);
+	}
+	exports.parseDocument = parseDocument;
+	// given a NodeList, build a tree with headers as ineteral nodes
+	function buildSection(list, name, level) {
 	    var intervals = [];
-	    nodes.forEach(function (node, i) {
-	        if (node['#name'] && isHeader(node['#name'], level))
+	    list.forEach(function (node, i) {
+	        if (isHeader(node.nodeName, level))
 	            intervals.push(i);
 	    });
-	    // console.log("looking for: h" + level);
-	    // console.log("intervals:", intervals)
-	    // console.log("total length:", nodes.length)
 	    if (intervals.length > 0) {
-	        var body = _.take(nodes, intervals[0]);
+	        var body = _.take(list, intervals[0]);
 	        var subs = intervals.map(function (start, i) {
-	            var name = nodes[start].$$[0]._;
+	            var name = list[start].childNodes[0].textContent;
 	            var interval;
 	            if (i === intervals.length - 1) {
-	                interval = [start + 1, nodes.length];
+	                interval = [start + 1, list.length];
 	            }
 	            else {
 	                interval = [start + 1, intervals[i + 1]];
 	            }
-	            var segment = nodes.slice(interval[0], interval[1]);
-	            return groupByHeader(segment, name, level + 1);
+	            var segment = list.slice(interval[0], interval[1]);
+	            return buildSection(segment, name, level + 1);
 	        });
 	        return {
 	            name: name,
@@ -176,7 +203,7 @@
 	        };
 	    }
 	    else {
-	        var body = nodes;
+	        var body = list;
 	        return {
 	            name: name,
 	            body: body,
@@ -184,70 +211,6 @@
 	        };
 	    }
 	}
-	exports.groupByHeader = groupByHeader;
-	function truncate(input) {
-	    var nodes = input.html.body[0].div[2].div[2].div[3].$$;
-	    // trucates some nodes before the content parts
-	    nodes = _.drop(nodes, _.findIndex(nodes, ['#name', 'h2']));
-	    // removes <hr>s between language sections
-	    nodes = nodes.filter(function (node) { return node['#name'] !== 'hr'; });
-	    return nodes;
-	}
-	exports.truncate = truncate;
-	function transform(input) {
-	    var nodes = input.html.body[0].div[2].div[2].div[3].$$;
-	    // trucates some nodes before the content parts
-	    nodes = _.drop(nodes, _.findIndex(nodes, ['#name', 'h2']));
-	    // removes <hr>s between language sections
-	    nodes = nodes.filter(function (node) { return node['#name'] !== 'hr'; });
-	    var result = [];
-	    nodes.forEach(function (node) {
-	        switch (node['#name']) {
-	            case 'h2':
-	                result.push({
-	                    name: node.span[0]._,
-	                    body: "...",
-	                    subs: []
-	                });
-	                break;
-	        }
-	        console.log(node);
-	    });
-	    return result;
-	}
-	function parseXML(raw) {
-	    return new Promise(function (resolve, reject) {
-	        xml2js_1.parseString(raw, {
-	            explicitChildren: true,
-	            preserveChildrenOrder: true
-	        }, function (err, result) {
-	            if (err) {
-	                reject(err);
-	            }
-	            else {
-	                resolve(result);
-	            }
-	        });
-	    });
-	}
-	exports.parseXML = parseXML;
-	function parser(raw) {
-	    return new Promise(function (resolve, reject) {
-	        xml2js_1.parseString(raw, {
-	            explicitChildren: true,
-	            preserveChildrenOrder: true,
-	            ignoreAttrs: true
-	        }, function (err, result) {
-	            if (err) {
-	                reject(err);
-	            }
-	            else {
-	                resolve(transform(result));
-	            }
-	        });
-	    });
-	}
-	exports.parser = parser;
 
 
 /***/ },
@@ -260,13 +223,7 @@
 /* 7 */
 /***/ function(module, exports) {
 
-	module.exports = require("bluebird");
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	module.exports = require("xml2js");
+	module.exports = require("xmldom");
 
 /***/ }
 /******/ ]);

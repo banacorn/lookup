@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import { jump, render, parseError } from '../actions';
-import { parser } from './parser';
+import { parseXML } from './parser';
 
 // import { parseString } from 'xml2js';
 
@@ -99,13 +99,18 @@ class Operator {
             this.messageUpstream(id, jump(word));
 
             fetch(word, (raw) => {
-                parser(raw).then(
-                    result => {
-                        // action: RENDER
-                        this.messageUpstream(id, render(result))
-                    },
-                    error => this.messageUpstream(id, parseError(error))
-                );
+
+                console.time('parse')
+                parseXML(raw);
+                console.timeEnd('parse')
+                //
+                // parser(raw).then(
+                //     result => {
+                //         // action: RENDER
+                //         this.messageUpstream(id, render(result))
+                //     },
+                //     error => this.messageUpstream(id, parseError(error))
+                // );
             });
         };
         const onDisconnect = () => {

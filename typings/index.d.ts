@@ -7,4 +7,4 @@
 /// <reference path="globals/react/index.d.ts" />
 /// <reference path="globals/redux-actions/index.d.ts" />
 /// <reference path="globals/redux/index.d.ts" />
-/// <reference path="globals/xml2js/index.d.ts" />
+/// <reference path="globals/xmldom/index.d.ts" />

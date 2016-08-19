@@ -4,7 +4,8 @@ import * as http from 'http';
 import * as _ from 'lodash';
 import 'colors';
 var request = require('request');
-import { parser, parseXML, groupByHeader, truncate } from '../chrome/parser';
+import { parseXML, parseDocument } from '../chrome/parser';
+// import { parser, parseXML, groupByHeader, truncate } from '../chrome/parser';
 import { Section } from '../types';
 
 function debug(s: any) {
@@ -24,16 +25,31 @@ const word = process.argv[2] || 'Legierung';
 read(word, (body) => {
     console.log('=================================================='.magenta)
     console.time('parse')
-    parseXML(body).then((result) => {
-        // debugGreen(result)
-        // debug('done');
-        result = truncate(result);
-        console.timeEnd('parse')
-        console.time('group')
-        groupByHeader(result, 'languages', 2);
-        console.timeEnd('group')
-        // debug(groupByHeader(result, 'languages', 2));
-    })
+    const doc = parseXML(body);
+    console.timeEnd('parse')
+    console.time('build')
+    const section = parseDocument(doc);
+    console.timeEnd('build')
+    console.log(section.subs[0].subs)
+    // debug(section)
+    // console.log(result.documentElement.childNodes[3].nodeName)
+    // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
+    // console.log(contentNodeList[1])
+    // Array.prototype.slice.call(contentNodeList).forEach((node: Node) => {
+    //     console.log(node.nodeName)
+    // })
+
+    // console.log(DOMParser)
+    // parseXML(body).then((result) => {
+    //     // debugGreen(result)
+    //     // debug('done');
+    //     result = truncate(result);
+    //     console.timeEnd('parse')
+    //     console.time('group')
+    //     groupByHeader(result, 'languages', 2);
+    //     console.timeEnd('group')
+    //     // debug(groupByHeader(result, 'languages', 2));
+    // })
 })
 
 
