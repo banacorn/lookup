@@ -48,6 +48,7 @@
 	var _ = __webpack_require__(1);
 	var actions_1 = __webpack_require__(3);
 	var parser_1 = __webpack_require__(10);
+	var types_1 = __webpack_require__(14);
 	// upstream  : connetion from devtools panel
 	// downstream: connetion from injected webpage
 	var Operator = (function () {
@@ -117,16 +118,14 @@
 	            _this.messageUpstream(id, actions_1.jump(word));
 	            fetch(word, function (raw) {
 	                console.time('parse');
-	                parser_1.parseXML(raw);
+	                var doc = parser_1.parseXML(raw);
 	                console.timeEnd('parse');
-	                //
-	                // parser(raw).then(
-	                //     result => {
-	                //         // action: RENDER
-	                //         this.messageUpstream(id, render(result))
-	                //     },
-	                //     error => this.messageUpstream(id, parseError(error))
-	                // );
+	                console.time('build');
+	                var toText = function (ns) { return ns.map(function (n) { return n.textContent; }).join(""); };
+	                var section = types_1.mapSection(toText, parser_1.parseDocument(doc));
+	                console.timeEnd('build');
+	                // action: RENDER
+	                _this.messageUpstream(id, actions_1.render(section.subs));
 	            });
 	        };
 	        var onDisconnect = function () {
@@ -17258,7 +17257,7 @@
 	"use strict";
 	var _ = __webpack_require__(1);
 	function isHeader(s, level) {
-	    var match = s.match(/^h(\d)+$/);
+	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
 	        if (level) {
 	            return parseInt(match[1]) === level;
@@ -17317,6 +17316,7 @@
 	        };
 	    }
 	    else {
+	        // const body = list.map((x) => x.textContent).join("");
 	        var body = list;
 	        return {
 	            name: name,
@@ -19325,6 +19325,22 @@
 		exports.DOMImplementation = DOMImplementation;
 		exports.XMLSerializer = XMLSerializer;
 	}
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function mapSection(f, _a) {
+	    var name = _a.name, body = _a.body, subs = _a.subs;
+	    return {
+	        name: name,
+	        body: f(body),
+	        subs: subs.map(function (s) { return mapSection(f, s); })
+	    };
+	}
+	exports.mapSection = mapSection;
 
 
 /***/ }

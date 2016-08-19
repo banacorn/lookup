@@ -1993,8 +1993,6 @@
 	var react_redux_1 = __webpack_require__(3);
 	;
 	var mapStateToProps = function (state) {
-	    console.info(state.body);
-	    console.info(state.body.map);
 	    return {
 	        word: state.word,
 	        body: state.body.map(function (section) { return section.name; })
@@ -2030,7 +2028,6 @@
 	    body: []
 	};
 	function handleRender(state, action) {
-	    console.log(action.payload.body);
 	    return _.assign({}, state, {
 	        body: action.payload.body
 	    });

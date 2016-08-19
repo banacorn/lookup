@@ -5,7 +5,7 @@ import { DOMParserStatic } from 'xmldom';
 import { Section } from '../types'
 
 function isHeader(s: string, level?: number): boolean {
-    const match = s.match(/^h(\d)+$/);
+    const match = s.match(/^[Hh](\d)+$/);
     if (match) {
         if (level) {
             return parseInt(match[1]) === level;
@@ -28,14 +28,14 @@ function parseXML(raw: string): Document {
     }
 }
 
-function parseDocument(doc: Document): Section {
+function parseDocument(doc: Document): Section<Node[]> {
     const contentNode: Node = doc.getElementById('mw-content-text');
     const nodeList: Node[] = Array.prototype.slice.call(contentNode.childNodes);
     return buildSection(nodeList, "Entry", 2);
 }
 
 // given a NodeList, build a tree with headers as ineteral nodes
-function buildSection(list: Node[], name: string, level: number): Section {
+function buildSection(list: Node[], name: string, level: number): Section<Node[]> {
 
     let intervals: number[] = [];
     list.forEach((node, i) => {
@@ -62,6 +62,7 @@ function buildSection(list: Node[], name: string, level: number): Section {
         }
 
     } else {
+        // const body = list.map((x) => x.textContent).join("");
         const body = list;
         return {
             name: name,
@@ -70,7 +71,6 @@ function buildSection(list: Node[], name: string, level: number): Section {
         }
     }
 }
-
 
 export {
     parseXML,

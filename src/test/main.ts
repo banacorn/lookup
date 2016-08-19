@@ -30,7 +30,6 @@ read(word, (body) => {
     console.time('build')
     const section = parseDocument(doc);
     console.timeEnd('build')
-    console.log(section.subs[0].subs)
     // debug(section)
     // console.log(result.documentElement.childNodes[3].nodeName)
     // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;

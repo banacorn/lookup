@@ -10,7 +10,6 @@ const defaultState: State = {
 }
 
 function handleRender(state: State, action: Action<RENDER>): State {
-    console.log(action.payload.body)
     return _.assign({}, state, {
         body: action.payload.body
     });

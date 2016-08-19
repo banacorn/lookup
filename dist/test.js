@@ -67,7 +67,6 @@
 	    console.time('build');
 	    var section = parser_1.parseDocument(doc);
 	    console.timeEnd('build');
-	    console.log(section.subs[0].subs);
 	    // debug(section)
 	    // console.log(result.documentElement.childNodes[3].nodeName)
 	    // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
@@ -144,7 +143,7 @@
 	"use strict";
 	var _ = __webpack_require__(6);
 	function isHeader(s, level) {
-	    var match = s.match(/^h(\d)+$/);
+	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
 	        if (level) {
 	            return parseInt(match[1]) === level;
@@ -203,6 +202,7 @@
 	        };
 	    }
 	    else {
+	        // const body = list.map((x) => x.textContent).join("");
 	        var body = list;
 	        return {
 	            name: name,

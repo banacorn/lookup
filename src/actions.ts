@@ -11,11 +11,11 @@ export type PARSE_ERROR = {
 };
 export const RENDER = 'RENDER';
 export type RENDER = {
-    body: Section[]
+    body: Section<string>[]
 };
 
 let b = createAction;
 
 export const jump = createAction<string, JUMP>(JUMP, word => ({ word }));
 export const parseError = createAction<any, PARSE_ERROR>(PARSE_ERROR, error => ({ error }));
-export const render = createAction<Section[], RENDER>(RENDER, body => ({ body }));
+export const render = createAction<Section<string>[], RENDER>(RENDER, body => ({ body }));

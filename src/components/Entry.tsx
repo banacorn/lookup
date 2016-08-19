@@ -8,8 +8,6 @@ interface EntryProps extends React.Props<any> {
 };
 
 const mapStateToProps = (state: State) => {
-    console.info(state.body)
-    console.info(state.body.map)
     return {
         word: state.word,
         body: state.body.map(section => section.name)
