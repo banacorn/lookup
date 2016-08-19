@@ -1,28 +1,33 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State } from '../types'
+import LangSect from './LangSect';
+import { State, LanguageSection } from '../types'
 
 interface EntryProps extends React.Props<any> {
     word: string;
-    body: string[];
+    subs: LanguageSection[];
 };
 
 const mapStateToProps = (state: State) => {
     return {
         word: state.word,
-        body: state.body.map(section => section.name)
+        subs: state.body
     }
 }
 
 class Entry extends React.Component<EntryProps, void> {
     render() {
-        const { word, body } = this.props;
+        const { word, subs } = this.props;
         return (
             <section>
                 <h1>{ word }</h1>
                 <ul>
-                    {body.map(val =>
-                        <li key={word + `-` + val}>{val}</li>
+                    {subs.map(section =>
+                        <LangSect
+                            key={word + `-` + section.languageName}
+                            languageName={section.languageName}
+                            subs={section.subs}
+                        />
                     )}
                 </ul>
             </section>

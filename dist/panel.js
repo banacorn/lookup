@@ -50,7 +50,7 @@
 	var react_redux_1 = __webpack_require__(3);
 	var redux_1 = __webpack_require__(11);
 	var Entry_1 = __webpack_require__(32);
-	var reducer_1 = __webpack_require__(33);
+	var reducer_1 = __webpack_require__(34);
 	var store = redux_1.createStore(reducer_1.default);
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
@@ -1991,11 +1991,12 @@
 	};
 	var React = __webpack_require__(1);
 	var react_redux_1 = __webpack_require__(3);
+	var LangSect_1 = __webpack_require__(33);
 	;
 	var mapStateToProps = function (state) {
 	    return {
 	        word: state.word,
-	        body: state.body.map(function (section) { return section.name; })
+	        subs: state.body
 	    };
 	};
 	var Entry = (function (_super) {
@@ -2004,9 +2005,9 @@
 	        _super.apply(this, arguments);
 	    }
 	    Entry.prototype.render = function () {
-	        var _a = this.props, word = _a.word, body = _a.body;
-	        return (React.createElement("section", null, React.createElement("h1", null, word), React.createElement("ul", null, body.map(function (val) {
-	            return React.createElement("li", {key: word + "-" + val}, val);
+	        var _a = this.props, word = _a.word, subs = _a.subs;
+	        return (React.createElement("section", null, React.createElement("h1", null, word), React.createElement("ul", null, subs.map(function (section) {
+	            return React.createElement(LangSect_1.default, {key: word + "-" + section.languageName, languageName: section.languageName, subs: section.subs});
 	        }))));
 	    };
 	    return Entry;
@@ -2020,9 +2021,38 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var _ = __webpack_require__(34);
-	var actions_1 = __webpack_require__(36);
-	var redux_actions_1 = __webpack_require__(37);
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var React = __webpack_require__(1);
+	;
+	var LangSect = (function (_super) {
+	    __extends(LangSect, _super);
+	    function LangSect() {
+	        _super.apply(this, arguments);
+	    }
+	    LangSect.prototype.render = function () {
+	        var _a = this.props, languageName = _a.languageName, subs = _a.subs;
+	        return (React.createElement("section", null, React.createElement("h2", null, languageName), React.createElement("ul", null, subs.map(function (val, i) {
+	            return React.createElement("li", {key: languageName + "-" + i}, val.name);
+	        }))));
+	    };
+	    return LangSect;
+	}(React.Component));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = LangSect;
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var _ = __webpack_require__(35);
+	var actions_1 = __webpack_require__(37);
+	var redux_actions_1 = __webpack_require__(38);
 	var defaultState = {
 	    word: ':D',
 	    body: []
@@ -2044,7 +2074,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -18781,10 +18811,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(35)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(36)(module)))
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -18800,11 +18830,11 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var redux_actions_1 = __webpack_require__(37);
+	var redux_actions_1 = __webpack_require__(38);
 	exports.JUMP = 'JUMP';
 	exports.PARSE_ERROR = 'PARSE_ERROR';
 	exports.RENDER = 'RENDER';
@@ -18815,7 +18845,7 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18825,15 +18855,15 @@
 	});
 	exports.handleActions = exports.handleAction = exports.createAction = undefined;
 	
-	var _createAction = __webpack_require__(38);
+	var _createAction = __webpack_require__(39);
 	
 	var _createAction2 = _interopRequireDefault(_createAction);
 	
-	var _handleAction = __webpack_require__(39);
+	var _handleAction = __webpack_require__(40);
 	
 	var _handleAction2 = _interopRequireDefault(_handleAction);
 	
-	var _handleActions = __webpack_require__(40);
+	var _handleActions = __webpack_require__(41);
 	
 	var _handleActions2 = _interopRequireDefault(_handleActions);
 	
@@ -18844,7 +18874,7 @@
 	exports.handleActions = _handleActions2.default;
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18892,7 +18922,7 @@
 	}
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18930,7 +18960,7 @@
 	}
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18940,15 +18970,15 @@
 	});
 	exports.default = handleActions;
 	
-	var _handleAction = __webpack_require__(39);
+	var _handleAction = __webpack_require__(40);
 	
 	var _handleAction2 = _interopRequireDefault(_handleAction);
 	
-	var _ownKeys = __webpack_require__(41);
+	var _ownKeys = __webpack_require__(42);
 	
 	var _ownKeys2 = _interopRequireDefault(_ownKeys);
 	
-	var _reduceReducers = __webpack_require__(42);
+	var _reduceReducers = __webpack_require__(43);
 	
 	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
 	
@@ -18970,7 +19000,7 @@
 	}
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18994,7 +19024,7 @@
 	}
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	"use strict";

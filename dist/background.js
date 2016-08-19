@@ -48,7 +48,6 @@
 	var _ = __webpack_require__(1);
 	var actions_1 = __webpack_require__(3);
 	var parser_1 = __webpack_require__(10);
-	var types_1 = __webpack_require__(14);
 	// upstream  : connetion from devtools panel
 	// downstream: connetion from injected webpage
 	var Operator = (function () {
@@ -121,11 +120,14 @@
 	                var doc = parser_1.parseXML(raw);
 	                console.timeEnd('parse');
 	                console.time('build');
-	                var toText = function (ns) { return ns.map(function (n) { return n.textContent; }).join(""); };
-	                var section = types_1.mapSection(toText, parser_1.parseDocument(doc));
+	                var entry = parser_1.parseDocument(doc);
 	                console.timeEnd('build');
 	                // action: RENDER
-	                _this.messageUpstream(id, actions_1.render(section.subs));
+	                var languageSections = entry.subs.map(function (s) { return ({
+	                    languageName: s.name,
+	                    subs: s.subs
+	                }); });
+	                _this.messageUpstream(id, actions_1.render(languageSections));
 	            });
 	        };
 	        var onDisconnect = function () {
@@ -17316,7 +17318,6 @@
 	        };
 	    }
 	    else {
-	        // const body = list.map((x) => x.textContent).join("");
 	        var body = list;
 	        return {
 	            name: name,
@@ -19325,22 +19326,6 @@
 		exports.DOMImplementation = DOMImplementation;
 		exports.XMLSerializer = XMLSerializer;
 	}
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	"use strict";
-	function mapSection(f, _a) {
-	    var name = _a.name, body = _a.body, subs = _a.subs;
-	    return {
-	        name: name,
-	        body: f(body),
-	        subs: subs.map(function (s) { return mapSection(f, s); })
-	    };
-	}
-	exports.mapSection = mapSection;
 
 
 /***/ }

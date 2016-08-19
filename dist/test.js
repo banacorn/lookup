@@ -202,7 +202,6 @@
 	        };
 	    }
 	    else {
-	        // const body = list.map((x) => x.textContent).join("");
 	        var body = list;
 	        return {
 	            name: name,

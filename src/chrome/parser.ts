@@ -62,7 +62,6 @@ function buildSection(list: Node[], name: string, level: number): Section<Node[]
         }
 
     } else {
-        // const body = list.map((x) => x.textContent).join("");
         const body = list;
         return {
             name: name,

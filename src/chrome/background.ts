@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import { jump, render, parseError } from '../actions';
 import { parseXML, parseDocument } from './parser';
-import { mapSection } from '../types';
+import { mapSection, LanguageSection } from '../types';
 
 type ID = number;
 type Connection = {
@@ -103,11 +103,14 @@ class Operator {
                 const doc = parseXML(raw);
                 console.timeEnd('parse')
                 console.time('build')
-                const toText = (ns: Node[]) => ns.map(n => n.textContent).join("");
-                const section = mapSection(toText, parseDocument(doc));
+                const entry = parseDocument(doc);
                 console.timeEnd('build');
                 // action: RENDER
-                this.messageUpstream(id, render(section.subs))
+                const languageSections: LanguageSection[] = entry.subs.map(s => ({
+                    languageName: s.name,
+                    subs: s.subs
+                }))
+                this.messageUpstream(id, render(languageSections))
             });
         };
         const onDisconnect = () => {
