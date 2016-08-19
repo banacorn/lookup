@@ -15,6 +15,8 @@ function handleRender(state: State, action: Action<RENDER>): State {
     });
 }
 
+
+
 export default handleActions<State, JUMP | RENDER>({
     [JUMP]: (state: State, action: Action<JUMP>) => _.assign({}, state, {
         word: action.payload.word

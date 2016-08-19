@@ -1,8 +1,6 @@
 import * as _ from 'lodash'
-// import * as Promise from 'bluebird'
-
 import { DOMParserStatic } from 'xmldom';
-import { Section } from '../types'
+import { Section, LanguageSection } from '../types'
 
 function isHeader(s: string, level?: number): boolean {
     const match = s.match(/^[Hh](\d)+$/);
@@ -17,7 +15,7 @@ function isHeader(s: string, level?: number): boolean {
     }
 }
 
-function parseXML(raw: string): Document {
+export function parseXML(raw: string): Document {
     if (typeof window === 'undefined') {
         // in nodejs
         const DOMParser: DOMParserStatic = require('xmldom').DOMParser;
@@ -28,10 +26,18 @@ function parseXML(raw: string): Document {
     }
 }
 
-function parseDocument(doc: Document): Section<Node[]> {
+export function parseDocument(doc: Document): Section<Node[]> {
     const contentNode: Node = doc.getElementById('mw-content-text');
     const nodeList: Node[] = Array.prototype.slice.call(contentNode.childNodes);
     return buildSection(nodeList, "Entry", 2);
+}
+
+export default function parse(raw: string): LanguageSection[] {
+    const entry = parseDocument(parseXML(raw));
+    return entry.subs.map(s => ({
+        languageName: s.name,
+        subs: s.subs
+    }))
 }
 
 // given a NodeList, build a tree with headers as ineteral nodes
@@ -69,9 +75,4 @@ function buildSection(list: Node[], name: string, level: number): Section<Node[]
             subs: []
         }
     }
-}
-
-export {
-    parseXML,
-    parseDocument,
 }

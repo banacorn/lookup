@@ -7,11 +7,13 @@
     "react-redux": "registry:dt/react-redux#4.4.0+20160724070751",
     "redux": "registry:dt/redux#3.5.2+20160703092728",
     "redux-actions": "registry:dt/redux-actions#0.8.0+20160521154116",
+    "redux-thunk": "registry:dt/redux-thunk#2.1.0+20160703120921",
     "xml2js": "registry:dt/xml2js#0.0.0+20160317120654"
   },
   "globalDevDependencies": {
     "colors": "registry:dt/colors#0.6.0-1+20160501135139",
     "node": "registry:dt/node#6.0.0+20160817204926",
+    "restify": "registry:dt/restify#2.0.0+20160726153409",
     "xmldom": "registry:dt/xmldom#0.1.22+20160319053438"
   }
 }

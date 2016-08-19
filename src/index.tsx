@@ -2,14 +2,18 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider, connect } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 
 import Entry from './components/Entry';
 import reducer from './reducer';
 
 declare var chrome: any;
 
-const store = createStore(reducer);
+const store = createStore(
+    reducer,
+    applyMiddleware(thunk)
+);
 
 ReactDOM.render(
     <Provider store={store}>

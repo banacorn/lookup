@@ -45,48 +45,51 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var fs = __webpack_require__(1);
+	// import * as _ from 'lodash';
 	var util_1 = __webpack_require__(2);
-	__webpack_require__(3);
-	var request = __webpack_require__(4);
-	var parser_1 = __webpack_require__(5);
+	var parser_1 = __webpack_require__(7);
+	var word = process.argv[2];
+	if (word) {
+	    util_1.search(word, function (body) {
+	        console.log('=================================================='.magenta);
+	        console.time('parse');
+	        var doc = parser_1.parseXML(body);
+	        console.timeEnd('parse');
+	        console.time('build');
+	        var section = parser_1.parseDocument(doc);
+	        console.timeEnd('build');
+	        // debug(section)
+	        // console.log(result.documentElement.childNodes[3].nodeName)
+	        // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
+	        // console.log(contentNodeList[1])
+	        // Array.prototype.slice.call(contentNodeList).forEach((node: Node) => {
+	        //     console.log(node.nodeName)
+	        // })
+	    });
+	}
+
+
+/***/ },
+/* 1 */,
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var fs = __webpack_require__(3);
+	var util_1 = __webpack_require__(4);
+	__webpack_require__(5);
+	var request = __webpack_require__(6);
 	function debug(s) {
 	    var t = util_1.inspect(s, false, null);
 	    console.log(t.cyan);
 	}
+	exports.debug = debug;
 	function debugGreen(s) {
 	    var t = util_1.inspect(s, false, null);
 	    console.log(t.green);
 	}
-	var word = process.argv[2] || 'Legierung';
-	read(word, function (body) {
-	    console.log('=================================================='.magenta);
-	    console.time('parse');
-	    var doc = parser_1.parseXML(body);
-	    console.timeEnd('parse');
-	    console.time('build');
-	    var section = parser_1.parseDocument(doc);
-	    console.timeEnd('build');
-	    // debug(section)
-	    // console.log(result.documentElement.childNodes[3].nodeName)
-	    // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
-	    // console.log(contentNodeList[1])
-	    // Array.prototype.slice.call(contentNodeList).forEach((node: Node) => {
-	    //     console.log(node.nodeName)
-	    // })
-	    // console.log(DOMParser)
-	    // parseXML(body).then((result) => {
-	    //     // debugGreen(result)
-	    //     // debug('done');
-	    //     result = truncate(result);
-	    //     console.timeEnd('parse')
-	    //     console.time('group')
-	    //     groupByHeader(result, 'languages', 2);
-	    //     console.timeEnd('group')
-	    //     // debug(groupByHeader(result, 'languages', 2));
-	    // })
-	});
-	function get(word, callback) {
+	exports.debugGreen = debugGreen;
+	function fetch(word, callback) {
 	    console.log(("fetching " + word).gray);
 	    request("http://en.wiktionary.org/w/index.php?title=" + word + "&printable=true", function (error, response, body) {
 	        if (!error && response.statusCode == 200) {
@@ -99,49 +102,51 @@
 	        }
 	    });
 	}
-	function read(word, callback) {
+	exports.fetch = fetch;
+	function search(word, callback) {
 	    fs.readFile("corpse/" + word, function (err, data) {
 	        if (err && err.errno === -2) {
 	            console.log((word + " not found").gray);
-	            get(word, callback);
+	            fetch(word, callback);
 	        }
 	        else {
 	            callback(data.toString());
 	        }
 	    });
 	}
+	exports.search = search;
 
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	module.exports = require("fs");
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	module.exports = require("util");
 
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = require("colors");
+	module.exports = require("fs");
 
 /***/ },
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = require("request");
+	module.exports = require("util");
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	module.exports = require("colors");
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = require("request");
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var _ = __webpack_require__(6);
+	var _ = __webpack_require__(8);
 	function isHeader(s, level) {
 	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
@@ -159,7 +164,7 @@
 	function parseXML(raw) {
 	    if (typeof window === 'undefined') {
 	        // in nodejs
-	        var DOMParser_1 = __webpack_require__(7).DOMParser;
+	        var DOMParser_1 = __webpack_require__(9).DOMParser;
 	        return new DOMParser_1().parseFromString(raw, 'text/html');
 	    }
 	    else {
@@ -174,6 +179,15 @@
 	    return buildSection(nodeList, "Entry", 2);
 	}
 	exports.parseDocument = parseDocument;
+	function parse(raw) {
+	    var entry = parseDocument(parseXML(raw));
+	    return entry.subs.map(function (s) { return ({
+	        languageName: s.name,
+	        subs: s.subs
+	    }); });
+	}
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = parse;
 	// given a NodeList, build a tree with headers as ineteral nodes
 	function buildSection(list, name, level) {
 	    var intervals = [];
@@ -213,13 +227,13 @@
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = require("lodash");
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = require("xmldom");

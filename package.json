@@ -24,11 +24,13 @@
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",
     "redux": "^3.5.2",
-    "redux-actions": "^0.10.1"
+    "redux-actions": "^0.10.1",
+    "redux-thunk": "^2.1.0"
   },
   "devDependencies": {
     "colors": "^1.1.2",
     "request": "^2.74.0",
+    "restify": "^4.1.1",
     "source-map-loader": "^0.1.5",
     "ts-loader": "^0.8.2",
     "webpack": "^1.13.1",

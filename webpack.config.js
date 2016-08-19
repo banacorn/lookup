@@ -3,9 +3,12 @@ var webpack = require("webpack");
 var nodeExternals = require('webpack-node-externals');
 
 module.exports = [{
-    name: "panel",
+    name: "browser",
     entry: {
         panel: "./src/index.tsx",
+        background: "./src/chrome/background.ts",
+        injected: "./src/chrome/injected.ts",
+        devtools: "./src/chrome/devtools.ts"
     },
     output: {
         path: path.join(__dirname, "dist"),
@@ -48,50 +51,14 @@ module.exports = [{
         "react-dom": "ReactDOM"
     },
 }, {
-    name: "extension",
+    name: "node",
     entry: {
-        background: "./src/chrome/background.ts",
-        injected: "./src/chrome/injected.ts",
-        devtools: "./src/chrome/devtools.ts"
-    },
-    output: {
-        path: path.join(__dirname, "dist"),
-        filename: "[name].js"
+        test: "./src/test/main.ts",
+        server: "./src/test/server.ts"
     },
 
-    // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
-
-    resolve: {
-        // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
-    },
-
-    module: {
-        loaders: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
-            { test: /\.tsx?$/, loader: "ts-loader" }
-        ],
-
-        preLoaders: [
-            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            { test: /\.js$/, loader: "source-map-loader" }
-        ]
-    },
-
-     plugins: [
-        new webpack.IgnorePlugin(
-          /\.\/(timers|any|race|call_get|filter|generators|map|nodeify|promisify|props|reduce|settle|some|progress|cancel)\.js/,
-          /node_modules\/bluebird\/js\/main/
-        ),
-    ]
-}, {
-    name: "test",
-    entry: {
-        test: "./src/test/main.ts"
-    },
     target: 'node',// in order to ignore built-in modules like path, fs, etc.
-    externals: [nodeExternals()], // in order to ignore all modules in node_modules folder 
+    externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
     output: {
         path: path.join(__dirname, "dist"),
