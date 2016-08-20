@@ -3,7 +3,6 @@ import { search, debug } from './util'
 
 const respond = (req: any, res: any, next: any) => {
     search(req.params.word, (reply) => {
-        debug(reply)
         res.send(reply);
     })
     next();

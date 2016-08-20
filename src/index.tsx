@@ -7,6 +7,7 @@ import thunk from 'redux-thunk';
 
 import Entry from './components/Entry';
 import reducer from './reducer';
+import { search } from './actions';
 
 declare var chrome: any;
 
@@ -33,4 +34,6 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener(store.dispatch);
+} else {
+    store.dispatch(search("Eisen"));
 }

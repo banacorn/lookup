@@ -17040,9 +17040,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Promise = __webpack_require__(4);
 	var redux_actions_1 = __webpack_require__(7);
 	var parser_1 = __webpack_require__(13);
+	var util_1 = __webpack_require__(51);
 	exports.JUMP = 'JUMP';
 	exports.PARSE_ERROR = 'PARSE_ERROR';
 	exports.RENDER = 'RENDER';
@@ -17051,26 +17051,11 @@
 	exports.parseError = redux_actions_1.createAction(exports.PARSE_ERROR, function (error) { return ({ error: error }); });
 	exports.render = redux_actions_1.createAction(exports.RENDER, function (body) { return ({ body: body }); });
 	exports.searchError = redux_actions_1.createAction(exports.SEARCH_ERROR, function (err) { return ({ err: err }); });
-	exports.search = function (word) { return function (dispatch) { return fetch(word)
-	    .then(function (res) { return dispatch(exports.render(parser_1.default(res))); }, function (err) { return dispatch(exports.searchError(err)); }); }; };
-	function fetch(word) {
-	    return new Promise(function (resolve, reject) {
-	        var req = new XMLHttpRequest();
-	        req.open('GET', "http://localhost:4000/search/" + word);
-	        req.onload = function () {
-	            if (req.status === 200) {
-	                resolve(req.responseText);
-	            }
-	            else {
-	                reject(new Error(req.statusText));
-	            }
-	        };
-	        req.onerror = function () {
-	            reject(new Error("Network error"));
-	        };
-	        req.send();
-	    });
-	}
+	exports.search = function (word) { return function (dispatch) { return util_1.fetch(word)
+	    .then(function (res) {
+	    dispatch(exports.jump(word));
+	    dispatch(exports.render(parser_1.default(res)));
+	}, function (err) { return dispatch(exports.searchError(err)); }); }; };
 
 
 /***/ },
@@ -25088,6 +25073,67 @@
 		exports.DOMImplementation = DOMImplementation;
 		exports.XMLSerializer = XMLSerializer;
 	}
+
+
+/***/ },
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */,
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */,
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Promise = __webpack_require__(4);
+	function fetch(word) {
+	    return new Promise(function (resolve, reject) {
+	        var req = new XMLHttpRequest();
+	        req.open('GET', "http://localhost:4000/search/" + word);
+	        req.onload = function () {
+	            if (req.status === 200) {
+	                resolve(req.responseText);
+	            }
+	            else {
+	                reject(new Error(req.statusText));
+	            }
+	        };
+	        req.onerror = function () {
+	            reject(new Error("Network error"));
+	        };
+	        req.send();
+	    });
+	}
+	exports.fetch = fetch;
 
 
 /***/ }

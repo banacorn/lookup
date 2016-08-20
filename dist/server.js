@@ -49,7 +49,6 @@
 	var util_1 = __webpack_require__(2);
 	var respond = function (req, res, next) {
 	    util_1.search(req.params.word, function (reply) {
-	        util_1.debug(reply);
 	        res.send(reply);
 	    });
 	    next();

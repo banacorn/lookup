@@ -2,6 +2,7 @@ import * as Promise from 'bluebird'
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 import { State, Section, LanguageSection } from './types';
 import parse from './chrome/parser';
+import { fetch } from './util';
 
 export const JUMP = 'JUMP';
 export type JUMP = {
@@ -27,25 +28,9 @@ export const render = createAction<LanguageSection[], RENDER>(RENDER, body => ({
 export const searchError = createAction<Error, SEARCH_ERROR>(SEARCH_ERROR, err => ({ err }));
 export const search = (word: string) => (dispatch: any) => fetch(word)
     .then(
-        res => dispatch(render(parse(res))),
+        res => {
+            dispatch(jump(word))
+            dispatch(render(parse(res)))
+        },
         err => dispatch(searchError(err))
     )
-
-
-function fetch(word: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-        let req = new XMLHttpRequest();
-        req.open('GET', `http://localhost:4000/search/${word}`);
-        req.onload = function() {
-            if (req.status === 200) {
-                resolve(req.responseText);
-            } else {
-                reject(new Error(req.statusText));
-            }
-        };
-        req.onerror = function() {
-            reject(new Error("Network error"));
-        };
-        req.send();
-    });
-}

@@ -52,6 +52,7 @@
 	var redux_thunk_1 = __webpack_require__(47);
 	var Entry_1 = __webpack_require__(48);
 	var reducer_1 = __webpack_require__(50);
+	var actions_1 = __webpack_require__(3);
 	var store = redux_1.createStore(reducer_1.default, redux_1.applyMiddleware(redux_thunk_1.default));
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
@@ -65,6 +66,9 @@
 	        tabId: chrome.devtools.inspectedWindow.tabId
 	    });
 	    backgroundConn.onMessage.addListener(store.dispatch);
+	}
+	else {
+	    store.dispatch(actions_1.search("Eisen"));
 	}
 
 
@@ -16829,9 +16833,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Promise = __webpack_require__(4);
 	var redux_actions_1 = __webpack_require__(7);
 	var parser_1 = __webpack_require__(13);
+	var util_1 = __webpack_require__(51);
 	exports.JUMP = 'JUMP';
 	exports.PARSE_ERROR = 'PARSE_ERROR';
 	exports.RENDER = 'RENDER';
@@ -16840,26 +16844,11 @@
 	exports.parseError = redux_actions_1.createAction(exports.PARSE_ERROR, function (error) { return ({ error: error }); });
 	exports.render = redux_actions_1.createAction(exports.RENDER, function (body) { return ({ body: body }); });
 	exports.searchError = redux_actions_1.createAction(exports.SEARCH_ERROR, function (err) { return ({ err: err }); });
-	exports.search = function (word) { return function (dispatch) { return fetch(word)
-	    .then(function (res) { return dispatch(exports.render(parser_1.default(res))); }, function (err) { return dispatch(exports.searchError(err)); }); }; };
-	function fetch(word) {
-	    return new Promise(function (resolve, reject) {
-	        var req = new XMLHttpRequest();
-	        req.open('GET', "http://localhost:4000/search/" + word);
-	        req.onload = function () {
-	            if (req.status === 200) {
-	                resolve(req.responseText);
-	            }
-	            else {
-	                reject(new Error(req.statusText));
-	            }
-	        };
-	        req.onerror = function () {
-	            reject(new Error("Network error"));
-	        };
-	        req.send();
-	    });
-	}
+	exports.search = function (word) { return function (dispatch) { return util_1.fetch(word)
+	    .then(function (res) {
+	    dispatch(exports.jump(word));
+	    dispatch(exports.render(parser_1.default(res)));
+	}, function (err) { return dispatch(exports.searchError(err)); }); }; };
 
 
 /***/ },
@@ -26756,6 +26745,33 @@
 	    _a
 	), defaultState);
 	var _a;
+
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Promise = __webpack_require__(4);
+	function fetch(word) {
+	    return new Promise(function (resolve, reject) {
+	        var req = new XMLHttpRequest();
+	        req.open('GET', "http://localhost:4000/search/" + word);
+	        req.onload = function () {
+	            if (req.status === 200) {
+	                resolve(req.responseText);
+	            }
+	            else {
+	                reject(new Error(req.statusText));
+	            }
+	        };
+	        req.onerror = function () {
+	            reject(new Error("Network error"));
+	        };
+	        req.send();
+	    });
+	}
+	exports.fetch = fetch;
 
 
 /***/ }
