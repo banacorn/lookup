@@ -42,7 +42,8 @@ export default function parse(raw: string): LanguageSection[] {
     const entry = parseDocument(parseXML(raw));
     return entry.subs.map(s => ({
         languageName: s.name,
-        subs: s.subs.map(sectionToText)
+        subs: s.subs
+        // subs: s.subs.map(sectionToText)
     }))
 }
 

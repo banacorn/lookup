@@ -125,7 +125,7 @@
 	                // action: RENDER
 	                var languageSections = entry.subs.map(function (s) { return ({
 	                    languageName: s.name,
-	                    subs: s.subs.map(parser_1.sectionToText)
+	                    subs: s.subs
 	                }); });
 	                _this.messageUpstream(id, actions_1.render(languageSections));
 	            });
@@ -17309,7 +17309,7 @@
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
 	        languageName: s.name,
-	        subs: s.subs.map(sectionToText)
+	        subs: s.subs
 	    }); });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });

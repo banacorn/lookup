@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State, Section } from '../types'
-import Sect from './sect'
+import { State, Section, BlockElem } from '../types'
+import Sect from './Sect'
 
 interface LangSectProps extends React.Props<any> {
     languageName: string;
-    subs: Section<string>[];
+    subs: Section<BlockElem[]>[];
 };
 
 class LangSect extends React.Component<LangSectProps, void> {
@@ -15,17 +15,9 @@ class LangSect extends React.Component<LangSectProps, void> {
             <Sect
                 name={languageName}
                 level={2}
-                body={""}
+                body={[] as BlockElem[]}
                 subs={subs}>
             </Sect>
-            // <section>
-            //     <h2>{ languageName }</h2>
-            //     <ul>
-            //         {subs.map((val, i) =>
-            //             <li key={languageName + `-` + i}>{val.name}</li>
-            //         )}
-            //     </ul>
-            // </section>
         )
     }
 }

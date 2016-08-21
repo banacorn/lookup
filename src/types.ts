@@ -32,7 +32,7 @@ export namespace Inline {
 
 export type LanguageSection = {
     languageName: string,
-    subs: Section<string>[]
+    subs: Section<BlockElem[]>[]
 }
 
 export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>): Section<U> {

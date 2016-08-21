@@ -51,7 +51,7 @@
 	var redux_1 = __webpack_require__(28);
 	var redux_thunk_1 = __webpack_require__(49);
 	var Entry_1 = __webpack_require__(50);
-	var reducer_1 = __webpack_require__(54);
+	var reducer_1 = __webpack_require__(55);
 	var actions_1 = __webpack_require__(3);
 	var store = redux_1.createStore(reducer_1.default, redux_1.applyMiddleware(redux_thunk_1.default));
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, 
@@ -17104,7 +17104,7 @@
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
 	        languageName: s.name,
-	        subs: s.subs.map(sectionToText)
+	        subs: s.subs
 	    }); });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -26814,7 +26814,7 @@
 	            ), 
 	            React.createElement("h1", null, word), 
 	            React.createElement("ul", null, subs.map(function (section) {
-	                return React.createElement(LangSect_1.default, {key: word + "-" + section.languageName, languageName: section.languageName, subs: section.subs});
+	                return React.createElement(LangSect_1.default, {key: section.languageName, languageName: section.languageName, subs: section.subs});
 	            }))));
 	    };
 	    return Entry;
@@ -26834,7 +26834,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(19);
-	var sect_1 = __webpack_require__(52);
+	var Sect_1 = __webpack_require__(52);
 	;
 	var LangSect = (function (_super) {
 	    __extends(LangSect, _super);
@@ -26843,7 +26843,7 @@
 	    }
 	    LangSect.prototype.render = function () {
 	        var _a = this.props, languageName = _a.languageName, subs = _a.subs;
-	        return (React.createElement(sect_1.default, {name: languageName, level: 2, body: "", subs: subs}));
+	        return (React.createElement(Sect_1.default, {name: languageName, level: 2, body: [], subs: subs}));
 	    };
 	    return LangSect;
 	}(React.Component));
@@ -26863,6 +26863,7 @@
 	};
 	var React = __webpack_require__(19);
 	var Header_1 = __webpack_require__(53);
+	var Block_1 = __webpack_require__(54);
 	;
 	var Sect = (function (_super) {
 	    __extends(Sect, _super);
@@ -26873,8 +26874,8 @@
 	        var _a = this.props, level = _a.level, name = _a.name, body = _a.body, subs = _a.subs;
 	        return (React.createElement("section", null, 
 	            React.createElement(Header_1.default, {level: level}, name), 
-	            React.createElement("p", null, body), 
-	            subs.map(function (section, i) { return (React.createElement(Sect, {key: level + "-" + i, level: level + 1, name: section.name, body: section.body, subs: section.subs})); })));
+	            body.map(function (block, i) { return (React.createElement(Block_1.default, {key: "body-" + i}, block)); }), 
+	            subs.map(function (section, i) { return (React.createElement(Sect, {key: "subsection-" + i, level: level + 1, name: section.name, body: section.body, subs: section.subs})); })));
 	    };
 	    return Sect;
 	}(React.Component));
@@ -26933,6 +26934,37 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var React = __webpack_require__(19);
+	var Inline_1 = __webpack_require__(56);
+	var Block = (function (_super) {
+	    __extends(Block, _super);
+	    function Block() {
+	        _super.apply(this, arguments);
+	    }
+	    Block.prototype.render = function () {
+	        var elem = this.props.children;
+	        switch (elem.kind) {
+	            case 'paragraph':
+	                return React.createElement("p", null, elem.body.map(function (inline, i) { return React.createElement(Inline_1.default, {key: i}, inline); }));
+	            default: return null;
+	        }
+	    };
+	    return Block;
+	}(React.Component));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Block;
+
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var _ = __webpack_require__(1);
 	var actions_1 = __webpack_require__(3);
 	var redux_actions_1 = __webpack_require__(4);
@@ -26954,6 +26986,41 @@
 	    _a
 	), defaultState);
 	var _a;
+
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var React = __webpack_require__(19);
+	var Inline = (function (_super) {
+	    __extends(Inline, _super);
+	    function Inline() {
+	        _super.apply(this, arguments);
+	    }
+	    Inline.prototype.componentWillMount = function () {
+	        this.id = _.uniqueId();
+	    };
+	    Inline.prototype.render = function () {
+	        var elem = this.props.children;
+	        switch (elem.kind) {
+	            case 'plain':
+	                return React.createElement("span", null, elem.text);
+	            case 'italic':
+	                return React.createElement("i", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "italic-" + i}, e)); }));
+	            default: return null;
+	        }
+	    };
+	    return Inline;
+	}(React.Component));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Inline;
 
 
 /***/ }

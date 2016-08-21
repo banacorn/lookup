@@ -40,7 +40,7 @@ class Entry extends React.Component<EntryProps, void> {
                 <ul>
                     {subs.map(section =>
                         <LangSect
-                            key={word + `-` + section.languageName}
+                            key={section.languageName}
                             languageName={section.languageName}
                             subs={section.subs}
                         />

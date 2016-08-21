@@ -200,7 +200,7 @@
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
 	        languageName: s.name,
-	        subs: s.subs.map(sectionToText)
+	        subs: s.subs
 	    }); });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
