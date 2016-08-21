@@ -60,8 +60,6 @@ function buildSection(list: Node[], name: string, level: number): Section<BlockE
         const body = _.take(list, intervals[0])
             .filter(notIgnorable)
             .map(parseBlockElem)
-            // .map(blockToText)
-            // .join('');
         const subs = intervals.map((start, i) => {
             const name = list[start].childNodes[0].textContent;
             let interval: [number, number];
@@ -83,8 +81,6 @@ function buildSection(list: Node[], name: string, level: number): Section<BlockE
         const body = list
             .filter(notIgnorable)
             .map(parseBlockElem)
-            // .map(blockToText)
-            // .join('');
         return {
             name: name,
             body: body,
@@ -130,6 +126,15 @@ function parseInline(node: Node): InlineElem[] {
         case 'I':
             return <InlineElem[]>[{
                 kind: 'italic',
+                body: _.flatten(toArray(node.childNodes).map(parseInline))
+            }]
+        // link
+        case 'a':
+        case 'A':
+            return <InlineElem[]>[{
+                kind: 'link',
+                href: (<Element>node).getAttribute('href'),
+                title: (<Element>node).getAttribute('title'),
                 body: _.flatten(toArray(node.childNodes).map(parseInline))
             }]
         default:

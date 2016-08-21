@@ -118,6 +118,14 @@ function parseInline(node) {
                     kind: 'italic',
                     body: _.flatten(toArray(node.childNodes).map(parseInline))
                 }];
+        case 'a':
+        case 'A':
+            return [{
+                    kind: 'link',
+                    href: node.getAttribute('href'),
+                    title: node.getAttribute('title'),
+                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+                }];
         default:
             return [{
                     kind: 'plain',

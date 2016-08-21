@@ -17,7 +17,7 @@ export namespace Block {
     }
 }
 
-export type InlineElem = Inline.Plain | Inline.Italic;
+export type InlineElem = Inline.Plain | Inline.Italic | Inline.Link;
 export namespace Inline {
     export interface Plain {
         kind: 'plain',
@@ -25,6 +25,12 @@ export namespace Inline {
     }
     export interface Italic {
         kind: 'italic',
+        body: InlineElem[]
+    }
+    export interface Link {
+        kind: 'link',
+        href: string,
+        title: string,
         body: InlineElem[]
     }
 }

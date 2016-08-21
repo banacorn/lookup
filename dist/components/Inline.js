@@ -10,9 +10,6 @@ var Inline = (function (_super) {
     function Inline() {
         _super.apply(this, arguments);
     }
-    Inline.prototype.componentWillMount = function () {
-        this.id = _.uniqueId();
-    };
     Inline.prototype.render = function () {
         var elem = this.props.children;
         switch (elem.kind) {
@@ -20,6 +17,8 @@ var Inline = (function (_super) {
                 return React.createElement("span", null, elem.text);
             case 'italic':
                 return React.createElement("i", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "italic-" + i}, e)); }));
+            case 'link':
+                return React.createElement("a", {href: elem.href, title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "link-" + i}, e)); }));
             default: return null;
         }
     };

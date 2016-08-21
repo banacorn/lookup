@@ -17120,8 +17120,6 @@
 	        var body = _.take(list, intervals[0])
 	            .filter(notIgnorable)
 	            .map(parseBlockElem);
-	        // .map(blockToText)
-	        // .join('');
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -17144,8 +17142,6 @@
 	        var body = list
 	            .filter(notIgnorable)
 	            .map(parseBlockElem);
-	        // .map(blockToText)
-	        // .join('');
 	        return {
 	            name: name,
 	            body: body,
@@ -17188,6 +17184,15 @@
 	        case 'I':
 	            return [{
 	                    kind: 'italic',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                }];
+	        // link
+	        case 'a':
+	        case 'A':
+	            return [{
+	                    kind: 'link',
+	                    href: node.getAttribute('href'),
+	                    title: node.getAttribute('title'),
 	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
 	                }];
 	        default:
@@ -27004,9 +27009,6 @@
 	    function Inline() {
 	        _super.apply(this, arguments);
 	    }
-	    Inline.prototype.componentWillMount = function () {
-	        this.id = _.uniqueId();
-	    };
 	    Inline.prototype.render = function () {
 	        var elem = this.props.children;
 	        switch (elem.kind) {
@@ -27014,6 +27016,8 @@
 	                return React.createElement("span", null, elem.text);
 	            case 'italic':
 	                return React.createElement("i", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "italic-" + i}, e)); }));
+	            case 'link':
+	                return React.createElement("a", {href: elem.href, title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "link-" + i}, e)); }));
 	            default: return null;
 	        }
 	    };

@@ -216,8 +216,6 @@
 	        var body = _.take(list, intervals[0])
 	            .filter(notIgnorable)
 	            .map(parseBlockElem);
-	        // .map(blockToText)
-	        // .join('');
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -240,8 +238,6 @@
 	        var body = list
 	            .filter(notIgnorable)
 	            .map(parseBlockElem);
-	        // .map(blockToText)
-	        // .join('');
 	        return {
 	            name: name,
 	            body: body,
@@ -284,6 +280,15 @@
 	        case 'I':
 	            return [{
 	                    kind: 'italic',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                }];
+	        // link
+	        case 'a':
+	        case 'A':
+	            return [{
+	                    kind: 'link',
+	                    href: node.getAttribute('href'),
+	                    title: node.getAttribute('title'),
 	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
 	                }];
 	        default:
