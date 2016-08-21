@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import { DOMParserStatic } from 'xmldom';
-import { Section, LanguageSection } from '../types'
+import { Section, LanguageSection, Inline, mapSection, toText } from '../types'
 
 function isHeader(s: string, level?: number): boolean {
     const match = s.match(/^[Hh](\d)+$/);
@@ -15,6 +15,12 @@ function isHeader(s: string, level?: number): boolean {
     }
 }
 
+const notIgnorable = (node: Node) => {
+    const isComment = node.nodeType === 8;
+    const isTextAndEmpty = node.nodeType == 3 && !/[^\t\n\r ]/.test(node.textContent);
+    return !(isComment || isTextAndEmpty);
+}
+
 export function parseXML(raw: string): Document {
     if (typeof window === 'undefined') {
         // in nodejs
@@ -26,22 +32,27 @@ export function parseXML(raw: string): Document {
     }
 }
 
-export function parseDocument(doc: Document): Section<Node[]> {
+export function parseDocument(doc: Document): Section<Inline[]> {
     const contentNode: Node = doc.getElementById('mw-content-text');
     const nodeList: Node[] = Array.prototype.slice.call(contentNode.childNodes);
     return buildSection(nodeList, "Entry", 2);
+}
+
+function sectionToText(s: Section<Inline[]>): Section<string> {
+    return mapSection(inlines => inlines.map(toText).join(''), s);
 }
 
 export default function parse(raw: string): LanguageSection[] {
     const entry = parseDocument(parseXML(raw));
     return entry.subs.map(s => ({
         languageName: s.name,
-        subs: s.subs
+        subs: s.subs.map(sectionToText)
     }))
 }
 
+
 // given a NodeList, build a tree with headers as ineteral nodes
-function buildSection(list: Node[], name: string, level: number): Section<Node[]> {
+function buildSection(list: Node[], name: string, level: number): Section<Inline[]> {
 
     let intervals: number[] = [];
     list.forEach((node, i) => {
@@ -49,7 +60,10 @@ function buildSection(list: Node[], name: string, level: number): Section<Node[]
             intervals.push(i);
     });
     if (intervals.length > 0) {
-        const body = _.take(list, intervals[0]);
+        const body = _.take(list, intervals[0]).filter(notIgnorable).map(node => <Inline>({
+            kind: 'plain',
+            text: node.textContent
+        }));
         const subs = intervals.map((start, i) => {
             const name = list[start].childNodes[0].textContent;
             let interval: [number, number];
@@ -68,7 +82,10 @@ function buildSection(list: Node[], name: string, level: number): Section<Node[]
         }
 
     } else {
-        const body = list;
+        const body = list.filter(notIgnorable).map(node => <Inline>({
+            kind: 'plain',
+            text: node.textContent
+        }));
         return {
             name: name,
             body: body,

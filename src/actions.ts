@@ -1,6 +1,6 @@
 import * as Promise from 'bluebird'
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
-import { State, Section, LanguageSection } from './types';
+import { State, Section, Inline, LanguageSection } from './types';
 import parse from './chrome/parser';
 import { fetch } from './util';
 
@@ -30,6 +30,7 @@ export const search = (word: string) => (dispatch: any) => fetch(word)
     .then(
         res => {
             dispatch(jump(word))
+            const inlineSections: Section<Inline[]> = parse(res);
             dispatch(render(parse(res)))
         },
         err => dispatch(searchError(err))

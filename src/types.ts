@@ -9,9 +9,17 @@ export type Section<T> = {
     subs: Section<T>[]
 }
 
+export type Inline = Plain;
+
+interface Plain {
+    kind: 'plain',
+    text: string
+}
+
+
 export type LanguageSection = {
     languageName: string,
-    subs: Section<any>[]
+    subs: Section<string>[]
 }
 
 export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>): Section<U> {
@@ -19,5 +27,11 @@ export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>)
         name,
         body: f(body),
         subs: subs.map(s => mapSection(f, s))
+    }
+}
+
+export function toText(x: Inline): string {
+    switch (x.kind) {
+        case 'plain': return x.text;
     }
 }

@@ -58,7 +58,18 @@
 	        console.time('build');
 	        var section = parser_1.parseDocument(doc);
 	        console.timeEnd('build');
-	        // debug(section)
+	        util_1.debug(section.subs.length);
+	        util_1.debug(section.subs[0].subs[0].body.length);
+	        util_1.debug(section);
+	        // Array.prototype.slice.call(section.subs[0].subs[0].body[0].childNodes).forEach((node: Node, i: number) => {
+	        //     if (i === 1) {
+	        //         console.log(node.childNodes[0].childNodes[0])
+	        //     }
+	        //     // console.log(`[${node.textContent}]`)
+	        //     // debug(node.nodeName)
+	        //     // console.log(node)
+	        // })
+	        // debug(section.subs.length)
 	        // console.log(result.documentElement.childNodes[3].nodeName)
 	        // const contentNodeList: NodeList = result.documentElement.childNodes[3].childNodes[5].childNodes[9].childNodes;
 	        // console.log(contentNodeList[1])
@@ -147,6 +158,7 @@
 
 	"use strict";
 	var _ = __webpack_require__(8);
+	var types_1 = __webpack_require__(10);
 	function isHeader(s, level) {
 	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
@@ -161,6 +173,11 @@
 	        return false;
 	    }
 	}
+	var notIgnorable = function (node) {
+	    var isComment = node.nodeType === 8;
+	    var isTextAndEmpty = node.nodeType == 3 && !/[^\t\n\r ]/.test(node.textContent);
+	    return !(isComment || isTextAndEmpty);
+	};
 	function parseXML(raw) {
 	    if (typeof window === 'undefined') {
 	        // in nodejs
@@ -179,11 +196,14 @@
 	    return buildSection(nodeList, "Entry", 2);
 	}
 	exports.parseDocument = parseDocument;
+	function sectionToText(s) {
+	    return types_1.mapSection(function (inlines) { return inlines.map(types_1.toText).join(''); }, s);
+	}
 	function parse(raw) {
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
 	        languageName: s.name,
-	        subs: s.subs
+	        subs: s.subs.map(sectionToText)
 	    }); });
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -196,7 +216,10 @@
 	            intervals.push(i);
 	    });
 	    if (intervals.length > 0) {
-	        var body = _.take(list, intervals[0]);
+	        var body = _.take(list, intervals[0]).filter(notIgnorable).map(function (node) { return ({
+	            kind: 'plain',
+	            text: node.textContent
+	        }); });
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -216,7 +239,10 @@
 	        };
 	    }
 	    else {
-	        var body = list;
+	        var body = list.filter(notIgnorable).map(function (node) { return ({
+	            kind: 'plain',
+	            text: node.textContent
+	        }); });
 	        return {
 	            name: name,
 	            body: body,
@@ -237,6 +263,28 @@
 /***/ function(module, exports) {
 
 	module.exports = require("xmldom");
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function mapSection(f, _a) {
+	    var name = _a.name, body = _a.body, subs = _a.subs;
+	    return {
+	        name: name,
+	        body: f(body),
+	        subs: subs.map(function (s) { return mapSection(f, s); })
+	    };
+	}
+	exports.mapSection = mapSection;
+	function toText(x) {
+	    switch (x.kind) {
+	        case 'plain': return x.text;
+	    }
+	}
+	exports.toText = toText;
+
 
 /***/ }
 /******/ ]);
