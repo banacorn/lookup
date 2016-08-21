@@ -9,10 +9,18 @@ export type Section<T> = {
     subs: Section<T>[]
 }
 
-export type BlockElem = Block.Paragraph;
+export type BlockElem = Block.Paragraph | Block.UnorderedList | Block.ListItem;
 export namespace Block {
     export interface Paragraph {
-        kind: 'paragraph',
+        kind: 'p',
+        body: InlineElem[]
+    }
+    export interface UnorderedList {
+        kind: 'ul',
+        body: ListItem[]
+    }
+    export interface ListItem {
+        kind: 'li',
         body: InlineElem[]
     }
 }
@@ -24,11 +32,11 @@ export namespace Inline {
         text: string
     }
     export interface Italic {
-        kind: 'italic',
+        kind: 'i',
         body: InlineElem[]
     }
     export interface Link {
-        kind: 'link',
+        kind: 'a',
         href: string,
         title: string,
         body: InlineElem[]
@@ -53,7 +61,9 @@ export function inlineToText(x: InlineElem): string {
     switch (x.kind) {
         case 'plain':
             return x.text;
-        case 'italic':
+        case 'i':
+            return x.body.map(inlineToText).join('');
+        case 'a':
             return x.body.map(inlineToText).join('');
         default:
             return '';
@@ -62,7 +72,11 @@ export function inlineToText(x: InlineElem): string {
 
 export function blockToText(node: BlockElem): string {
     switch (node.kind) {
-        case 'paragraph':
+        case 'p':
+            return node.body.map(inlineToText).join('');
+        case 'ul':
+            return node.body.map(blockToText).join('\n');
+        case 'li':
             return node.body.map(inlineToText).join('');
         default:
             return "<unknown block element>";

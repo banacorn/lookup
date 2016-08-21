@@ -14,8 +14,13 @@ var Block = (function (_super) {
     Block.prototype.render = function () {
         var elem = this.props.children;
         switch (elem.kind) {
-            case 'paragraph':
+            case 'p':
                 return React.createElement("p", null, elem.body.map(function (inline, i) { return React.createElement(Inline_1.default, {key: i}, inline); }));
+            case 'ul':
+                console.log(elem);
+                return React.createElement("ul", null, elem.body.map(function (li, i) { return React.createElement(Block, {key: i}, li); }));
+            case 'li':
+                return React.createElement("li", null, elem.body.map(function (inline, i) { return React.createElement(Inline_1.default, {key: i}, inline); }));
             default: return null;
         }
     };

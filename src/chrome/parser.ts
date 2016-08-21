@@ -17,8 +17,9 @@ function isHeader(s: string, level?: number): boolean {
 
 const notIgnorable = (node: Node) => {
     const isComment = node.nodeType === 8;
-    const isTextAndEmpty = node.nodeType == 3 && !/[^\t\n\r ]/.test(node.textContent);
-    return !(isComment || isTextAndEmpty);
+    const isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r ]/.test(node.textContent);
+    const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+    return !(isComment || isTextAndEmpty || isEmptyParagraph);
 }
 
 export function parseXML(raw: string): Document {
@@ -34,7 +35,9 @@ export function parseXML(raw: string): Document {
 
 export function parseDocument(doc: Document): Section<BlockElem[]> {
     const contentNode: Node = doc.getElementById('mw-content-text');
+    removeWhitespace(contentNode);
     const nodeList: Node[] = Array.prototype.slice.call(contentNode.childNodes);
+    console.log(contentNode)
     return buildSection(nodeList, "Entry", 2);
 }
 
@@ -43,23 +46,32 @@ export default function parse(raw: string): LanguageSection[] {
     return entry.subs.map(s => ({
         languageName: s.name,
         subs: s.subs
-        // subs: s.subs.map(sectionToText)
     }))
 }
 
+// removes whitespaces in the tree
+function removeWhitespace(node: Node) {
+    if (node && node.childNodes) {
+        const children: Node[] = Array.prototype.slice.call(node.childNodes);
+        children.forEach(child => {
+            if (notIgnorable(child)) {
+                removeWhitespace(child);
+            } else {
+                node.removeChild(child);
+            }
+        });
+    }
+}
 
 // given a NodeList, build a tree with headers as ineteral nodes
 function buildSection(list: Node[], name: string, level: number): Section<BlockElem[]> {
-
     let intervals: number[] = [];
     list.forEach((node, i) => {
         if (isHeader(node.nodeName, level))
             intervals.push(i);
     });
     if (intervals.length > 0) {
-        const body = _.take(list, intervals[0])
-            .filter(notIgnorable)
-            .map(parseBlockElem)
+        const body = _.take(list, intervals[0]).map(parseBlockElem)
         const subs = intervals.map((start, i) => {
             const name = list[start].childNodes[0].textContent;
             let interval: [number, number];
@@ -78,9 +90,7 @@ function buildSection(list: Node[], name: string, level: number): Section<BlockE
         }
 
     } else {
-        const body = list
-            .filter(notIgnorable)
-            .map(parseBlockElem)
+        const body = list.map(parseBlockElem)
         return {
             name: name,
             body: body,
@@ -90,7 +100,10 @@ function buildSection(list: Node[], name: string, level: number): Section<BlockE
 }
 
 function toArray(nodes: NodeList): Node[] {
-    return Array.prototype.slice.call(nodes);
+    if (nodes)
+        return Array.prototype.slice.call(nodes);
+    else
+        return [];
 }
 
 function parseBlockElem(node: Node): BlockElem {
@@ -98,44 +111,58 @@ function parseBlockElem(node: Node): BlockElem {
         case 'p':
         case 'P':
             return <BlockElem>({
-                kind: 'paragraph',
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                kind: 'p',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+            })
+        case 'ul':
+        case 'UL':
+            console.log("ul")
+            return <BlockElem>({
+                kind: 'ul',
+                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+            })
+        case 'li':
+        case 'LI':
+            console.log("li")
+            return <BlockElem>({
+                kind: 'li',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             })
         default:
             return <BlockElem>({
-                kind: 'paragraph',
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                kind: 'p',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             })
     }
 }
 
-function parseInline(node: Node): InlineElem[] {
+function parseInlineElem(node: Node): InlineElem[] {
     switch (node.nodeName) {
-        // induction case: subtree of inline elements
-        case 'span':
-        case 'SPAN':
-            return _.flatten(toArray(node.childNodes).map(parseInline));
-        // plain text node
+        // base case: plain text node
         case '#text':
             return <InlineElem[]>[{
                 kind: 'plain',
                 text: node.textContent
             }]
+        // subtree of inline elements
+        case 'span':
+        case 'SPAN':
+            return _.flatten(toArray(node.childNodes).map(parseInlineElem));
         // italic
         case 'i':
         case 'I':
             return <InlineElem[]>[{
-                kind: 'italic',
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                kind: 'i',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             }]
         // link
         case 'a':
         case 'A':
             return <InlineElem[]>[{
-                kind: 'link',
+                kind: 'a',
                 href: (<Element>node).getAttribute('href'),
                 title: (<Element>node).getAttribute('title'),
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             }]
         default:
             return <InlineElem[]>[{

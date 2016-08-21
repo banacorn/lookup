@@ -12,7 +12,9 @@ function inlineToText(x) {
     switch (x.kind) {
         case 'plain':
             return x.text;
-        case 'italic':
+        case 'i':
+            return x.body.map(inlineToText).join('');
+        case 'a':
             return x.body.map(inlineToText).join('');
         default:
             return '';
@@ -21,7 +23,11 @@ function inlineToText(x) {
 exports.inlineToText = inlineToText;
 function blockToText(node) {
     switch (node.kind) {
-        case 'paragraph':
+        case 'p':
+            return node.body.map(inlineToText).join('');
+        case 'ul':
+            return node.body.map(blockToText).join('\n');
+        case 'li':
             return node.body.map(inlineToText).join('');
         default:
             return "<unknown block element>";

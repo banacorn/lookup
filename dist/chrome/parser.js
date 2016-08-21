@@ -17,8 +17,9 @@ function isHeader(s, level) {
 }
 var notIgnorable = function (node) {
     var isComment = node.nodeType === 8;
-    var isTextAndEmpty = node.nodeType == 3 && !/[^\t\n\r ]/.test(node.textContent);
-    return !(isComment || isTextAndEmpty);
+    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r ]/.test(node.textContent);
+    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+    return !(isComment || isTextAndEmpty || isEmptyParagraph);
 };
 function parseXML(raw) {
     if (typeof window === 'undefined') {
@@ -32,7 +33,9 @@ function parseXML(raw) {
 exports.parseXML = parseXML;
 function parseDocument(doc) {
     var contentNode = doc.getElementById('mw-content-text');
+    removeWhitespace(contentNode);
     var nodeList = Array.prototype.slice.call(contentNode.childNodes);
+    console.log(contentNode);
     return buildSection(nodeList, "Entry", 2);
 }
 exports.parseDocument = parseDocument;
@@ -45,6 +48,19 @@ function parse(raw) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = parse;
+function removeWhitespace(node) {
+    if (node && node.childNodes) {
+        var children = Array.prototype.slice.call(node.childNodes);
+        children.forEach(function (child) {
+            if (notIgnorable(child)) {
+                removeWhitespace(child);
+            }
+            else {
+                node.removeChild(child);
+            }
+        });
+    }
+}
 function buildSection(list, name, level) {
     var intervals = [];
     list.forEach(function (node, i) {
@@ -52,9 +68,7 @@ function buildSection(list, name, level) {
             intervals.push(i);
     });
     if (intervals.length > 0) {
-        var body = _.take(list, intervals[0])
-            .filter(notIgnorable)
-            .map(parseBlockElem);
+        var body = _.take(list, intervals[0]).map(parseBlockElem);
         var subs = intervals.map(function (start, i) {
             var name = list[start].childNodes[0].textContent;
             var interval;
@@ -74,9 +88,7 @@ function buildSection(list, name, level) {
         };
     }
     else {
-        var body = list
-            .filter(notIgnorable)
-            .map(parseBlockElem);
+        var body = list.map(parseBlockElem);
         return {
             name: name,
             body: body,
@@ -85,46 +97,63 @@ function buildSection(list, name, level) {
     }
 }
 function toArray(nodes) {
-    return Array.prototype.slice.call(nodes);
+    if (nodes)
+        return Array.prototype.slice.call(nodes);
+    else
+        return [];
 }
 function parseBlockElem(node) {
     switch (node.nodeName) {
         case 'p':
         case 'P':
             return ({
-                kind: 'paragraph',
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                kind: 'p',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+            });
+        case 'ul':
+        case 'UL':
+            console.log("ul");
+            return ({
+                kind: 'ul',
+                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+            });
+        case 'li':
+        case 'LI':
+            console.log("li");
+            return ({
+                kind: 'li',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             });
         default:
             return ({
-                kind: 'paragraph',
-                body: _.flatten(toArray(node.childNodes).map(parseInline))
+                kind: 'p',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             });
     }
 }
-function parseInline(node) {
+function parseInlineElem(node) {
     switch (node.nodeName) {
-        case 'span':
-        case 'SPAN':
-            return _.flatten(toArray(node.childNodes).map(parseInline));
         case '#text':
             return [{
                     kind: 'plain',
                     text: node.textContent
                 }];
+        case 'span':
+        case 'SPAN':
+            return _.flatten(toArray(node.childNodes).map(parseInlineElem));
         case 'i':
         case 'I':
             return [{
-                    kind: 'italic',
-                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+                    kind: 'i',
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
                 }];
         case 'a':
         case 'A':
             return [{
-                    kind: 'link',
+                    kind: 'a',
                     href: node.getAttribute('href'),
                     title: node.getAttribute('title'),
-                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
                 }];
         default:
             return [{

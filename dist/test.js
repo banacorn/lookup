@@ -175,8 +175,9 @@
 	}
 	var notIgnorable = function (node) {
 	    var isComment = node.nodeType === 8;
-	    var isTextAndEmpty = node.nodeType == 3 && !/[^\t\n\r ]/.test(node.textContent);
-	    return !(isComment || isTextAndEmpty);
+	    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r ]/.test(node.textContent);
+	    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+	    return !(isComment || isTextAndEmpty || isEmptyParagraph);
 	};
 	function parseXML(raw) {
 	    if (typeof window === 'undefined') {
@@ -192,7 +193,9 @@
 	exports.parseXML = parseXML;
 	function parseDocument(doc) {
 	    var contentNode = doc.getElementById('mw-content-text');
+	    removeWhitespace(contentNode);
 	    var nodeList = Array.prototype.slice.call(contentNode.childNodes);
+	    console.log(contentNode);
 	    return buildSection(nodeList, "Entry", 2);
 	}
 	exports.parseDocument = parseDocument;
@@ -205,6 +208,20 @@
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = parse;
+	// removes whitespaces in the tree
+	function removeWhitespace(node) {
+	    if (node && node.childNodes) {
+	        var children = Array.prototype.slice.call(node.childNodes);
+	        children.forEach(function (child) {
+	            if (notIgnorable(child)) {
+	                removeWhitespace(child);
+	            }
+	            else {
+	                node.removeChild(child);
+	            }
+	        });
+	    }
+	}
 	// given a NodeList, build a tree with headers as ineteral nodes
 	function buildSection(list, name, level) {
 	    var intervals = [];
@@ -213,9 +230,7 @@
 	            intervals.push(i);
 	    });
 	    if (intervals.length > 0) {
-	        var body = _.take(list, intervals[0])
-	            .filter(notIgnorable)
-	            .map(parseBlockElem);
+	        var body = _.take(list, intervals[0]).map(parseBlockElem);
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -235,9 +250,7 @@
 	        };
 	    }
 	    else {
-	        var body = list
-	            .filter(notIgnorable)
-	            .map(parseBlockElem);
+	        var body = list.map(parseBlockElem);
 	        return {
 	            name: name,
 	            body: body,
@@ -246,50 +259,67 @@
 	    }
 	}
 	function toArray(nodes) {
-	    return Array.prototype.slice.call(nodes);
+	    if (nodes)
+	        return Array.prototype.slice.call(nodes);
+	    else
+	        return [];
 	}
 	function parseBlockElem(node) {
 	    switch (node.nodeName) {
 	        case 'p':
 	        case 'P':
 	            return ({
-	                kind: 'paragraph',
-	                body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                kind: 'p',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	            });
+	        case 'ul':
+	        case 'UL':
+	            console.log("ul");
+	            return ({
+	                kind: 'ul',
+	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+	            });
+	        case 'li':
+	        case 'LI':
+	            console.log("li");
+	            return ({
+	                kind: 'li',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	            });
 	        default:
 	            return ({
-	                kind: 'paragraph',
-	                body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                kind: 'p',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	            });
 	    }
 	}
-	function parseInline(node) {
+	function parseInlineElem(node) {
 	    switch (node.nodeName) {
-	        // induction case: subtree of inline elements
-	        case 'span':
-	        case 'SPAN':
-	            return _.flatten(toArray(node.childNodes).map(parseInline));
-	        // plain text node
+	        // base case: plain text node
 	        case '#text':
 	            return [{
 	                    kind: 'plain',
 	                    text: node.textContent
 	                }];
+	        // subtree of inline elements
+	        case 'span':
+	        case 'SPAN':
+	            return _.flatten(toArray(node.childNodes).map(parseInlineElem));
 	        // italic
 	        case 'i':
 	        case 'I':
 	            return [{
-	                    kind: 'italic',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                    kind: 'i',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	                }];
 	        // link
 	        case 'a':
 	        case 'A':
 	            return [{
-	                    kind: 'link',
+	                    kind: 'a',
 	                    href: node.getAttribute('href'),
 	                    title: node.getAttribute('title'),
-	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	                }];
 	        default:
 	            return [{
@@ -328,7 +358,9 @@
 	    switch (x.kind) {
 	        case 'plain':
 	            return x.text;
-	        case 'italic':
+	        case 'i':
+	            return x.body.map(inlineToText).join('');
+	        case 'a':
 	            return x.body.map(inlineToText).join('');
 	        default:
 	            return '';
@@ -337,7 +369,11 @@
 	exports.inlineToText = inlineToText;
 	function blockToText(node) {
 	    switch (node.kind) {
-	        case 'paragraph':
+	        case 'p':
+	            return node.body.map(inlineToText).join('');
+	        case 'ul':
+	            return node.body.map(blockToText).join('\n');
+	        case 'li':
 	            return node.body.map(inlineToText).join('');
 	        default:
 	            return "<unknown block element>";
