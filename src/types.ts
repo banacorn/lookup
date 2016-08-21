@@ -17,13 +17,18 @@ export namespace Block {
     }
 }
 
-export type InlineElem = Inline.Plain;
+export type InlineElem = Inline.Plain | Inline.Italic;
 export namespace Inline {
     export interface Plain {
         kind: 'plain',
         text: string
     }
+    export interface Italic {
+        kind: 'italic',
+        body: InlineElem[]
+    }
 }
+
 
 export type LanguageSection = {
     languageName: string,
@@ -40,7 +45,12 @@ export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>)
 
 export function inlineToText(x: InlineElem): string {
     switch (x.kind) {
-        case 'plain': return x.text;
+        case 'plain':
+            return x.text;
+        case 'italic':
+            return x.body.map(inlineToText).join('');
+        default:
+            return '';
     }
 }
 
@@ -49,6 +59,6 @@ export function blockToText(node: BlockElem): string {
         case 'paragraph':
             return node.body.map(inlineToText).join('');
         default:
-            return node.body.map(inlineToText).join('');
+            return "<unknown block element>";
     }
 }

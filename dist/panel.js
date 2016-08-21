@@ -54,7 +54,9 @@
 	var reducer_1 = __webpack_require__(54);
 	var actions_1 = __webpack_require__(3);
 	var store = redux_1.createStore(reducer_1.default, redux_1.applyMiddleware(redux_thunk_1.default));
-	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, React.createElement(Entry_1.default, null)), document.getElementById('entry'));
+	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, 
+	    React.createElement(Entry_1.default, null)
+	), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	var inDevtools = chrome.devtools !== undefined;
@@ -17160,27 +17162,39 @@
 	        case 'P':
 	            return ({
 	                kind: 'paragraph',
-	                body: toArray(node.childNodes).map(parseInline)
+	                body: _.flatten(toArray(node.childNodes).map(parseInline))
 	            });
 	        default:
 	            return ({
 	                kind: 'paragraph',
-	                body: toArray(node.childNodes).map(parseInline)
+	                body: _.flatten(toArray(node.childNodes).map(parseInline))
 	            });
 	    }
 	}
 	function parseInline(node) {
 	    switch (node.nodeName) {
+	        // induction case: subtree of inline elements
+	        case 'span':
+	        case 'SPAN':
+	            return _.flatten(toArray(node.childNodes).map(parseInline));
+	        // plain text node
 	        case '#text':
-	            return ({
-	                kind: 'plain',
-	                text: node.textContent
-	            });
+	            return [{
+	                    kind: 'plain',
+	                    text: node.textContent
+	                }];
+	        // italic
+	        case 'i':
+	        case 'I':
+	            return [{
+	                    kind: 'italic',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                }];
 	        default:
-	            return ({
-	                kind: 'plain',
-	                text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
-	            });
+	            return [{
+	                    kind: 'plain',
+	                    text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
+	                }];
 	    }
 	}
 	function sectionToText(s) {
@@ -17205,7 +17219,12 @@
 	exports.mapSection = mapSection;
 	function inlineToText(x) {
 	    switch (x.kind) {
-	        case 'plain': return x.text;
+	        case 'plain':
+	            return x.text;
+	        case 'italic':
+	            return x.body.map(inlineToText).join('');
+	        default:
+	            return '';
 	    }
 	}
 	exports.inlineToText = inlineToText;
@@ -17214,7 +17233,7 @@
 	        case 'paragraph':
 	            return node.body.map(inlineToText).join('');
 	        default:
-	            return node.body.map(inlineToText).join('');
+	            return "<unknown block element>";
 	    }
 	}
 	exports.blockToText = blockToText;
@@ -26789,9 +26808,14 @@
 	    }
 	    Entry.prototype.render = function () {
 	        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch;
-	        return (React.createElement("section", null, React.createElement("form", {onSubmit: onSearch}, React.createElement("input", {id: "search-box", type: "text"})), React.createElement("h1", null, word), React.createElement("ul", null, subs.map(function (section) {
-	            return React.createElement(LangSect_1.default, {key: word + "-" + section.languageName, languageName: section.languageName, subs: section.subs});
-	        }))));
+	        return (React.createElement("section", null, 
+	            React.createElement("form", {onSubmit: onSearch}, 
+	                React.createElement("input", {id: "search-box", type: "text"})
+	            ), 
+	            React.createElement("h1", null, word), 
+	            React.createElement("ul", null, subs.map(function (section) {
+	                return React.createElement(LangSect_1.default, {key: word + "-" + section.languageName, languageName: section.languageName, subs: section.subs});
+	            }))));
 	    };
 	    return Entry;
 	}(React.Component));
@@ -26847,7 +26871,10 @@
 	    }
 	    Sect.prototype.render = function () {
 	        var _a = this.props, level = _a.level, name = _a.name, body = _a.body, subs = _a.subs;
-	        return (React.createElement("section", null, React.createElement(Header_1.default, {level: level}, name), React.createElement("p", null, body), subs.map(function (section, i) { return (React.createElement(Sect, {key: level + "-" + i, level: level + 1, name: section.name, body: section.body, subs: section.subs})); })));
+	        return (React.createElement("section", null, 
+	            React.createElement(Header_1.default, {level: level}, name), 
+	            React.createElement("p", null, body), 
+	            subs.map(function (section, i) { return (React.createElement(Sect, {key: level + "-" + i, level: level + 1, name: section.name, body: section.body, subs: section.subs})); })));
 	    };
 	    return Sect;
 	}(React.Component));

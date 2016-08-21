@@ -258,27 +258,39 @@
 	        case 'P':
 	            return ({
 	                kind: 'paragraph',
-	                body: toArray(node.childNodes).map(parseInline)
+	                body: _.flatten(toArray(node.childNodes).map(parseInline))
 	            });
 	        default:
 	            return ({
 	                kind: 'paragraph',
-	                body: toArray(node.childNodes).map(parseInline)
+	                body: _.flatten(toArray(node.childNodes).map(parseInline))
 	            });
 	    }
 	}
 	function parseInline(node) {
 	    switch (node.nodeName) {
+	        // induction case: subtree of inline elements
+	        case 'span':
+	        case 'SPAN':
+	            return _.flatten(toArray(node.childNodes).map(parseInline));
+	        // plain text node
 	        case '#text':
-	            return ({
-	                kind: 'plain',
-	                text: node.textContent
-	            });
+	            return [{
+	                    kind: 'plain',
+	                    text: node.textContent
+	                }];
+	        // italic
+	        case 'i':
+	        case 'I':
+	            return [{
+	                    kind: 'italic',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInline))
+	                }];
 	        default:
-	            return ({
-	                kind: 'plain',
-	                text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
-	            });
+	            return [{
+	                    kind: 'plain',
+	                    text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
+	                }];
 	    }
 	}
 	function sectionToText(s) {
@@ -309,7 +321,12 @@
 	exports.mapSection = mapSection;
 	function inlineToText(x) {
 	    switch (x.kind) {
-	        case 'plain': return x.text;
+	        case 'plain':
+	            return x.text;
+	        case 'italic':
+	            return x.body.map(inlineToText).join('');
+	        default:
+	            return '';
 	    }
 	}
 	exports.inlineToText = inlineToText;
@@ -318,7 +335,7 @@
 	        case 'paragraph':
 	            return node.body.map(inlineToText).join('');
 	        default:
-	            return node.body.map(inlineToText).join('');
+	            return "<unknown block element>";
 	    }
 	}
 	exports.blockToText = blockToText;

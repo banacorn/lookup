@@ -102,28 +102,40 @@ function parseBlockElem(node: Node): BlockElem {
         case 'P':
             return <BlockElem>({
                 kind: 'paragraph',
-                body: toArray(node.childNodes).map(parseInline)
+                body: _.flatten(toArray(node.childNodes).map(parseInline))
             })
         default:
             return <BlockElem>({
                 kind: 'paragraph',
-                body: toArray(node.childNodes).map(parseInline)
+                body: _.flatten(toArray(node.childNodes).map(parseInline))
             })
     }
 }
 
-function parseInline(node: Node): InlineElem {
+function parseInline(node: Node): InlineElem[] {
     switch (node.nodeName) {
+        // induction case: subtree of inline elements
+        case 'span':
+        case 'SPAN':
+            return _.flatten(toArray(node.childNodes).map(parseInline));
+        // plain text node
         case '#text':
-            return <InlineElem>({
+            return <InlineElem[]>[{
                 kind: 'plain',
                 text: node.textContent
-            })
+            }]
+        // italic
+        case 'i':
+        case 'I':
+            return <InlineElem[]>[{
+                kind: 'italic',
+                body: _.flatten(toArray(node.childNodes).map(parseInline))
+            }]
         default:
-            return <InlineElem>({
+            return <InlineElem[]>[{
                 kind: 'plain',
                 text: `<${node.nodeName}>${node.textContent}</${node.nodeName}>\n`
-            })
+            }]
     }
 }
 
