@@ -5,12 +5,23 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var React = require('react');
-var Inline = (function (_super) {
-    __extends(Inline, _super);
-    function Inline() {
+var react_redux_1 = require('react-redux');
+var actions_1 = require('../actions');
+;
+var mapDispatchToProps = function (dispatch) {
+    return {
+        onJump: function (elem) { return function (event) {
+            dispatch(actions_1.search(elem.word));
+            event.preventDefault();
+        }; }
+    };
+};
+var InlineC = (function (_super) {
+    __extends(InlineC, _super);
+    function InlineC() {
         _super.apply(this, arguments);
     }
-    Inline.prototype.render = function () {
+    InlineC.prototype.render = function () {
         var elem = this.props.children;
         switch (elem.kind) {
             case 'plain':
@@ -30,12 +41,13 @@ var Inline = (function (_super) {
             case 'a':
                 return React.createElement("a", {href: elem.href, title: elem.title, target: "_blank"}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "a-" + i}, e)); }));
             case 'jump':
-                return React.createElement("a", {onClick: function (e) { e.preventDefault(); }, href: "", title: elem.name}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "jump-" + i}, e)); }));
+                return React.createElement("a", {onClick: this.props.onJump(elem), href: "", title: elem.name, target: "_blank"}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "jump-" + i}, e)); }));
             default: return null;
         }
     };
-    return Inline;
+    return InlineC;
 }(React.Component));
+var Inline = react_redux_1.connect(null, mapDispatchToProps)(InlineC);
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Inline;
 //# sourceMappingURL=Inline.js.map

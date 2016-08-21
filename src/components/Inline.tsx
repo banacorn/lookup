@@ -1,8 +1,22 @@
 import * as React from 'react';
-import { State, Section, BlockElem, InlineElem, inlineToText } from '../types';
+import { connect } from 'react-redux';
+import { State, Section, InlineElem, inlineToText, Inline as I } from '../types';
+import { search } from '../actions';
 
+interface InlineProps extends React.Props<any> {
+    onJump: (elem: I.Jump) => (event: Event) => void;
+};
 
-class Inline extends React.Component<React.Props<any>, void> {
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        onJump: (elem: I.Jump) => (event: Event) => {
+            dispatch(search(elem.word));
+            event.preventDefault(); // prevent submit from refreshing the page
+        }
+    };
+};
+
+class InlineC extends React.Component<InlineProps, void> {
     render(): JSX.Element {
         const elem = this.props.children as InlineElem;
         switch (elem.kind) {
@@ -44,9 +58,10 @@ class Inline extends React.Component<React.Props<any>, void> {
                 ))}</a>;
             case 'jump':
                 return <a
-                    onClick={(e) => {e.preventDefault()}}
+                    onClick={this.props.onJump(elem)}
                     href=""
                     title={elem.name}
+                    target="_blank"
                 >{elem.body.map((e, i) => (
                     <Inline key={`jump-${i}`}>{e}</Inline>
                 ))}</a>;
@@ -55,4 +70,5 @@ class Inline extends React.Component<React.Props<any>, void> {
     }
 }
 
+const Inline = connect(null, mapDispatchToProps)(InlineC);
 export default Inline;
