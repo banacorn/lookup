@@ -38,8 +38,17 @@ class Inline extends React.Component<React.Props<any>, void> {
                 return <a
                     href={elem.href}
                     title={elem.title}
+                    target="_blank"
                 >{elem.body.map((e, i) => (
                     <Inline key={`a-${i}`}>{e}</Inline>
+                ))}</a>;
+            case 'jump':
+                return <a
+                    onClick={(e) => {e.preventDefault()}}
+                    href=""
+                    title={elem.name}
+                >{elem.body.map((e, i) => (
+                    <Inline key={`jump-${i}`}>{e}</Inline>
                 ))}</a>;
             default: return null;
         }

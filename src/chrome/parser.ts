@@ -199,12 +199,31 @@ function parseInlineElem(node: Node): InlineElem[] {
         // link
         case 'a':
         case 'A':
+
+            const href = (<Element>node).getAttribute('href');
+            // if internal
+            if (_.startsWith(href, '/')) {
+                const match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
+                if (match) {
+                    const section = match[2];
+                    return <InlineElem[]>[{
+                        kind: 'jump',
+                        word: (<Element>node).getAttribute('title'),
+                        section: section,
+                        name: (<Element>node).getAttribute('title'),
+                        body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                    }]
+                }
+            }
+        
+            // else external
             return <InlineElem[]>[{
                 kind: 'a',
-                href: (<Element>node).getAttribute('href'),
+                href: href,
                 title: (<Element>node).getAttribute('title'),
                 body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             }]
+
         default:
             return <InlineElem[]>[{
                 kind: 'plain',

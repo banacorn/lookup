@@ -17260,9 +17260,25 @@
 	        // link
 	        case 'a':
 	        case 'A':
+	            var href = node.getAttribute('href');
+	            // if internal
+	            if (_.startsWith(href, '/')) {
+	                var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
+	                if (match) {
+	                    var section = match[2];
+	                    return [{
+	                            kind: 'jump',
+	                            word: node.getAttribute('title'),
+	                            section: section,
+	                            name: node.getAttribute('title'),
+	                            body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                        }];
+	                }
+	            }
+	            // else external
 	            return [{
 	                    kind: 'a',
-	                    href: node.getAttribute('href'),
+	                    href: href,
 	                    title: node.getAttribute('title'),
 	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	                }];
@@ -27084,7 +27100,9 @@
 	            case 'abbr':
 	                return React.createElement("abbr", {title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "abbr-" + i}, e)); }));
 	            case 'a':
-	                return React.createElement("a", {href: elem.href, title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "a-" + i}, e)); }));
+	                return React.createElement("a", {href: elem.href, title: elem.title, target: "_blank"}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "a-" + i}, e)); }));
+	            case 'jump':
+	                return React.createElement("a", {onClick: function (e) { e.preventDefault(); }, href: "", title: elem.name}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "jump-" + i}, e)); }));
 	            default: return null;
 	        }
 	    };

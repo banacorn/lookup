@@ -184,9 +184,23 @@ function parseInlineElem(node) {
                 }];
         case 'a':
         case 'A':
+            var href = node.getAttribute('href');
+            if (_.startsWith(href, '/')) {
+                var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
+                if (match) {
+                    var section = match[2];
+                    return [{
+                            kind: 'jump',
+                            word: node.getAttribute('title'),
+                            section: section,
+                            name: node.getAttribute('title'),
+                            body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                        }];
+                }
+            }
             return [{
                     kind: 'a',
-                    href: node.getAttribute('href'),
+                    href: href,
                     title: node.getAttribute('title'),
                     body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
                 }];

@@ -40,7 +40,8 @@ export type InlineElem = Inline.Plain |
     Inline.Strong |
     Inline.Superscript |
     Inline.Abbreviation |
-    Inline.Link;
+    Inline.Link |
+    Inline.Jump;
 export namespace Inline {
     export interface Plain {
         kind: 'plain',
@@ -75,6 +76,13 @@ export namespace Inline {
         kind: 'a',
         href: string,
         title: string,
+        body: InlineElem[]
+    }
+    export interface Jump {
+        kind: 'jump',
+        word: string,
+        section: string,
+        name: string,
         body: InlineElem[]
     }
 }
