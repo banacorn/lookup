@@ -17,6 +17,14 @@ var Inline = (function (_super) {
                 return React.createElement("span", null, elem.text);
             case 'i':
                 return React.createElement("i", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "i-" + i}, e)); }));
+            case 'em':
+                return React.createElement("em", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "em-" + i}, e)); }));
+            case 'b':
+                return React.createElement("b", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "b-" + i}, e)); }));
+            case 'strong':
+                return React.createElement("strong", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "strong-" + i}, e)); }));
+            case 'abbr':
+                return React.createElement("abbr", {title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "abbr-" + i}, e)); }));
             case 'a':
                 return React.createElement("a", {href: elem.href, title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "a-" + i}, e)); }));
             default: return null;

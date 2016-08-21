@@ -13,7 +13,7 @@ export type BlockElem = Block.Paragraph |
     Block.OrderedList |
     Block.UnorderedList |
     Block.ListItem;
-    
+
 export namespace Block {
     export interface Paragraph {
         kind: 'p',
@@ -33,7 +33,13 @@ export namespace Block {
     }
 }
 
-export type InlineElem = Inline.Plain | Inline.Italic | Inline.Link;
+export type InlineElem = Inline.Plain |
+    Inline.Italic |
+    Inline.Emphasize |
+    Inline.Bold |
+    Inline.Strong |
+    Inline.Abbreviation |
+    Inline.Link;
 export namespace Inline {
     export interface Plain {
         kind: 'plain',
@@ -41,6 +47,23 @@ export namespace Inline {
     }
     export interface Italic {
         kind: 'i',
+        body: InlineElem[]
+    }
+    export interface Emphasize {
+        kind: 'em',
+        body: InlineElem[]
+    }
+    export interface Bold {
+        kind: 'b',
+        body: InlineElem[]
+    }
+    export interface Strong {
+        kind: 'strong',
+        body: InlineElem[]
+    }
+    export interface Abbreviation {
+        kind: 'abbr',
+        title: string
         body: InlineElem[]
     }
     export interface Link {

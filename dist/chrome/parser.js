@@ -151,6 +151,31 @@ function parseInlineElem(node) {
                     kind: 'i',
                     body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
                 }];
+        case 'em':
+        case 'EM':
+            return [{
+                    kind: 'em',
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                }];
+        case 'b':
+        case 'B':
+            return [{
+                    kind: 'b',
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                }];
+        case 'strong':
+        case 'STRONG':
+            return [{
+                    kind: 'strong',
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                }];
+        case 'abbr':
+        case 'ABBR':
+            return [{
+                    kind: 'abbr',
+                    title: node.getAttribute('title'),
+                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+                }];
         case 'a':
         case 'A':
             return [{

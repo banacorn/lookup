@@ -17220,6 +17220,34 @@
 	                    kind: 'i',
 	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	                }];
+	        // emphasize
+	        case 'em':
+	        case 'EM':
+	            return [{
+	                    kind: 'em',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // bold
+	        case 'b':
+	        case 'B':
+	            return [{
+	                    kind: 'b',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // strong
+	        case 'strong':
+	        case 'STRONG':
+	            return [{
+	                    kind: 'strong',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        case 'abbr':
+	        case 'ABBR':
+	            return [{
+	                    kind: 'abbr',
+	                    title: node.getAttribute('title'),
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
 	        // link
 	        case 'a':
 	        case 'A':
@@ -27036,6 +27064,14 @@
 	                return React.createElement("span", null, elem.text);
 	            case 'i':
 	                return React.createElement("i", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "i-" + i}, e)); }));
+	            case 'em':
+	                return React.createElement("em", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "em-" + i}, e)); }));
+	            case 'b':
+	                return React.createElement("b", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "b-" + i}, e)); }));
+	            case 'strong':
+	                return React.createElement("strong", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "strong-" + i}, e)); }));
+	            case 'abbr':
+	                return React.createElement("abbr", {title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "abbr-" + i}, e)); }));
 	            case 'a':
 	                return React.createElement("a", {href: elem.href, title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "a-" + i}, e)); }));
 	            default: return null;
