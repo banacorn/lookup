@@ -9,11 +9,19 @@ export type Section<T> = {
     subs: Section<T>[]
 }
 
-export type BlockElem = Block.Paragraph | Block.UnorderedList | Block.ListItem;
+export type BlockElem = Block.Paragraph |
+    Block.OrderedList |
+    Block.UnorderedList |
+    Block.ListItem;
+    
 export namespace Block {
     export interface Paragraph {
         kind: 'p',
         body: InlineElem[]
+    }
+    export interface OrderedList {
+        kind: 'ol',
+        body: ListItem[]
     }
     export interface UnorderedList {
         kind: 'ul',
@@ -74,6 +82,8 @@ export function blockToText(node: BlockElem): string {
     switch (node.kind) {
         case 'p':
             return node.body.map(inlineToText).join('');
+        case 'ol':
+            return node.body.map(blockToText).join('\n');
         case 'ul':
             return node.body.map(blockToText).join('\n');
         case 'li':

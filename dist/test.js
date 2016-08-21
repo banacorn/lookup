@@ -272,16 +272,20 @@
 	                kind: 'p',
 	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	            });
+	        case 'ol':
+	        case 'OL':
+	            return ({
+	                kind: 'ol',
+	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+	            });
 	        case 'ul':
 	        case 'UL':
-	            console.log("ul");
 	            return ({
 	                kind: 'ul',
 	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
 	            });
 	        case 'li':
 	        case 'LI':
-	            console.log("li");
 	            return ({
 	                kind: 'li',
 	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
@@ -371,6 +375,8 @@
 	    switch (node.kind) {
 	        case 'p':
 	            return node.body.map(inlineToText).join('');
+	        case 'ol':
+	            return node.body.map(blockToText).join('\n');
 	        case 'ul':
 	            return node.body.map(blockToText).join('\n');
 	        case 'li':

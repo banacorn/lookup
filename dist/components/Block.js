@@ -16,8 +16,9 @@ var Block = (function (_super) {
         switch (elem.kind) {
             case 'p':
                 return React.createElement("p", null, elem.body.map(function (inline, i) { return React.createElement(Inline_1.default, {key: i}, inline); }));
+            case 'ol':
+                return React.createElement("ol", null, elem.body.map(function (li, i) { return React.createElement(Block, {key: i}, li); }));
             case 'ul':
-                console.log(elem);
                 return React.createElement("ul", null, elem.body.map(function (li, i) { return React.createElement(Block, {key: i}, li); }));
             case 'li':
                 return React.createElement("li", null, elem.body.map(function (inline, i) { return React.createElement(Inline_1.default, {key: i}, inline); }));

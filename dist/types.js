@@ -25,6 +25,8 @@ function blockToText(node) {
     switch (node.kind) {
         case 'p':
             return node.body.map(inlineToText).join('');
+        case 'ol':
+            return node.body.map(blockToText).join('\n');
         case 'ul':
             return node.body.map(blockToText).join('\n');
         case 'li':

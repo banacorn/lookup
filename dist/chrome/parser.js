@@ -110,16 +110,20 @@ function parseBlockElem(node) {
                 kind: 'p',
                 body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             });
+        case 'ol':
+        case 'OL':
+            return ({
+                kind: 'ol',
+                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+            });
         case 'ul':
         case 'UL':
-            console.log("ul");
             return ({
                 kind: 'ul',
                 body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
             });
         case 'li':
         case 'LI':
-            console.log("li");
             return ({
                 kind: 'li',
                 body: _.flatten(toArray(node.childNodes).map(parseInlineElem))

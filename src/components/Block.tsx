@@ -10,8 +10,11 @@ class Block extends React.Component<React.Props<any>, void> {
                 return <p>{
                     elem.body.map((inline, i) => <Inline key={i}>{inline}</Inline>)
                 }</p>;
+            case 'ol':
+                return <ol>{
+                    elem.body.map((li, i) => <Block key={i}>{li}</Block>)
+                }</ol>;
             case 'ul':
-                console.log(elem)
                 return <ul>{
                     elem.body.map((li, i) => <Block key={i}>{li}</Block>)
                 }</ul>;
