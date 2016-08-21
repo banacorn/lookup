@@ -24,6 +24,10 @@ class Inline extends React.Component<React.Props<any>, void> {
                 return <strong>{elem.body.map((e, i) => (
                     <Inline key={`strong-${i}`}>{e}</Inline>
                 ))}</strong>;
+            case 'sup':
+                return <sup>{elem.body.map((e, i) => (
+                    <Inline key={`sup-${i}`}>{e}</Inline>
+                ))}</sup>;
             case 'abbr':
                 return <abbr
                     title={elem.title}

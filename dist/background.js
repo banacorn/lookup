@@ -17447,6 +17447,14 @@
 	                    kind: 'strong',
 	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
 	                }];
+	        // superscript
+	        case 'sup':
+	        case 'SUP':
+	            return [{
+	                    kind: 'sup',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // abbreviation
 	        case 'abbr':
 	        case 'ABBR':
 	            return [{

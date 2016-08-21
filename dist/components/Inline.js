@@ -23,6 +23,8 @@ var Inline = (function (_super) {
                 return React.createElement("b", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "b-" + i}, e)); }));
             case 'strong':
                 return React.createElement("strong", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "strong-" + i}, e)); }));
+            case 'sup':
+                return React.createElement("sup", null, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "sup-" + i}, e)); }));
             case 'abbr':
                 return React.createElement("abbr", {title: elem.title}, elem.body.map(function (e, i) { return (React.createElement(Inline, {key: "abbr-" + i}, e)); }));
             case 'a':

@@ -181,6 +181,14 @@ function parseInlineElem(node: Node): InlineElem[] {
                 kind: 'strong',
                 body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
             }]
+        // superscript
+        case 'sup':
+        case 'SUP':
+            return <InlineElem[]>[{
+                kind: 'sup',
+                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+            }]
+        // abbreviation
         case 'abbr':
         case 'ABBR':
             return <InlineElem[]>[{

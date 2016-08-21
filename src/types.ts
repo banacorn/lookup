@@ -38,6 +38,7 @@ export type InlineElem = Inline.Plain |
     Inline.Emphasize |
     Inline.Bold |
     Inline.Strong |
+    Inline.Superscript |
     Inline.Abbreviation |
     Inline.Link;
 export namespace Inline {
@@ -59,6 +60,10 @@ export namespace Inline {
     }
     export interface Strong {
         kind: 'strong',
+        body: InlineElem[]
+    }
+    export interface Superscript {
+        kind: 'sup',
         body: InlineElem[]
     }
     export interface Abbreviation {
