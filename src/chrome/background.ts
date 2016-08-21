@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import { jump, render, parseError } from '../actions';
-import { parseXML, parseDocument } from './parser';
-import { mapSection, LanguageSection } from '../types';
+import { parseXML, parseDocument, sectionToText } from './parser';
+import { mapSection, LanguageSection, blockToText } from '../types';
 
 type ID = number;
 type Connection = {
@@ -108,7 +108,7 @@ class Operator {
                 // action: RENDER
                 const languageSections: LanguageSection[] = entry.subs.map(s => ({
                     languageName: s.name,
-                    subs: s.subs
+                    subs: s.subs.map(sectionToText)
                 }))
                 this.messageUpstream(id, render(languageSections))
             });

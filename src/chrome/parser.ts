@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import { DOMParserStatic } from 'xmldom';
-import { Section, LanguageSection, Inline, mapSection, toText } from '../types'
+import { Section, LanguageSection, InlineElem, BlockElem, mapSection, blockToText } from '../types'
 
 function isHeader(s: string, level?: number): boolean {
     const match = s.match(/^[Hh](\d)+$/);
@@ -32,14 +32,10 @@ export function parseXML(raw: string): Document {
     }
 }
 
-export function parseDocument(doc: Document): Section<Inline[]> {
+export function parseDocument(doc: Document): Section<BlockElem[]> {
     const contentNode: Node = doc.getElementById('mw-content-text');
     const nodeList: Node[] = Array.prototype.slice.call(contentNode.childNodes);
     return buildSection(nodeList, "Entry", 2);
-}
-
-function sectionToText(s: Section<Inline[]>): Section<string> {
-    return mapSection(inlines => inlines.map(toText).join(''), s);
 }
 
 export default function parse(raw: string): LanguageSection[] {
@@ -52,7 +48,7 @@ export default function parse(raw: string): LanguageSection[] {
 
 
 // given a NodeList, build a tree with headers as ineteral nodes
-function buildSection(list: Node[], name: string, level: number): Section<Inline[]> {
+function buildSection(list: Node[], name: string, level: number): Section<BlockElem[]> {
 
     let intervals: number[] = [];
     list.forEach((node, i) => {
@@ -60,10 +56,11 @@ function buildSection(list: Node[], name: string, level: number): Section<Inline
             intervals.push(i);
     });
     if (intervals.length > 0) {
-        const body = _.take(list, intervals[0]).filter(notIgnorable).map(node => <Inline>({
-            kind: 'plain',
-            text: node.textContent
-        }));
+        const body = _.take(list, intervals[0])
+            .filter(notIgnorable)
+            .map(parseBlockElem)
+            // .map(blockToText)
+            // .join('');
         const subs = intervals.map((start, i) => {
             const name = list[start].childNodes[0].textContent;
             let interval: [number, number];
@@ -82,14 +79,54 @@ function buildSection(list: Node[], name: string, level: number): Section<Inline
         }
 
     } else {
-        const body = list.filter(notIgnorable).map(node => <Inline>({
-            kind: 'plain',
-            text: node.textContent
-        }));
+        const body = list
+            .filter(notIgnorable)
+            .map(parseBlockElem)
+            // .map(blockToText)
+            // .join('');
         return {
             name: name,
             body: body,
             subs: []
         }
     }
+}
+
+function toArray(nodes: NodeList): Node[] {
+    return Array.prototype.slice.call(nodes);
+}
+
+function parseBlockElem(node: Node): BlockElem {
+    switch (node.nodeName) {
+        case 'p':
+        case 'P':
+            return <BlockElem>({
+                kind: 'paragraph',
+                body: toArray(node.childNodes).map(parseInline)
+            })
+        default:
+            return <BlockElem>({
+                kind: 'paragraph',
+                body: toArray(node.childNodes).map(parseInline)
+            })
+    }
+}
+
+function parseInline(node: Node): InlineElem {
+    switch (node.nodeName) {
+        case '#text':
+            return <InlineElem>({
+                kind: 'plain',
+                text: node.textContent
+            })
+        default:
+            return <InlineElem>({
+                kind: 'plain',
+                text: `<${node.nodeName}>${node.textContent}</${node.nodeName}>\n`
+            })
+    }
+}
+
+export function sectionToText(s: Section<BlockElem[]>): Section<string> {
+    return mapSection(blocks => blocks.map(blockToText).join(''), s);
 }

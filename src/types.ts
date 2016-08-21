@@ -9,13 +9,21 @@ export type Section<T> = {
     subs: Section<T>[]
 }
 
-export type Inline = Plain;
-
-interface Plain {
-    kind: 'plain',
-    text: string
+export type BlockElem = Block.Paragraph;
+export namespace Block {
+    export interface Paragraph {
+        kind: 'paragraph',
+        body: InlineElem[]
+    }
 }
 
+export type InlineElem = Inline.Plain;
+export namespace Inline {
+    export interface Plain {
+        kind: 'plain',
+        text: string
+    }
+}
 
 export type LanguageSection = {
     languageName: string,
@@ -30,8 +38,17 @@ export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>)
     }
 }
 
-export function toText(x: Inline): string {
+export function inlineToText(x: InlineElem): string {
     switch (x.kind) {
         case 'plain': return x.text;
+    }
+}
+
+export function blockToText(node: BlockElem): string {
+    switch (node.kind) {
+        case 'paragraph':
+            return node.body.map(inlineToText).join('');
+        default:
+            return node.body.map(inlineToText).join('');
     }
 }

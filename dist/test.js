@@ -158,7 +158,7 @@
 
 	"use strict";
 	var _ = __webpack_require__(8);
-	var types_1 = __webpack_require__(10);
+	var types_1 = __webpack_require__(9);
 	function isHeader(s, level) {
 	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
@@ -181,7 +181,7 @@
 	function parseXML(raw) {
 	    if (typeof window === 'undefined') {
 	        // in nodejs
-	        var DOMParser_1 = __webpack_require__(9).DOMParser;
+	        var DOMParser_1 = __webpack_require__(10).DOMParser;
 	        return new DOMParser_1().parseFromString(raw, 'text/html');
 	    }
 	    else {
@@ -196,9 +196,6 @@
 	    return buildSection(nodeList, "Entry", 2);
 	}
 	exports.parseDocument = parseDocument;
-	function sectionToText(s) {
-	    return types_1.mapSection(function (inlines) { return inlines.map(types_1.toText).join(''); }, s);
-	}
 	function parse(raw) {
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
@@ -216,10 +213,11 @@
 	            intervals.push(i);
 	    });
 	    if (intervals.length > 0) {
-	        var body = _.take(list, intervals[0]).filter(notIgnorable).map(function (node) { return ({
-	            kind: 'plain',
-	            text: node.textContent
-	        }); });
+	        var body = _.take(list, intervals[0])
+	            .filter(notIgnorable)
+	            .map(parseBlockElem);
+	        // .map(blockToText)
+	        // .join('');
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -239,10 +237,11 @@
 	        };
 	    }
 	    else {
-	        var body = list.filter(notIgnorable).map(function (node) { return ({
-	            kind: 'plain',
-	            text: node.textContent
-	        }); });
+	        var body = list
+	            .filter(notIgnorable)
+	            .map(parseBlockElem);
+	        // .map(blockToText)
+	        // .join('');
 	        return {
 	            name: name,
 	            body: body,
@@ -250,6 +249,42 @@
 	        };
 	    }
 	}
+	function toArray(nodes) {
+	    return Array.prototype.slice.call(nodes);
+	}
+	function parseBlockElem(node) {
+	    switch (node.nodeName) {
+	        case 'p':
+	        case 'P':
+	            return ({
+	                kind: 'paragraph',
+	                body: toArray(node.childNodes).map(parseInline)
+	            });
+	        default:
+	            return ({
+	                kind: 'paragraph',
+	                body: toArray(node.childNodes).map(parseInline)
+	            });
+	    }
+	}
+	function parseInline(node) {
+	    switch (node.nodeName) {
+	        case '#text':
+	            return ({
+	                kind: 'plain',
+	                text: node.textContent
+	            });
+	        default:
+	            return ({
+	                kind: 'plain',
+	                text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
+	            });
+	    }
+	}
+	function sectionToText(s) {
+	    return types_1.mapSection(function (blocks) { return blocks.map(types_1.blockToText).join(''); }, s);
+	}
+	exports.sectionToText = sectionToText;
 
 
 /***/ },
@@ -262,12 +297,6 @@
 /* 9 */
 /***/ function(module, exports) {
 
-	module.exports = require("xmldom");
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
 	"use strict";
 	function mapSection(f, _a) {
 	    var name = _a.name, body = _a.body, subs = _a.subs;
@@ -278,13 +307,28 @@
 	    };
 	}
 	exports.mapSection = mapSection;
-	function toText(x) {
+	function inlineToText(x) {
 	    switch (x.kind) {
 	        case 'plain': return x.text;
 	    }
 	}
-	exports.toText = toText;
+	exports.inlineToText = inlineToText;
+	function blockToText(node) {
+	    switch (node.kind) {
+	        case 'paragraph':
+	            return node.body.map(inlineToText).join('');
+	        default:
+	            return node.body.map(inlineToText).join('');
+	    }
+	}
+	exports.blockToText = blockToText;
 
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = require("xmldom");
 
 /***/ }
 /******/ ]);

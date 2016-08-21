@@ -125,7 +125,7 @@
 	                // action: RENDER
 	                var languageSections = entry.subs.map(function (s) { return ({
 	                    languageName: s.name,
-	                    subs: s.subs
+	                    subs: s.subs.map(parser_1.sectionToText)
 	                }); });
 	                _this.messageUpstream(id, actions_1.render(languageSections));
 	            });
@@ -17042,7 +17042,7 @@
 	"use strict";
 	var redux_actions_1 = __webpack_require__(4);
 	var parser_1 = __webpack_require__(10);
-	var util_1 = __webpack_require__(14);
+	var util_1 = __webpack_require__(15);
 	exports.JUMP = 'JUMP';
 	exports.PARSE_ERROR = 'PARSE_ERROR';
 	exports.RENDER = 'RENDER';
@@ -17054,7 +17054,7 @@
 	exports.search = function (word) { return function (dispatch) { return util_1.fetch(word)
 	    .then(function (res) {
 	    dispatch(exports.jump(word));
-	    var inlineSections = parser_1.default(res);
+	    // const blockSections: Section<BlockElem[]> = parse(res);
 	    dispatch(exports.render(parser_1.default(res)));
 	}, function (err) { return dispatch(exports.searchError(err)); }); }; };
 
@@ -17267,7 +17267,7 @@
 
 	"use strict";
 	var _ = __webpack_require__(1);
-	var types_1 = __webpack_require__(54);
+	var types_1 = __webpack_require__(11);
 	function isHeader(s, level) {
 	    var match = s.match(/^[Hh](\d)+$/);
 	    if (match) {
@@ -17290,7 +17290,7 @@
 	function parseXML(raw) {
 	    if (typeof window === 'undefined') {
 	        // in nodejs
-	        var DOMParser_1 = __webpack_require__(11).DOMParser;
+	        var DOMParser_1 = __webpack_require__(12).DOMParser;
 	        return new DOMParser_1().parseFromString(raw, 'text/html');
 	    }
 	    else {
@@ -17305,9 +17305,6 @@
 	    return buildSection(nodeList, "Entry", 2);
 	}
 	exports.parseDocument = parseDocument;
-	function sectionToText(s) {
-	    return types_1.mapSection(function (inlines) { return inlines.map(types_1.toText).join(''); }, s);
-	}
 	function parse(raw) {
 	    var entry = parseDocument(parseXML(raw));
 	    return entry.subs.map(function (s) { return ({
@@ -17325,10 +17322,11 @@
 	            intervals.push(i);
 	    });
 	    if (intervals.length > 0) {
-	        var body = _.take(list, intervals[0]).filter(notIgnorable).map(function (node) { return ({
-	            kind: 'plain',
-	            text: node.textContent
-	        }); });
+	        var body = _.take(list, intervals[0])
+	            .filter(notIgnorable)
+	            .map(parseBlockElem);
+	        // .map(blockToText)
+	        // .join('');
 	        var subs = intervals.map(function (start, i) {
 	            var name = list[start].childNodes[0].textContent;
 	            var interval;
@@ -17348,10 +17346,11 @@
 	        };
 	    }
 	    else {
-	        var body = list.filter(notIgnorable).map(function (node) { return ({
-	            kind: 'plain',
-	            text: node.textContent
-	        }); });
+	        var body = list
+	            .filter(notIgnorable)
+	            .map(parseBlockElem);
+	        // .map(blockToText)
+	        // .join('');
 	        return {
 	            name: name,
 	            body: body,
@@ -17359,10 +17358,77 @@
 	        };
 	    }
 	}
+	function toArray(nodes) {
+	    return Array.prototype.slice.call(nodes);
+	}
+	function parseBlockElem(node) {
+	    switch (node.nodeName) {
+	        case 'p':
+	        case 'P':
+	            return ({
+	                kind: 'paragraph',
+	                body: toArray(node.childNodes).map(parseInline)
+	            });
+	        default:
+	            return ({
+	                kind: 'paragraph',
+	                body: toArray(node.childNodes).map(parseInline)
+	            });
+	    }
+	}
+	function parseInline(node) {
+	    switch (node.nodeName) {
+	        case '#text':
+	            return ({
+	                kind: 'plain',
+	                text: node.textContent
+	            });
+	        default:
+	            return ({
+	                kind: 'plain',
+	                text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
+	            });
+	    }
+	}
+	function sectionToText(s) {
+	    return types_1.mapSection(function (blocks) { return blocks.map(types_1.blockToText).join(''); }, s);
+	}
+	exports.sectionToText = sectionToText;
 
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function mapSection(f, _a) {
+	    var name = _a.name, body = _a.body, subs = _a.subs;
+	    return {
+	        name: name,
+	        body: f(body),
+	        subs: subs.map(function (s) { return mapSection(f, s); })
+	    };
+	}
+	exports.mapSection = mapSection;
+	function inlineToText(x) {
+	    switch (x.kind) {
+	        case 'plain': return x.text;
+	    }
+	}
+	exports.inlineToText = inlineToText;
+	function blockToText(node) {
+	    switch (node.kind) {
+	        case 'paragraph':
+	            return node.body.map(inlineToText).join('');
+	        default:
+	            return node.body.map(inlineToText).join('');
+	    }
+	}
+	exports.blockToText = blockToText;
+
+
+/***/ },
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	function DOMParser(options){
@@ -17609,15 +17675,15 @@
 	}//appendChild and setAttributeNS are preformance key
 	
 	if(true){
-		var XMLReader = __webpack_require__(12).XMLReader;
-		var DOMImplementation = exports.DOMImplementation = __webpack_require__(13).DOMImplementation;
-		exports.XMLSerializer = __webpack_require__(13).XMLSerializer ;
+		var XMLReader = __webpack_require__(13).XMLReader;
+		var DOMImplementation = exports.DOMImplementation = __webpack_require__(14).DOMImplementation;
+		exports.XMLSerializer = __webpack_require__(14).XMLSerializer ;
 		exports.DOMParser = DOMParser;
 	}
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -18209,7 +18275,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -19362,11 +19428,11 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Promise = __webpack_require__(15);
+	var Promise = __webpack_require__(16);
 	function fetch(word) {
 	    return new Promise(function (resolve, reject) {
 	        var req = new XMLHttpRequest();
@@ -19389,7 +19455,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -24868,10 +24934,10 @@
 	
 	},{"./es5":13}]},{},[4])(4)
 	});                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), (function() { return this; }()), __webpack_require__(17).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17), (function() { return this; }()), __webpack_require__(18).setImmediate))
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -25037,10 +25103,10 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(16).nextTick;
+	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(17).nextTick;
 	var apply = Function.prototype.apply;
 	var slice = Array.prototype.slice;
 	var immediateIds = {};
@@ -25116,65 +25182,7 @@
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17).setImmediate, __webpack_require__(17).clearImmediate))
-
-/***/ },
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */,
-/* 38 */,
-/* 39 */,
-/* 40 */,
-/* 41 */,
-/* 42 */,
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */
-/***/ function(module, exports) {
-
-	"use strict";
-	function mapSection(f, _a) {
-	    var name = _a.name, body = _a.body, subs = _a.subs;
-	    return {
-	        name: name,
-	        body: f(body),
-	        subs: subs.map(function (s) { return mapSection(f, s); })
-	    };
-	}
-	exports.mapSection = mapSection;
-	function toText(x) {
-	    switch (x.kind) {
-	        case 'plain': return x.text;
-	    }
-	}
-	exports.toText = toText;
-
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).setImmediate, __webpack_require__(18).clearImmediate))
 
 /***/ }
 /******/ ]);

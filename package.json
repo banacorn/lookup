@@ -18,7 +18,8 @@
   },
   "scripts": {
       "watch": "webpack --progress --colors --watch",
-      "server": "node dist/server.js"
+      "server": "node dist/server.js",
+      "test": "node dist/test.js Eisen"
   },
   "homepage": "https://github.com/banacorn/lookup#readme",
   "dependencies": {
