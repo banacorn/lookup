@@ -62,17 +62,7 @@ var Operator = (function () {
             console.log('word:', word);
             _this.messageUpstream(id, actions_1.jump(word));
             fetch(word, function (raw) {
-                console.time('parse');
-                var doc = parser_1.parseXML(raw);
-                console.timeEnd('parse');
-                console.time('build');
-                var entry = parser_1.parseDocument(doc);
-                console.timeEnd('build');
-                var languageSections = entry.subs.map(function (s) { return ({
-                    languageName: s.name,
-                    subs: s.subs
-                }); });
-                _this.messageUpstream(id, actions_1.render(languageSections));
+                _this.messageUpstream(id, actions_1.render(parser_1.default(raw)));
             });
         };
         var onDisconnect = function () {
