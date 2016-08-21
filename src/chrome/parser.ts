@@ -17,8 +17,9 @@ function isHeader(s: string, level?: number): boolean {
 
 const notIgnorable = (node: Node) => {
     const isComment = node.nodeType === 8;
-    const isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r ]/.test(node.textContent);
-    const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+    const isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r]/.test(node.textContent);
+    const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && node.textContent.trim().length === 0;
+    // const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
     return !(isComment || isTextAndEmpty || isEmptyParagraph);
 }
 

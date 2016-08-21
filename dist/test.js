@@ -175,8 +175,9 @@
 	}
 	var notIgnorable = function (node) {
 	    var isComment = node.nodeType === 8;
-	    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r ]/.test(node.textContent);
-	    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+	    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r]/.test(node.textContent);
+	    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && node.textContent.trim().length === 0;
+	    // const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
 	    return !(isComment || isTextAndEmpty || isEmptyParagraph);
 	};
 	function parseXML(raw) {
