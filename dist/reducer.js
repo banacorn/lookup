@@ -8,8 +8,7 @@ var defaultState = {
     status: 'pending',
     history: []
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = redux_actions_1.handleActions((_a = {},
+var lookupReducers = redux_actions_1.handleActions((_a = {},
     _a[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
         word: action.payload,
         status: 'pending',
@@ -24,7 +23,24 @@ exports.default = redux_actions_1.handleActions((_a = {},
         status: 'failed',
         history: _.initial(state.history)
     }); },
+    _a[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
+        word: action.payload,
+        status: 'pending',
+        history: _.initial(state.history)
+    }); },
+    _a[actions_1.BACKWARD.SUCC] = function (state, action) { return _.assign({}, state, {
+        body: action.payload,
+        status: 'succeed'
+    }); },
+    _a[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
+        word: action.payload.current,
+        status: 'failed',
+        history: _.concat(state.history, action.payload.current)
+    }); },
     _a
 ), defaultState);
+var backwardReducers = redux_actions_1.handleActions({}, defaultState);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = lookupReducers;
 var _a;
 //# sourceMappingURL=reducer.js.map

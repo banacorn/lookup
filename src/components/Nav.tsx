@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
 import { State } from '../types'
-import { lookup } from '../actions'
+import { lookup, backward } from '../actions'
 
 interface NavProps extends React.Props<any> {
     status: 'pending' | 'succeed' | 'failed',
@@ -9,7 +9,8 @@ interface NavProps extends React.Props<any> {
     // history
     history: string[],
 
-    onSearch: (e: Event) => void
+    onSearch: (e: Event) => void,
+    onBackward: (e: Event) => void
 };
 
 const mapStateToProps = ({ status, history }: State) => {
@@ -25,15 +26,19 @@ const mapDispatchToProps = (dispatch: any) => {
             const searchBox = document.getElementById('search-box') as HTMLInputElement;
             const word: string = searchBox.value;
             dispatch(lookup(word));
+        },
+        onBackward: (e: Event) => {
+            dispatch(backward);
         }
     };
 };
 
 class Nav extends React.Component<NavProps, void> {
     render() {
-        const { status, history, onSearch } = this.props;
+        const { status, history, onSearch, onBackward } = this.props;
         return (
             <nav>
+                <button onClick={onBackward}>backward</button>
                 <p>{`${_.last(history)}: ${status}`}</p>
                 <p>{ history.toString() }</p>
                 <form onSubmit={onSearch}>

@@ -21,6 +21,9 @@ var mapDispatchToProps = function (dispatch) {
             var searchBox = document.getElementById('search-box');
             var word = searchBox.value;
             dispatch(actions_1.lookup(word));
+        },
+        onBackward: function (e) {
+            dispatch(actions_1.backward);
         }
     };
 };
@@ -30,8 +33,9 @@ var Nav = (function (_super) {
         _super.apply(this, arguments);
     }
     Nav.prototype.render = function () {
-        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch;
+        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward;
         return (React.createElement("nav", null, 
+            React.createElement("button", {onClick: onBackward}, "backward"), 
             React.createElement("p", null, _.last(history) + ": " + status), 
             React.createElement("p", null, history.toString()), 
             React.createElement("form", {onSubmit: onSearch}, 

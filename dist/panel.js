@@ -16844,12 +16844,12 @@
 	    LOOKUP.SUCC = 'LOOKUP.SUCC';
 	    LOOKUP.FAIL = 'LOOKUP.FAIL';
 	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
-	var NAV;
-	(function (NAV) {
-	    // akin to random walk
-	    NAV.SEARCH = 'NAV.SEARCH';
-	    NAV.BACKWARD = 'NAV.BACKWARD';
-	})(NAV = exports.NAV || (exports.NAV = {}));
+	var BACKWARD;
+	(function (BACKWARD) {
+	    BACKWARD.INIT = 'BACKWARD.INIT';
+	    BACKWARD.SUCC = 'BACKWARD.SUCC';
+	    BACKWARD.FAIL = 'BACKWARD.FAIL';
+	})(BACKWARD = exports.BACKWARD || (exports.BACKWARD = {}));
 	exports.lookup = function (target) { return function (dispatch) {
 	    var init = redux_actions_1.createAction(LOOKUP.INIT);
 	    var succ = redux_actions_1.createAction(LOOKUP.SUCC);
@@ -16857,32 +16857,18 @@
 	    dispatch(init(target));
 	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail(err)); });
 	}; };
-	// // navigation
-	// export const navBackward = createAction<NAV.BACKWARD>(NAV.BACKWARD);
-	//
-	//
-	// export const backward = (dispatch: any, getState: () => State) => {
-	//     const state = getState();
-	//     const target = lastTarget(state.history);
-	//     if (target) {
-	//         dispatch(navBackward);
-	//         dispatch(lookup.init(target));
-	//         fetch(target).then(
-	//             res => dispatch(render(parse(res))),
-	//             err => dispatch(error(err))
-	//         );
-	//     }
-	// }
-	// export const backward = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL, err => ({ err }));
-	// export const backward = (word: string) => (dispatch: any) => {
-	//     dispatch(lookup(word));
-	//     fetch(word).then(
-	//         res => {
-	//             dispatch(render(parse(res)))
-	//         },
-	//         err => dispatch(lookup(word))
-	//     );
-	// }
+	exports.backward = function (dispatch, getState) {
+	    var init = redux_actions_1.createAction(BACKWARD.INIT);
+	    var succ = redux_actions_1.createAction(BACKWARD.SUCC);
+	    var fail = redux_actions_1.createAction(BACKWARD.FAIL);
+	    var history = getState().history;
+	    var target = lastTarget(history);
+	    dispatch(init(target));
+	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail({
+	        err: err,
+	        current: getState().word
+	    })); });
+	};
 	function lastTarget(history) {
 	    if (history.length >= 2) {
 	        return history[history.length - 2];
@@ -27168,8 +27154,7 @@
 	    status: 'pending',
 	    history: []
 	};
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = redux_actions_1.handleActions((_a = {},
+	var lookupReducers = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
 	        // display the target right away
 	        word: action.payload,
@@ -27186,9 +27171,31 @@
 	        status: 'failed',
 	        history: _.initial(state.history)
 	    }); },
+	    _a[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
+	        word: action.payload,
+	        status: 'pending',
+	        history: _.initial(state.history)
+	    }); },
+	    _a[actions_1.BACKWARD.SUCC] = function (state, action) { return _.assign({}, state, {
+	        body: action.payload,
+	        status: 'succeed'
+	    }); },
+	    _a[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
+	        // rewind
+	        word: action.payload.current,
+	        status: 'failed',
+	        history: _.concat(state.history, action.payload.current)
+	    }); },
 	    _a
 	), defaultState);
+	var backwardReducers = redux_actions_1.handleActions({}, defaultState);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = lookupReducers;
 	var _a;
+	// export default combineReducers({
+	//   lookupReducers,
+	//   backwardReducers
+	// })
 
 
 /***/ },
@@ -27219,6 +27226,9 @@
 	            var searchBox = document.getElementById('search-box');
 	            var word = searchBox.value;
 	            dispatch(actions_1.lookup(word));
+	        },
+	        onBackward: function (e) {
+	            dispatch(actions_1.backward);
 	        }
 	    };
 	};
@@ -27228,8 +27238,9 @@
 	        _super.apply(this, arguments);
 	    }
 	    Nav.prototype.render = function () {
-	        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch;
+	        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward;
 	        return (React.createElement("nav", null, 
+	            React.createElement("button", {onClick: onBackward}, "backward"), 
 	            React.createElement("p", null, _.last(history) + ": " + status), 
 	            React.createElement("p", null, history.toString()), 
 	            React.createElement("form", {onSubmit: onSearch}, 

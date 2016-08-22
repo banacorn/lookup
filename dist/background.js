@@ -16822,12 +16822,12 @@
 	    LOOKUP.SUCC = 'LOOKUP.SUCC';
 	    LOOKUP.FAIL = 'LOOKUP.FAIL';
 	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
-	var NAV;
-	(function (NAV) {
-	    // akin to random walk
-	    NAV.SEARCH = 'NAV.SEARCH';
-	    NAV.BACKWARD = 'NAV.BACKWARD';
-	})(NAV = exports.NAV || (exports.NAV = {}));
+	var BACKWARD;
+	(function (BACKWARD) {
+	    BACKWARD.INIT = 'BACKWARD.INIT';
+	    BACKWARD.SUCC = 'BACKWARD.SUCC';
+	    BACKWARD.FAIL = 'BACKWARD.FAIL';
+	})(BACKWARD = exports.BACKWARD || (exports.BACKWARD = {}));
 	exports.lookup = function (target) { return function (dispatch) {
 	    var init = redux_actions_1.createAction(LOOKUP.INIT);
 	    var succ = redux_actions_1.createAction(LOOKUP.SUCC);
@@ -16835,32 +16835,18 @@
 	    dispatch(init(target));
 	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail(err)); });
 	}; };
-	// // navigation
-	// export const navBackward = createAction<NAV.BACKWARD>(NAV.BACKWARD);
-	//
-	//
-	// export const backward = (dispatch: any, getState: () => State) => {
-	//     const state = getState();
-	//     const target = lastTarget(state.history);
-	//     if (target) {
-	//         dispatch(navBackward);
-	//         dispatch(lookup.init(target));
-	//         fetch(target).then(
-	//             res => dispatch(render(parse(res))),
-	//             err => dispatch(error(err))
-	//         );
-	//     }
-	// }
-	// export const backward = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL, err => ({ err }));
-	// export const backward = (word: string) => (dispatch: any) => {
-	//     dispatch(lookup(word));
-	//     fetch(word).then(
-	//         res => {
-	//             dispatch(render(parse(res)))
-	//         },
-	//         err => dispatch(lookup(word))
-	//     );
-	// }
+	exports.backward = function (dispatch, getState) {
+	    var init = redux_actions_1.createAction(BACKWARD.INIT);
+	    var succ = redux_actions_1.createAction(BACKWARD.SUCC);
+	    var fail = redux_actions_1.createAction(BACKWARD.FAIL);
+	    var history = getState().history;
+	    var target = lastTarget(history);
+	    dispatch(init(target));
+	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail({
+	        err: err,
+	        current: getState().word
+	    })); });
+	};
 	function lastTarget(history) {
 	    if (history.length >= 2) {
 	        return history[history.length - 2];
