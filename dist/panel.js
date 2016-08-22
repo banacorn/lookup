@@ -53,14 +53,17 @@
 	var Entry_1 = __webpack_require__(50);
 	var reducer_1 = __webpack_require__(56);
 	var actions_1 = __webpack_require__(3);
+	var util_1 = __webpack_require__(15);
 	var store = redux_1.createStore(reducer_1.default, redux_1.applyMiddleware(redux_thunk_1.default));
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, 
 	    React.createElement(Entry_1.default, null)
 	), document.getElementById('entry'));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
-	var inDevtools = chrome.devtools !== undefined;
-	if (inDevtools) {
+	if (util_1.inWebpage) {
+	    store.dispatch(actions_1.search("Eisen"));
+	}
+	else {
 	    var backgroundConn = chrome.runtime.connect({
 	        name: 'woerterbuch-panel'
 	    });
@@ -68,9 +71,6 @@
 	        tabId: chrome.devtools.inspectedWindow.tabId
 	    });
 	    backgroundConn.onMessage.addListener(store.dispatch);
-	}
-	else {
-	    store.dispatch(actions_1.search("Eisen"));
 	}
 
 
@@ -19345,22 +19345,26 @@
 
 	"use strict";
 	var Promise = __webpack_require__(16);
+	exports.inWebpage = chrome.panels === undefined && chrome.tabs === undefined && chrome.devtools === undefined;
 	function fetch(word) {
 	    return new Promise(function (resolve, reject) {
-	        var req = new XMLHttpRequest();
-	        req.open('GET', "http://localhost:4000/search/" + word);
-	        req.onload = function () {
-	            if (req.status === 200) {
-	                resolve(req.responseText);
+	        var xhr = new XMLHttpRequest();
+	        if (exports.inWebpage)
+	            xhr.open('GET', "http://localhost:4000/search/" + word);
+	        else
+	            xhr.open('GET', 'https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes', true);
+	        xhr.onload = function () {
+	            if (xhr.status === 200) {
+	                resolve(xhr.responseText);
 	            }
 	            else {
-	                reject(new Error(req.statusText));
+	                reject(new Error(xhr.statusText));
 	            }
 	        };
-	        req.onerror = function () {
+	        xhr.onerror = function () {
 	            reject(new Error("Network error"));
 	        };
-	        req.send();
+	        xhr.send();
 	    });
 	}
 	exports.fetch = fetch;

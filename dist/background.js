@@ -19326,22 +19326,26 @@
 
 	"use strict";
 	var Promise = __webpack_require__(16);
+	exports.inWebpage = chrome.panels === undefined && chrome.tabs === undefined && chrome.devtools === undefined;
 	function fetch(word) {
 	    return new Promise(function (resolve, reject) {
-	        var req = new XMLHttpRequest();
-	        req.open('GET', "http://localhost:4000/search/" + word);
-	        req.onload = function () {
-	            if (req.status === 200) {
-	                resolve(req.responseText);
+	        var xhr = new XMLHttpRequest();
+	        if (exports.inWebpage)
+	            xhr.open('GET', "http://localhost:4000/search/" + word);
+	        else
+	            xhr.open('GET', 'https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes', true);
+	        xhr.onload = function () {
+	            if (xhr.status === 200) {
+	                resolve(xhr.responseText);
 	            }
 	            else {
-	                reject(new Error(req.statusText));
+	                reject(new Error(xhr.statusText));
 	            }
 	        };
-	        req.onerror = function () {
+	        xhr.onerror = function () {
 	            reject(new Error("Network error"));
 	        };
-	        req.send();
+	        xhr.send();
 	    });
 	}
 	exports.fetch = fetch;

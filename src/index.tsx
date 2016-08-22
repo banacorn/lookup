@@ -8,6 +8,7 @@ import thunk from 'redux-thunk';
 import Entry from './components/Entry';
 import reducer from './reducer';
 import { search } from './actions';
+import { inWebpage } from './util';
 
 declare var chrome: any;
 
@@ -25,8 +26,9 @@ ReactDOM.render(
 
 // detect whether we are in normal webpage or chrome devtools
 // so that we can develop in both environments
-const inDevtools = chrome.devtools !== undefined;
-if (inDevtools) {
+if (inWebpage) {
+    store.dispatch(search("Eisen"));
+} else {
     var backgroundConn = chrome.runtime.connect({
         name: 'woerterbuch-panel'
     });
@@ -34,6 +36,4 @@ if (inDevtools) {
         tabId: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener(store.dispatch);
-} else {
-    store.dispatch(search("Eisen"));
 }
