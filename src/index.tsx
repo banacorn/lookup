@@ -5,7 +5,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
-import Entry from './components/Entry';
+import App from './components/App';
 import reducer from './reducer';
 import { search } from './actions';
 import { inWebpage } from './util';
@@ -19,9 +19,9 @@ const store = createStore(
 
 ReactDOM.render(
     <Provider store={store}>
-        <Entry />
+        <App />
     </Provider>,
-    document.getElementById('entry')
+    document.getElementById('app')
 )
 
 // detect whether we are in normal webpage or chrome devtools

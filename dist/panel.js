@@ -50,14 +50,14 @@
 	var react_redux_1 = __webpack_require__(21);
 	var redux_1 = __webpack_require__(28);
 	var redux_thunk_1 = __webpack_require__(49);
-	var Entry_1 = __webpack_require__(50);
+	var App_1 = __webpack_require__(59);
 	var reducer_1 = __webpack_require__(56);
 	var actions_1 = __webpack_require__(3);
 	var util_1 = __webpack_require__(15);
 	var store = redux_1.createStore(reducer_1.default, redux_1.applyMiddleware(redux_thunk_1.default));
 	ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store}, 
-	    React.createElement(Entry_1.default, null)
-	), document.getElementById('entry'));
+	    React.createElement(App_1.default, null)
+	), document.getElementById('app'));
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	if (util_1.inWebpage) {
@@ -26888,23 +26888,11 @@
 	var React = __webpack_require__(19);
 	var react_redux_1 = __webpack_require__(21);
 	var LangSect_1 = __webpack_require__(51);
-	var actions_1 = __webpack_require__(3);
 	;
 	var mapStateToProps = function (state) {
 	    return {
 	        word: state.word,
-	        subs: state.body,
-	        lookupStatus: state.lookupStatus,
-	    };
-	};
-	var mapDispatchToProps = function (dispatch) {
-	    return {
-	        onSearch: function (e) {
-	            e.preventDefault(); // prevent submit from refreshing the page
-	            var searchBox = document.getElementById('search-box');
-	            var word = searchBox.value;
-	            dispatch(actions_1.search(word));
-	        }
+	        subs: state.body
 	    };
 	};
 	var Entry = (function (_super) {
@@ -26913,13 +26901,9 @@
 	        _super.apply(this, arguments);
 	    }
 	    Entry.prototype.render = function () {
-	        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch, lookupStatus = _a.lookupStatus;
+	        var _a = this.props, word = _a.word, subs = _a.subs;
 	        return (React.createElement("section", null, 
-	            React.createElement("form", {onSubmit: onSearch}, 
-	                React.createElement("input", {id: "search-box", type: "text"})
-	            ), 
 	            React.createElement("h1", null, word), 
-	            React.createElement("p", null, lookupStatus), 
 	            React.createElement("ul", null, subs.map(function (section) {
 	                return React.createElement(LangSect_1.default, {key: section.languageName, languageName: section.languageName, subs: section.subs});
 	            }))));
@@ -26927,7 +26911,7 @@
 	    return Entry;
 	}(React.Component));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Entry);
+	exports.default = react_redux_1.connect(mapStateToProps, null)(Entry);
 
 
 /***/ },
@@ -27160,6 +27144,93 @@
 	    _a
 	), defaultState);
 	var _a;
+
+
+/***/ },
+/* 57 */,
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var React = __webpack_require__(19);
+	var react_redux_1 = __webpack_require__(21);
+	var actions_1 = __webpack_require__(3);
+	;
+	var mapStateToProps = function (state) {
+	    return {
+	        lookupStatus: state.lookupStatus,
+	    };
+	};
+	var mapDispatchToProps = function (dispatch) {
+	    return {
+	        onSearch: function (e) {
+	            e.preventDefault(); // prevent submit from refreshing the page
+	            var searchBox = document.getElementById('search-box');
+	            var word = searchBox.value;
+	            dispatch(actions_1.search(word));
+	        }
+	    };
+	};
+	var Nav = (function (_super) {
+	    __extends(Nav, _super);
+	    function Nav() {
+	        _super.apply(this, arguments);
+	    }
+	    Nav.prototype.render = function () {
+	        var _a = this.props, lookupStatus = _a.lookupStatus, onSearch = _a.onSearch;
+	        return (React.createElement("nav", null, 
+	            React.createElement("p", null, lookupStatus), 
+	            React.createElement("form", {onSubmit: onSearch}, 
+	                React.createElement("input", {id: "search-box", type: "text"})
+	            )));
+	    };
+	    return Nav;
+	}(React.Component));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Nav);
+
+
+/***/ },
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var React = __webpack_require__(19);
+	var react_redux_1 = __webpack_require__(21);
+	var Entry_1 = __webpack_require__(50);
+	var Nav_1 = __webpack_require__(58);
+	;
+	var mapStateToProps = function (state) {
+	    return {};
+	};
+	var mapDispatchToProps = function (dispatch) {
+	    return {};
+	};
+	var App = (function (_super) {
+	    __extends(App, _super);
+	    function App() {
+	        _super.apply(this, arguments);
+	    }
+	    App.prototype.render = function () {
+	        // const { word, subs, onSearch, lookupStatus } = this.props;
+	        return (React.createElement("article", null, 
+	            React.createElement(Nav_1.default, null), 
+	            React.createElement(Entry_1.default, null)));
+	    };
+	    return App;
+	}(React.Component));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(App);
 
 
 /***/ }

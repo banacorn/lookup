@@ -2,44 +2,25 @@ import * as React from 'react'
 import { connect } from 'react-redux';
 import LangSect from './LangSect';
 import { State, LanguageSection } from '../types'
-import { search } from '../actions'
 
 interface EntryProps extends React.Props<any> {
     word: string;
     subs: LanguageSection[];
-    lookupStatus: "pending" | "succeed" | "failed",
-    onSearch: (e: Event) => void;
 };
 
 const mapStateToProps = (state: State) => {
     return {
         word: state.word,
-        subs: state.body,
-        lookupStatus: state.lookupStatus,
+        subs: state.body
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-        onSearch: (e: Event) => {
-            e.preventDefault(); // prevent submit from refreshing the page
-            const searchBox = document.getElementById('search-box') as HTMLInputElement;
-            const word: string = searchBox.value;
-            dispatch(search(word));
-        }
-    };
-};
-
 class Entry extends React.Component<EntryProps, void> {
     render() {
-        const { word, subs, onSearch, lookupStatus } = this.props;
+        const { word, subs } = this.props;
         return (
             <section>
-                <form onSubmit={onSearch}>
-                    <input id="search-box" type="text"/>
-                </form>
                 <h1>{ word }</h1>
-                <p>{ lookupStatus }</p>
                 <ul>
                     {subs.map(section =>
                         <LangSect
@@ -56,5 +37,5 @@ class Entry extends React.Component<EntryProps, void> {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(Entry);
