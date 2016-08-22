@@ -160,8 +160,8 @@
 	    });
 	};
 	function lastTarget(history) {
-	    if (history.length >= 2) {
-	        return history[history.length - 2];
+	    if (history.words.length >= 2) {
+	        return history.words[history.words.length - 2];
 	    }
 	    else {
 	        return null;
@@ -27264,7 +27264,7 @@
 	        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward;
 	        return (React.createElement("nav", null, 
 	            React.createElement("button", {onClick: onBackward}, "backward"), 
-	            React.createElement("p", null, _.last(history) + ": " + status), 
+	            React.createElement("p", null, _.last(history.words) + ": " + status), 
 	            React.createElement("p", null, history.toString()), 
 	            React.createElement("form", {onSubmit: onSearch}, 
 	                React.createElement("input", {id: 'search-box', type: 'text'})
@@ -27291,7 +27291,10 @@
 	        body: []
 	    },
 	    status: 'pending',
-	    history: []
+	    history: {
+	        words: [],
+	        cursor: null
+	    }
 	};
 	var entry = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.FETCH.INIT] = function (state, action) { return _.assign({}, state, {
@@ -27311,10 +27314,18 @@
 	    _b
 	), defaultState.status);
 	var history = redux_actions_1.handleActions((_c = {},
-	    _c[actions_1.LOOKUP.INIT] = function (state, action) { return _.concat(state, action.payload); },
-	    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.initial(state); },
-	    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.initial(state); },
-	    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.concat(state, action.payload.current); },
+	    _c[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
+	        words: _.concat(state.words, action.payload)
+	    }); },
+	    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
+	        words: _.initial(state.words)
+	    }); },
+	    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
+	        words: _.initial(state.words)
+	    }); },
+	    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
+	        words: _.concat(state.words, action.payload.current)
+	    }); },
 	    _c
 	), defaultState.history);
 	Object.defineProperty(exports, "__esModule", { value: true });

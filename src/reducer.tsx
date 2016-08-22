@@ -10,7 +10,10 @@ const defaultState: State = {
         body: []
     },
     status: 'pending',
-    history: []
+    history: {
+        words: [],
+        cursor: null
+    }
 }
 
 const entry = handleActions<Entry, FETCH>({
@@ -31,11 +34,19 @@ const status = handleActions<Status, STATUS>({
 }, defaultState.status);
 
 const history = handleActions<History, LOOKUP | BACKWARD>({
-    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => _.concat(state, action.payload),
-    [LOOKUP.FAIL]: (state: History, action: Action<LOOKUP.FAIL>) => _.initial(state),
+    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => _.assign({}, state, {
+        words: _.concat(state.words, action.payload)
+    }),
+    [LOOKUP.FAIL]: (state: History, action: Action<LOOKUP.FAIL>) => _.assign({}, state, {
+        words: _.initial(state.words)
+    }),
 
-    [BACKWARD.INIT]: (state: History, action: Action<BACKWARD.INIT>) => _.initial(state),
-    [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.concat(state, action.payload.current)
+    [BACKWARD.INIT]: (state: History, action: Action<BACKWARD.INIT>) => _.assign({}, state, {
+        words: _.initial(state.words)
+    }),
+    [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
+        words: _.concat(state.words, action.payload.current)
+    })
 }, defaultState.history);
 
 export default combineReducers({

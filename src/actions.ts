@@ -1,6 +1,6 @@
 import * as Promise from 'bluebird'
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
-import { State, Section, BlockElem, LanguageSection } from './types';
+import { State, Section, BlockElem, LanguageSection, History } from './types';
 import parse from './chrome/parser';
 import { fetch as fetchEntry } from './util';
 
@@ -117,9 +117,9 @@ export const backward = (dispatch: any, getState: () => State) => {
     )
 }
 
-export function lastTarget(history: string[]): string {
-    if (history.length >= 2) {
-        return history[history.length - 2];
+export function lastTarget(history: History): string {
+    if (history.words.length >= 2) {
+        return history.words[history.words.length - 2];
     } else {
         return null;
     }

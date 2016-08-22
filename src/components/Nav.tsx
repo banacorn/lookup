@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State } from '../types'
+import { State, Status, History } from '../types'
 import { lookup, backward } from '../actions'
 
 interface NavProps extends React.Props<any> {
-    status: 'pending' | 'succeed' | 'failed',
+    status: Status,
 
     // history
-    history: string[],
+    history: History,
 
     onSearch: (e: Event) => void,
     onBackward: (e: Event) => void
@@ -39,7 +39,7 @@ class Nav extends React.Component<NavProps, void> {
         return (
             <nav>
                 <button onClick={onBackward}>backward</button>
-                <p>{`${_.last(history)}: ${status}`}</p>
+                <p>{`${_.last(history.words)}: ${status}`}</p>
                 <p>{ history.toString() }</p>
                 <form onSubmit={onSearch}>
                     <input id='search-box' type='text'/>

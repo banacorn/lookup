@@ -9,7 +9,10 @@ var defaultState = {
         body: []
     },
     status: 'pending',
-    history: []
+    history: {
+        words: [],
+        cursor: null
+    }
 };
 var entry = redux_actions_1.handleActions((_a = {},
     _a[actions_1.FETCH.INIT] = function (state, action) { return _.assign({}, state, {
@@ -29,10 +32,18 @@ var status = redux_actions_1.handleActions((_b = {},
     _b
 ), defaultState.status);
 var history = redux_actions_1.handleActions((_c = {},
-    _c[actions_1.LOOKUP.INIT] = function (state, action) { return _.concat(state, action.payload); },
-    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.initial(state); },
-    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.initial(state); },
-    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.concat(state, action.payload.current); },
+    _c[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
+        words: _.concat(state.words, action.payload)
+    }); },
+    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
+        words: _.initial(state.words)
+    }); },
+    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
+        words: _.initial(state.words)
+    }); },
+    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
+        words: _.concat(state.words, action.payload.current)
+    }); },
     _c
 ), defaultState.history);
 Object.defineProperty(exports, "__esModule", { value: true });

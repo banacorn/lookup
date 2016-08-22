@@ -80,8 +80,8 @@ exports.backward = function (dispatch, getState) {
     });
 };
 function lastTarget(history) {
-    if (history.length >= 2) {
-        return history[history.length - 2];
+    if (history.words.length >= 2) {
+        return history.words[history.words.length - 2];
     }
     else {
         return null;

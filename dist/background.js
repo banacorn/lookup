@@ -138,8 +138,8 @@
 	    });
 	};
 	function lastTarget(history) {
-	    if (history.length >= 2) {
-	        return history[history.length - 2];
+	    if (history.words.length >= 2) {
+	        return history.words[history.words.length - 2];
 	    }
 	    else {
 	        return null;

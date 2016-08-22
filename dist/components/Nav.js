@@ -36,7 +36,7 @@ var Nav = (function (_super) {
         var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward;
         return (React.createElement("nav", null, 
             React.createElement("button", {onClick: onBackward}, "backward"), 
-            React.createElement("p", null, _.last(history) + ": " + status), 
+            React.createElement("p", null, _.last(history.words) + ": " + status), 
             React.createElement("p", null, history.toString()), 
             React.createElement("form", {onSubmit: onSearch}, 
                 React.createElement("input", {id: 'search-box', type: 'text'})

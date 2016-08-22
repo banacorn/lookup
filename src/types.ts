@@ -13,7 +13,10 @@ export type Entry = {
     body: LanguageSection[]
 }
 export type Status = 'pending' | 'succeed' | 'failed'
-export type History = string[];
+export type History = {
+    words: string[],
+    cursor: number
+}
 
 export type LanguageSection = {
     languageName: string,
