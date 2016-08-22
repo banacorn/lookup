@@ -435,7 +435,7 @@
 	        case 'li':
 	            return node.body.map(inlineToText).join('');
 	        default:
-	            return "<unknown block element>";
+	            return '<unknown block element>';
 	    }
 	}
 	exports.blockToText = blockToText;

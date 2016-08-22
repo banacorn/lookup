@@ -7,19 +7,35 @@ import { createAction, handleAction, handleActions, Action } from 'redux-actions
 const defaultState: State = {
     word: '',
     body: [],
-    lookupStatus: 'pending'
+    lookup: {
+        word: null,
+        status: 'pending',
+        history: []
+    }
 }
 
 export default handleActions<State, LOOKUP>({
     [LOOKUP.REQUEST]: (state: State, action: Action<LOOKUP.REQUEST>) => _.assign({}, state, {
-        word: action.payload.word,
-        lookupStatus: 'pending'
+        lookup: {
+            word: action.payload.word,
+            status: 'pending',
+            history: state.lookup.history
+        }
     }),
     [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
+        word: state.lookup.word,
         body: action.payload.body,
-        lookupStatus: 'succeed'
+        lookup: {
+            word: state.lookup.word,
+            status: 'succeed',
+            history: _.concat(state.lookup.history, [state.lookup.word])
+        }
     }),
     [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
-        lookupStatus: 'failed'
+        lookup: {
+            word: state.lookup.word,
+            status: 'failed',
+            history: state.lookup.history
+        }
     })
 }, defaultState);

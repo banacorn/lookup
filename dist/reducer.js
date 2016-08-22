@@ -5,20 +5,36 @@ var redux_actions_1 = require('redux-actions');
 var defaultState = {
     word: '',
     body: [],
-    lookupStatus: 'pending'
+    lookup: {
+        word: null,
+        status: 'pending',
+        history: []
+    }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = redux_actions_1.handleActions((_a = {},
     _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-        word: action.payload.word,
-        lookupStatus: 'pending'
+        lookup: {
+            word: action.payload.word,
+            status: 'pending',
+            history: state.lookup.history
+        }
     }); },
     _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
+        word: state.lookup.word,
         body: action.payload.body,
-        lookupStatus: 'succeed'
+        lookup: {
+            word: state.lookup.word,
+            status: 'succeed',
+            history: _.concat(state.lookup.history, [state.lookup.word])
+        }
     }); },
     _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-        lookupStatus: 'failed'
+        lookup: {
+            word: state.lookup.word,
+            status: 'failed',
+            history: state.lookup.history
+        }
     }); },
     _a
 ), defaultState);

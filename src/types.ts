@@ -1,7 +1,18 @@
 export type State = {
     word: string,
-    lookupStatus: "pending" | "succeed" | "failed",
-    body: LanguageSection[]
+    body: LanguageSection[],
+    lookup: LookupState
+}
+
+export type LookupState = {
+    word: string,
+    status: 'pending' | 'succeed' | 'failed',
+    history: string[]
+}
+
+export type LanguageSection = {
+    languageName: string,
+    subs: Section<BlockElem[]>[]
 }
 
 export type Section<T> = {
@@ -89,10 +100,6 @@ export namespace Inline {
 }
 
 
-export type LanguageSection = {
-    languageName: string,
-    subs: Section<BlockElem[]>[]
-}
 
 export function mapSection<T, U>(f: (t: T) => U, {name, body, subs}: Section<T>): Section<U> {
     return {
@@ -126,6 +133,6 @@ export function blockToText(node: BlockElem): string {
         case 'li':
             return node.body.map(inlineToText).join('');
         default:
-            return "<unknown block element>";
+            return '<unknown block element>';
     }
 }

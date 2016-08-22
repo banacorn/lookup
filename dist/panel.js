@@ -17334,7 +17334,7 @@
 	        case 'li':
 	            return node.body.map(inlineToText).join('');
 	        default:
-	            return "<unknown block element>";
+	            return '<unknown block element>';
 	    }
 	}
 	exports.blockToText = blockToText;
@@ -27126,20 +27126,36 @@
 	var defaultState = {
 	    word: '',
 	    body: [],
-	    lookupStatus: 'pending'
+	    lookup: {
+	        word: null,
+	        status: 'pending',
+	        history: []
+	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-	        word: action.payload.word,
-	        lookupStatus: 'pending'
+	        lookup: {
+	            word: action.payload.word,
+	            status: 'pending',
+	            history: state.lookup.history
+	        }
 	    }); },
 	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
+	        word: state.lookup.word,
 	        body: action.payload.body,
-	        lookupStatus: 'succeed'
+	        lookup: {
+	            word: state.lookup.word,
+	            status: 'succeed',
+	            history: _.concat(state.lookup.history, [state.lookup.word])
+	        }
 	    }); },
 	    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-	        lookupStatus: 'failed'
+	        lookup: {
+	            word: state.lookup.word,
+	            status: 'failed',
+	            history: state.lookup.history
+	        }
 	    }); },
 	    _a
 	), defaultState);
@@ -27163,7 +27179,7 @@
 	;
 	var mapStateToProps = function (state) {
 	    return {
-	        lookupStatus: state.lookupStatus,
+	        lookup: state.lookup
 	    };
 	};
 	var mapDispatchToProps = function (dispatch) {
@@ -27182,11 +27198,12 @@
 	        _super.apply(this, arguments);
 	    }
 	    Nav.prototype.render = function () {
-	        var _a = this.props, lookupStatus = _a.lookupStatus, onSearch = _a.onSearch;
+	        var _a = this.props, lookup = _a.lookup, onSearch = _a.onSearch;
 	        return (React.createElement("nav", null, 
-	            React.createElement("p", null, lookupStatus), 
+	            React.createElement("p", null, lookup.word + ": " + lookup.status), 
+	            React.createElement("p", null, lookup.history), 
 	            React.createElement("form", {onSubmit: onSearch}, 
-	                React.createElement("input", {id: "search-box", type: "text"})
+	                React.createElement("input", {id: 'search-box', type: 'text'})
 	            )));
 	    };
 	    return Nav;

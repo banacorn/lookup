@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State } from '../types'
+import { State, LookupState } from '../types'
 import { search } from '../actions'
 
 interface NavProps extends React.Props<any> {
-    lookupStatus: "pending" | "succeed" | "failed",
+    lookup: LookupState,
     onSearch: (e: Event) => void
 };
 
 const mapStateToProps = (state: State) => {
     return {
-        lookupStatus: state.lookupStatus,
-    }
+        lookup: state.lookup
+    };
 }
 
 const mapDispatchToProps = (dispatch: any) => {
@@ -27,12 +27,13 @@ const mapDispatchToProps = (dispatch: any) => {
 
 class Nav extends React.Component<NavProps, void> {
     render() {
-        const { lookupStatus, onSearch } = this.props;
+        const { lookup, onSearch } = this.props;
         return (
             <nav>
-                <p>{ lookupStatus }</p>
+                <p>{`${lookup.word}: ${lookup.status}`}</p>
+                <p>{ lookup.history }</p>
                 <form onSubmit={onSearch}>
-                    <input id="search-box" type="text"/>
+                    <input id='search-box' type='text'/>
                 </form>
             </nav>
         )
