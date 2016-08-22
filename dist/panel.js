@@ -27126,7 +27126,7 @@
 	var defaultState = {
 	    word: '',
 	    body: [],
-	    lookup: {
+	    nav: {
 	        word: null,
 	        status: 'pending',
 	        history: []
@@ -27135,26 +27135,26 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-	        lookup: {
+	        nav: {
 	            word: action.payload.word,
 	            status: 'pending',
-	            history: state.lookup.history
+	            history: state.nav.history
 	        }
 	    }); },
 	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
-	        word: state.lookup.word,
+	        word: state.nav.word,
 	        body: action.payload.body,
-	        lookup: {
-	            word: state.lookup.word,
+	        nav: {
+	            word: state.nav.word,
 	            status: 'succeed',
-	            history: _.concat(state.lookup.history, [state.lookup.word])
+	            history: _.concat(state.nav.history, [state.nav.word])
 	        }
 	    }); },
 	    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-	        lookup: {
-	            word: state.lookup.word,
+	        nav: {
+	            word: state.nav.word,
 	            status: 'failed',
-	            history: state.lookup.history
+	            history: state.nav.history
 	        }
 	    }); },
 	    _a
@@ -27179,7 +27179,7 @@
 	;
 	var mapStateToProps = function (state) {
 	    return {
-	        lookup: state.lookup
+	        nav: state.nav
 	    };
 	};
 	var mapDispatchToProps = function (dispatch) {
@@ -27198,10 +27198,10 @@
 	        _super.apply(this, arguments);
 	    }
 	    Nav.prototype.render = function () {
-	        var _a = this.props, lookup = _a.lookup, onSearch = _a.onSearch;
+	        var _a = this.props, nav = _a.nav, onSearch = _a.onSearch;
 	        return (React.createElement("nav", null, 
-	            React.createElement("p", null, lookup.word + ": " + lookup.status), 
-	            React.createElement("p", null, lookup.history), 
+	            React.createElement("p", null, nav.word + ": " + nav.status), 
+	            React.createElement("p", null, nav.history), 
 	            React.createElement("form", {onSubmit: onSearch}, 
 	                React.createElement("input", {id: 'search-box', type: 'text'})
 	            )));

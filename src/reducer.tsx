@@ -7,7 +7,7 @@ import { createAction, handleAction, handleActions, Action } from 'redux-actions
 const defaultState: State = {
     word: '',
     body: [],
-    lookup: {
+    nav: {
         word: null,
         status: 'pending',
         history: []
@@ -16,26 +16,26 @@ const defaultState: State = {
 
 export default handleActions<State, LOOKUP>({
     [LOOKUP.REQUEST]: (state: State, action: Action<LOOKUP.REQUEST>) => _.assign({}, state, {
-        lookup: {
+        nav: {
             word: action.payload.word,
             status: 'pending',
-            history: state.lookup.history
+            history: state.nav.history
         }
     }),
     [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
-        word: state.lookup.word,
+        word: state.nav.word,
         body: action.payload.body,
-        lookup: {
-            word: state.lookup.word,
+        nav: {
+            word: state.nav.word,
             status: 'succeed',
-            history: _.concat(state.lookup.history, [state.lookup.word])
+            history: _.concat(state.nav.history, [state.nav.word])
         }
     }),
     [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
-        lookup: {
-            word: state.lookup.word,
+        nav: {
+            word: state.nav.word,
             status: 'failed',
-            history: state.lookup.history
+            history: state.nav.history
         }
     })
 }, defaultState);

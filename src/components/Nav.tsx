@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State, LookupState } from '../types'
+import { State, NavState } from '../types'
 import { search } from '../actions'
 
 interface NavProps extends React.Props<any> {
-    lookup: LookupState,
+    nav: NavState,
     onSearch: (e: Event) => void
 };
 
 const mapStateToProps = (state: State) => {
     return {
-        lookup: state.lookup
+        nav: state.nav
     };
 }
 
@@ -27,11 +27,11 @@ const mapDispatchToProps = (dispatch: any) => {
 
 class Nav extends React.Component<NavProps, void> {
     render() {
-        const { lookup, onSearch } = this.props;
+        const { nav, onSearch } = this.props;
         return (
             <nav>
-                <p>{`${lookup.word}: ${lookup.status}`}</p>
-                <p>{ lookup.history }</p>
+                <p>{`${nav.word}: ${nav.status}`}</p>
+                <p>{ nav.history }</p>
                 <form onSubmit={onSearch}>
                     <input id='search-box' type='text'/>
                 </form>

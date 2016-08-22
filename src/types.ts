@@ -1,10 +1,13 @@
 export type State = {
+    // entry
     word: string,
     body: LanguageSection[],
-    lookup: LookupState
+
+    // navigation
+    nav: NavState
 }
 
-export type LookupState = {
+export type NavState = {
     word: string,
     status: 'pending' | 'succeed' | 'failed',
     history: string[]

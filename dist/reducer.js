@@ -5,7 +5,7 @@ var redux_actions_1 = require('redux-actions');
 var defaultState = {
     word: '',
     body: [],
-    lookup: {
+    nav: {
         word: null,
         status: 'pending',
         history: []
@@ -14,26 +14,26 @@ var defaultState = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = redux_actions_1.handleActions((_a = {},
     _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-        lookup: {
+        nav: {
             word: action.payload.word,
             status: 'pending',
-            history: state.lookup.history
+            history: state.nav.history
         }
     }); },
     _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
-        word: state.lookup.word,
+        word: state.nav.word,
         body: action.payload.body,
-        lookup: {
-            word: state.lookup.word,
+        nav: {
+            word: state.nav.word,
             status: 'succeed',
-            history: _.concat(state.lookup.history, [state.lookup.word])
+            history: _.concat(state.nav.history, [state.nav.word])
         }
     }); },
     _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-        lookup: {
-            word: state.lookup.word,
+        nav: {
+            word: state.nav.word,
             status: 'failed',
-            history: state.lookup.history
+            history: state.nav.history
         }
     }); },
     _a

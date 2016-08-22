@@ -10,7 +10,7 @@ var actions_1 = require('../actions');
 ;
 var mapStateToProps = function (state) {
     return {
-        lookup: state.lookup
+        nav: state.nav
     };
 };
 var mapDispatchToProps = function (dispatch) {
@@ -29,10 +29,10 @@ var Nav = (function (_super) {
         _super.apply(this, arguments);
     }
     Nav.prototype.render = function () {
-        var _a = this.props, lookup = _a.lookup, onSearch = _a.onSearch;
+        var _a = this.props, nav = _a.nav, onSearch = _a.onSearch;
         return (React.createElement("nav", null, 
-            React.createElement("p", null, lookup.word + ": " + lookup.status), 
-            React.createElement("p", null, lookup.history), 
+            React.createElement("p", null, nav.word + ": " + nav.status), 
+            React.createElement("p", null, nav.history), 
             React.createElement("form", {onSubmit: onSearch}, 
                 React.createElement("input", {id: 'search-box', type: 'text'})
             )));
