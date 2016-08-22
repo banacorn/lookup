@@ -2,28 +2,46 @@ import * as Promise from 'bluebird'
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 import { State, Section, BlockElem, LanguageSection } from './types';
 import parse from './chrome/parser';
-import { fetch } from './util';
+import { fetch as fetchEntry } from './util';
 
 
-export type LOOKUP = LOOKUP.INIT | LOOKUP.SUCC | LOOKUP.FAIL;
+export type FETCH = FETCH.INIT | FETCH.SUCC | FETCH.FAIL;
+export namespace FETCH {
+    export const INIT = 'FETCH.INIT';
+    export type INIT = string;
+
+    export const SUCC = 'FETCH.SUCC';
+    export type SUCC = LanguageSection[];
+
+    export const FAIL = 'FETCH.FAIL';
+    export type FAIL = Error;
+}
+
+export type STATUS = STATUS.INIT | STATUS.SUCC | STATUS.FAIL;
+export namespace STATUS {
+    export const INIT = 'STATUS.INIT';
+    export type INIT = void;
+
+    export const SUCC = 'STATUS.SUCC';
+    export type SUCC = void;
+
+    export const FAIL = 'STATUS.FAIL';
+    export type FAIL = void;
+}
+
+export type LOOKUP = LOOKUP.INIT | LOOKUP.FAIL;
 export namespace LOOKUP {
     export const INIT = 'LOOKUP.INIT';
     export type INIT = string;
-
-    export const SUCC = 'LOOKUP.SUCC';
-    export type SUCC = LanguageSection[];
 
     export const FAIL = 'LOOKUP.FAIL';
     export type FAIL = Error;
 }
 
-export type BACKWARD = BACKWARD.INIT | BACKWARD.SUCC | BACKWARD.FAIL;
+export type BACKWARD = BACKWARD.INIT | BACKWARD.FAIL;
 export namespace BACKWARD {
     export const INIT = 'BACKWARD.INIT';
     export type INIT = string;
-
-    export const SUCC = 'BACKWARD.SUCC';
-    export type SUCC = LanguageSection[];
 
     export const FAIL = 'BACKWARD.FAIL';
     export type FAIL = {
@@ -32,36 +50,71 @@ export namespace BACKWARD {
     };
 }
 
-export const lookup = (target: string) => (dispatch: any) => {
-    const init = createAction<string, LOOKUP.INIT>(LOOKUP.INIT);
-    const succ = createAction<LanguageSection[], LOOKUP.SUCC>(LOOKUP.SUCC);
-    const fail = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL);
+export namespace fetch {
+    export const init = createAction<string, FETCH.INIT>(FETCH.INIT);
+    export const succ = createAction<LanguageSection[], FETCH.SUCC>(FETCH.SUCC);
+    export const fail = createAction<Error, FETCH.FAIL>(FETCH.FAIL);
+}
 
-    dispatch(init(target));
-    fetch(target).then(
-        res => dispatch(succ(parse(res))),
-        err => dispatch(fail(err))
+export namespace status {
+    export const init = createAction(STATUS.INIT);
+    export const succ = createAction(STATUS.SUCC);
+    export const fail = createAction(STATUS.FAIL);
+}
+
+export namespace historyLookup {
+    export const init = createAction<string, LOOKUP.INIT>(LOOKUP.INIT);
+    export const fail = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL);
+}
+
+export namespace historyBackward {
+    export const init = createAction<string, BACKWARD.INIT>(BACKWARD.INIT);
+    export const fail = createAction<{
+        err: Error,
+        current: string
+    }, BACKWARD.FAIL>(BACKWARD.FAIL);
+}
+
+export const lookup = (target: string) => (dispatch: any, getState: () => State) => {
+    dispatch(fetch.init(target));
+    dispatch(status.init());
+    dispatch(historyLookup.init(target));
+    fetchEntry(target).then(
+        res => {
+            const result = parse(res);
+            dispatch(fetch.succ(result));
+            dispatch(status.succ());
+        },
+        err => {
+            dispatch(fetch.fail(err));
+            dispatch(status.fail());
+             dispatch(historyLookup.fail(err));
+        }
     );
 }
 
 export const backward = (dispatch: any, getState: () => State) => {
-    const init = createAction<string, BACKWARD.INIT>(BACKWARD.INIT);
-    const succ = createAction<LanguageSection[], BACKWARD.SUCC>(BACKWARD.SUCC);
-    const fail = createAction<{
-        err: Error,
-        current: string
-    }, BACKWARD.FAIL>(BACKWARD.FAIL);
-
     const history = getState().history;
     const target = lastTarget(history);
-    dispatch(init(target));
-    fetch(target).then(
-        res => dispatch(succ(parse(res))),
-        err => dispatch(fail({
-            err: err,
-            current: getState().word
-        }))
-    );
+
+    dispatch(fetch.init(target));
+    dispatch(status.init());
+    dispatch(historyBackward.init(target));
+    fetchEntry(target).then(
+        res => {
+            const result = parse(res);
+            dispatch(fetch.succ(result));
+            dispatch(status.succ());
+        },
+        err => {
+            dispatch(fetch.fail(err));
+            dispatch(status.fail());
+             dispatch(historyBackward.fail({
+                err: err,
+                current: getState().word
+            }));
+        }
+    )
 }
 
 export function lastTarget(history: string[]): string {

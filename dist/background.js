@@ -45,8 +45,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var actions_1 = __webpack_require__(3);
-	var operator_1 = __webpack_require__(57);
+	var actions_1 = __webpack_require__(1);
+	var operator_1 = __webpack_require__(19);
 	operator_1.default.setListener(function (sendMessage, word) {
 	    sendMessage(actions_1.lookup(word));
 	});
@@ -54,6 +54,543 @@
 
 /***/ },
 /* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var redux_actions_1 = __webpack_require__(2);
+	var parser_1 = __webpack_require__(8);
+	var util_1 = __webpack_require__(15);
+	var FETCH;
+	(function (FETCH) {
+	    FETCH.INIT = 'FETCH.INIT';
+	    FETCH.SUCC = 'FETCH.SUCC';
+	    FETCH.FAIL = 'FETCH.FAIL';
+	})(FETCH = exports.FETCH || (exports.FETCH = {}));
+	var STATUS;
+	(function (STATUS) {
+	    STATUS.INIT = 'STATUS.INIT';
+	    STATUS.SUCC = 'STATUS.SUCC';
+	    STATUS.FAIL = 'STATUS.FAIL';
+	})(STATUS = exports.STATUS || (exports.STATUS = {}));
+	var LOOKUP;
+	(function (LOOKUP) {
+	    LOOKUP.INIT = 'LOOKUP.INIT';
+	    LOOKUP.FAIL = 'LOOKUP.FAIL';
+	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
+	var BACKWARD;
+	(function (BACKWARD) {
+	    BACKWARD.INIT = 'BACKWARD.INIT';
+	    BACKWARD.FAIL = 'BACKWARD.FAIL';
+	})(BACKWARD = exports.BACKWARD || (exports.BACKWARD = {}));
+	var fetch;
+	(function (fetch) {
+	    fetch.init = redux_actions_1.createAction(FETCH.INIT);
+	    fetch.succ = redux_actions_1.createAction(FETCH.SUCC);
+	    fetch.fail = redux_actions_1.createAction(FETCH.FAIL);
+	})(fetch = exports.fetch || (exports.fetch = {}));
+	var status;
+	(function (status) {
+	    status.init = redux_actions_1.createAction(STATUS.INIT);
+	    status.succ = redux_actions_1.createAction(STATUS.SUCC);
+	    status.fail = redux_actions_1.createAction(STATUS.FAIL);
+	})(status = exports.status || (exports.status = {}));
+	var historyLookup;
+	(function (historyLookup) {
+	    historyLookup.init = redux_actions_1.createAction(LOOKUP.INIT);
+	    historyLookup.fail = redux_actions_1.createAction(LOOKUP.FAIL);
+	})(historyLookup = exports.historyLookup || (exports.historyLookup = {}));
+	var historyBackward;
+	(function (historyBackward) {
+	    historyBackward.init = redux_actions_1.createAction(BACKWARD.INIT);
+	    historyBackward.fail = redux_actions_1.createAction(BACKWARD.FAIL);
+	})(historyBackward = exports.historyBackward || (exports.historyBackward = {}));
+	exports.lookup = function (target) { return function (dispatch, getState) {
+	    dispatch(fetch.init(target));
+	    dispatch(status.init());
+	    dispatch(historyLookup.init(target));
+	    util_1.fetch(target).then(function (res) {
+	        var result = parser_1.default(res);
+	        dispatch(fetch.succ(result));
+	        dispatch(status.succ());
+	    }, function (err) {
+	        dispatch(fetch.fail(err));
+	        dispatch(status.fail());
+	        dispatch(historyLookup.fail(err));
+	    });
+	}; };
+	exports.backward = function (dispatch, getState) {
+	    var history = getState().history;
+	    var target = lastTarget(history);
+	    dispatch(fetch.init(target));
+	    dispatch(status.init());
+	    dispatch(historyBackward.init(target));
+	    util_1.fetch(target).then(function (res) {
+	        var result = parser_1.default(res);
+	        dispatch(fetch.succ(result));
+	        dispatch(status.succ());
+	    }, function (err) {
+	        dispatch(fetch.fail(err));
+	        dispatch(status.fail());
+	        dispatch(historyBackward.fail({
+	            err: err,
+	            current: getState().word
+	        }));
+	    });
+	};
+	function lastTarget(history) {
+	    if (history.length >= 2) {
+	        return history[history.length - 2];
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.lastTarget = lastTarget;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.handleActions = exports.handleAction = exports.createAction = undefined;
+	
+	var _createAction = __webpack_require__(3);
+	
+	var _createAction2 = _interopRequireDefault(_createAction);
+	
+	var _handleAction = __webpack_require__(4);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _handleActions = __webpack_require__(5);
+	
+	var _handleActions2 = _interopRequireDefault(_handleActions);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.createAction = _createAction2.default;
+	exports.handleAction = _handleAction2.default;
+	exports.handleActions = _handleActions2.default;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = createAction;
+	function identity(t) {
+	  return t;
+	}
+	
+	function createAction(type, actionCreator, metaCreator) {
+	  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
+	
+	  var actionHandler = function actionHandler() {
+	    var hasError = (arguments.length <= 0 ? undefined : arguments[0]) instanceof Error;
+	
+	    var action = {
+	      type: type
+	    };
+	
+	    var payload = hasError ? arguments.length <= 0 ? undefined : arguments[0] : finalActionCreator.apply(undefined, arguments);
+	    if (!(payload === null || payload === undefined)) {
+	      action.payload = payload;
+	    }
+	
+	    if (hasError) {
+	      // Handle FSA errors where the payload is an Error object. Set error.
+	      action.error = true;
+	    }
+	
+	    if (typeof metaCreator === 'function') {
+	      action.meta = metaCreator.apply(undefined, arguments);
+	    }
+	
+	    return action;
+	  };
+	
+	  actionHandler.toString = function () {
+	    return type;
+	  };
+	
+	  return actionHandler;
+	}
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleAction;
+	function isFunction(val) {
+	  return typeof val === 'function';
+	}
+	
+	function handleAction(type, reducers, defaultState) {
+	  var typeValue = isFunction(type) ? type.toString() : type;
+	
+	  return function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	
+	    // If action type does not match, return previous state
+	    if (action.type !== typeValue) return state;
+	
+	    var handlerKey = action.error === true ? 'throw' : 'next';
+	
+	    // If function is passed instead of map, use as reducer
+	    if (isFunction(reducers)) {
+	      reducers.next = reducers.throw = reducers;
+	    }
+	
+	    // Otherwise, assume an action map was passed
+	    var reducer = reducers[handlerKey];
+	
+	    return isFunction(reducer) ? reducer(state, action) : state;
+	  };
+	}
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = handleActions;
+	
+	var _handleAction = __webpack_require__(4);
+	
+	var _handleAction2 = _interopRequireDefault(_handleAction);
+	
+	var _ownKeys = __webpack_require__(6);
+	
+	var _ownKeys2 = _interopRequireDefault(_ownKeys);
+	
+	var _reduceReducers = __webpack_require__(7);
+	
+	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function handleActions(handlers, defaultState) {
+	  var reducers = (0, _ownKeys2.default)(handlers).map(function (type) {
+	    return (0, _handleAction2.default)(type, handlers[type]);
+	  });
+	  var reducer = _reduceReducers2.default.apply(undefined, _toConsumableArray(reducers));
+	
+	  return typeof defaultState !== 'undefined' ? function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
+	    var action = arguments[1];
+	    return reducer(state, action);
+	  } : reducer;
+	}
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = ownKeys;
+	function ownKeys(object) {
+	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+	    return Reflect.ownKeys(object);
+	  }
+	
+	  var keys = Object.getOwnPropertyNames(object);
+	
+	  if (typeof Object.getOwnPropertySymbols === 'function') {
+	    keys = keys.concat(Object.getOwnPropertySymbols(object));
+	  }
+	
+	  return keys;
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = reduceReducers;
+	
+	function reduceReducers() {
+	  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
+	    reducers[_key] = arguments[_key];
+	  }
+	
+	  return function (previous, current) {
+	    return reducers.reduce(function (p, r) {
+	      return r(p, current);
+	    }, previous);
+	  };
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var _ = __webpack_require__(9);
+	var types_1 = __webpack_require__(11);
+	function isHeader(s, level) {
+	    var match = s.match(/^[Hh](\d)+$/);
+	    if (match) {
+	        if (level) {
+	            return parseInt(match[1]) === level;
+	        }
+	        else {
+	            return true;
+	        }
+	    }
+	    else {
+	        return false;
+	    }
+	}
+	var notIgnorable = function (node) {
+	    var isComment = node.nodeType === 8;
+	    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r]/.test(node.textContent);
+	    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && node.textContent.trim().length === 0;
+	    // const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
+	    return !(isComment || isTextAndEmpty || isEmptyParagraph);
+	};
+	function parseXML(raw) {
+	    if (typeof window === 'undefined') {
+	        // in nodejs
+	        var DOMParser_1 = __webpack_require__(12).DOMParser;
+	        return new DOMParser_1().parseFromString(raw, 'text/html');
+	    }
+	    else {
+	        // in browser
+	        return new DOMParser().parseFromString(raw, 'text/html');
+	    }
+	}
+	exports.parseXML = parseXML;
+	function parseDocument(doc) {
+	    var contentNode = doc.getElementById('mw-content-text');
+	    removeWhitespace(contentNode);
+	    var nodeList = Array.prototype.slice.call(contentNode.childNodes);
+	    console.log(contentNode);
+	    return buildSection(nodeList, "Entry", 2);
+	}
+	exports.parseDocument = parseDocument;
+	function parse(raw) {
+	    var entry = parseDocument(parseXML(raw));
+	    return entry.subs.map(function (s) { return ({
+	        languageName: s.name,
+	        subs: s.subs
+	    }); });
+	}
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = parse;
+	// removes whitespaces in the tree
+	function removeWhitespace(node) {
+	    if (node && node.childNodes) {
+	        var children = Array.prototype.slice.call(node.childNodes);
+	        children.forEach(function (child) {
+	            if (notIgnorable(child)) {
+	                removeWhitespace(child);
+	            }
+	            else {
+	                node.removeChild(child);
+	            }
+	        });
+	    }
+	}
+	// given a NodeList, build a tree with headers as ineteral nodes
+	function buildSection(list, name, level) {
+	    var intervals = [];
+	    list.forEach(function (node, i) {
+	        if (isHeader(node.nodeName, level))
+	            intervals.push(i);
+	    });
+	    if (intervals.length > 0) {
+	        var body = _.take(list, intervals[0]).map(parseBlockElem);
+	        var subs = intervals.map(function (start, i) {
+	            var name = list[start].childNodes[0].textContent;
+	            var interval;
+	            if (i === intervals.length - 1) {
+	                interval = [start + 1, list.length];
+	            }
+	            else {
+	                interval = [start + 1, intervals[i + 1]];
+	            }
+	            var segment = list.slice(interval[0], interval[1]);
+	            return buildSection(segment, name, level + 1);
+	        });
+	        return {
+	            name: name,
+	            body: body,
+	            subs: subs
+	        };
+	    }
+	    else {
+	        var body = list.map(parseBlockElem);
+	        return {
+	            name: name,
+	            body: body,
+	            subs: []
+	        };
+	    }
+	}
+	function toArray(nodes) {
+	    if (nodes)
+	        return Array.prototype.slice.call(nodes);
+	    else
+	        return [];
+	}
+	function parseBlockElem(node) {
+	    switch (node.nodeName) {
+	        case 'p':
+	        case 'P':
+	            return ({
+	                kind: 'p',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	            });
+	        case 'ol':
+	        case 'OL':
+	            return ({
+	                kind: 'ol',
+	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+	            });
+	        case 'ul':
+	        case 'UL':
+	            return ({
+	                kind: 'ul',
+	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
+	            });
+	        case 'li':
+	        case 'LI':
+	            return ({
+	                kind: 'li',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	            });
+	        default:
+	            return ({
+	                kind: 'p',
+	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	            });
+	    }
+	}
+	function parseInlineElem(node) {
+	    switch (node.nodeName) {
+	        // base case: plain text node
+	        case '#text':
+	            return [{
+	                    kind: 'plain',
+	                    text: node.textContent
+	                }];
+	        // subtree of inline elements
+	        case 'span':
+	        case 'SPAN':
+	            return _.flatten(toArray(node.childNodes).map(parseInlineElem));
+	        // italic
+	        case 'i':
+	        case 'I':
+	            return [{
+	                    kind: 'i',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // emphasize
+	        case 'em':
+	        case 'EM':
+	            return [{
+	                    kind: 'em',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // bold
+	        case 'b':
+	        case 'B':
+	            return [{
+	                    kind: 'b',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // strong
+	        case 'strong':
+	        case 'STRONG':
+	            return [{
+	                    kind: 'strong',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // superscript
+	        case 'sup':
+	        case 'SUP':
+	            return [{
+	                    kind: 'sup',
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // abbreviation
+	        case 'abbr':
+	        case 'ABBR':
+	            return [{
+	                    kind: 'abbr',
+	                    title: node.getAttribute('title'),
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        // link
+	        case 'a':
+	        case 'A':
+	            var href = node.getAttribute('href');
+	            // if internal
+	            if (_.startsWith(href, '/')) {
+	                var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
+	                if (match) {
+	                    var section = match[2];
+	                    return [{
+	                            kind: 'jump',
+	                            word: node.getAttribute('title'),
+	                            section: section,
+	                            name: node.getAttribute('title'),
+	                            body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                        }];
+	                }
+	            }
+	            // else external
+	            return [{
+	                    kind: 'a',
+	                    href: href,
+	                    title: node.getAttribute('title'),
+	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                }];
+	        default:
+	            return [{
+	                    kind: 'plain',
+	                    text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
+	                }];
+	    }
+	}
+	function sectionToText(s) {
+	    return types_1.mapSection(function (blocks) { return blocks.map(types_1.blockToText).join(''); }, s);
+	}
+	exports.sectionToText = sectionToText;
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -16790,10 +17327,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(2)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(10)(module)))
 
 /***/ },
-/* 2 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -16806,497 +17343,6 @@
 		}
 		return module;
 	}
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var redux_actions_1 = __webpack_require__(4);
-	var parser_1 = __webpack_require__(10);
-	var util_1 = __webpack_require__(15);
-	var LOOKUP;
-	(function (LOOKUP) {
-	    LOOKUP.INIT = 'LOOKUP.INIT';
-	    LOOKUP.SUCC = 'LOOKUP.SUCC';
-	    LOOKUP.FAIL = 'LOOKUP.FAIL';
-	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
-	var BACKWARD;
-	(function (BACKWARD) {
-	    BACKWARD.INIT = 'BACKWARD.INIT';
-	    BACKWARD.SUCC = 'BACKWARD.SUCC';
-	    BACKWARD.FAIL = 'BACKWARD.FAIL';
-	})(BACKWARD = exports.BACKWARD || (exports.BACKWARD = {}));
-	exports.lookup = function (target) { return function (dispatch) {
-	    var init = redux_actions_1.createAction(LOOKUP.INIT);
-	    var succ = redux_actions_1.createAction(LOOKUP.SUCC);
-	    var fail = redux_actions_1.createAction(LOOKUP.FAIL);
-	    dispatch(init(target));
-	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail(err)); });
-	}; };
-	exports.backward = function (dispatch, getState) {
-	    var init = redux_actions_1.createAction(BACKWARD.INIT);
-	    var succ = redux_actions_1.createAction(BACKWARD.SUCC);
-	    var fail = redux_actions_1.createAction(BACKWARD.FAIL);
-	    var history = getState().history;
-	    var target = lastTarget(history);
-	    dispatch(init(target));
-	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail({
-	        err: err,
-	        current: getState().word
-	    })); });
-	};
-	function lastTarget(history) {
-	    if (history.length >= 2) {
-	        return history[history.length - 2];
-	    }
-	    else {
-	        return null;
-	    }
-	}
-	exports.lastTarget = lastTarget;
-
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.handleActions = exports.handleAction = exports.createAction = undefined;
-	
-	var _createAction = __webpack_require__(5);
-	
-	var _createAction2 = _interopRequireDefault(_createAction);
-	
-	var _handleAction = __webpack_require__(6);
-	
-	var _handleAction2 = _interopRequireDefault(_handleAction);
-	
-	var _handleActions = __webpack_require__(7);
-	
-	var _handleActions2 = _interopRequireDefault(_handleActions);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.createAction = _createAction2.default;
-	exports.handleAction = _handleAction2.default;
-	exports.handleActions = _handleActions2.default;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = createAction;
-	function identity(t) {
-	  return t;
-	}
-	
-	function createAction(type, actionCreator, metaCreator) {
-	  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
-	
-	  var actionHandler = function actionHandler() {
-	    var hasError = (arguments.length <= 0 ? undefined : arguments[0]) instanceof Error;
-	
-	    var action = {
-	      type: type
-	    };
-	
-	    var payload = hasError ? arguments.length <= 0 ? undefined : arguments[0] : finalActionCreator.apply(undefined, arguments);
-	    if (!(payload === null || payload === undefined)) {
-	      action.payload = payload;
-	    }
-	
-	    if (hasError) {
-	      // Handle FSA errors where the payload is an Error object. Set error.
-	      action.error = true;
-	    }
-	
-	    if (typeof metaCreator === 'function') {
-	      action.meta = metaCreator.apply(undefined, arguments);
-	    }
-	
-	    return action;
-	  };
-	
-	  actionHandler.toString = function () {
-	    return type;
-	  };
-	
-	  return actionHandler;
-	}
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = handleAction;
-	function isFunction(val) {
-	  return typeof val === 'function';
-	}
-	
-	function handleAction(type, reducers, defaultState) {
-	  var typeValue = isFunction(type) ? type.toString() : type;
-	
-	  return function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
-	    var action = arguments[1];
-	
-	    // If action type does not match, return previous state
-	    if (action.type !== typeValue) return state;
-	
-	    var handlerKey = action.error === true ? 'throw' : 'next';
-	
-	    // If function is passed instead of map, use as reducer
-	    if (isFunction(reducers)) {
-	      reducers.next = reducers.throw = reducers;
-	    }
-	
-	    // Otherwise, assume an action map was passed
-	    var reducer = reducers[handlerKey];
-	
-	    return isFunction(reducer) ? reducer(state, action) : state;
-	  };
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = handleActions;
-	
-	var _handleAction = __webpack_require__(6);
-	
-	var _handleAction2 = _interopRequireDefault(_handleAction);
-	
-	var _ownKeys = __webpack_require__(8);
-	
-	var _ownKeys2 = _interopRequireDefault(_ownKeys);
-	
-	var _reduceReducers = __webpack_require__(9);
-	
-	var _reduceReducers2 = _interopRequireDefault(_reduceReducers);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	function handleActions(handlers, defaultState) {
-	  var reducers = (0, _ownKeys2.default)(handlers).map(function (type) {
-	    return (0, _handleAction2.default)(type, handlers[type]);
-	  });
-	  var reducer = _reduceReducers2.default.apply(undefined, _toConsumableArray(reducers));
-	
-	  return typeof defaultState !== 'undefined' ? function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? defaultState : arguments[0];
-	    var action = arguments[1];
-	    return reducer(state, action);
-	  } : reducer;
-	}
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = ownKeys;
-	function ownKeys(object) {
-	  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
-	    return Reflect.ownKeys(object);
-	  }
-	
-	  var keys = Object.getOwnPropertyNames(object);
-	
-	  if (typeof Object.getOwnPropertySymbols === 'function') {
-	    keys = keys.concat(Object.getOwnPropertySymbols(object));
-	  }
-	
-	  return keys;
-	}
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	exports.__esModule = true;
-	exports["default"] = reduceReducers;
-	
-	function reduceReducers() {
-	  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
-	    reducers[_key] = arguments[_key];
-	  }
-	
-	  return function (previous, current) {
-	    return reducers.reduce(function (p, r) {
-	      return r(p, current);
-	    }, previous);
-	  };
-	}
-	
-	module.exports = exports["default"];
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var _ = __webpack_require__(1);
-	var types_1 = __webpack_require__(11);
-	function isHeader(s, level) {
-	    var match = s.match(/^[Hh](\d)+$/);
-	    if (match) {
-	        if (level) {
-	            return parseInt(match[1]) === level;
-	        }
-	        else {
-	            return true;
-	        }
-	    }
-	    else {
-	        return false;
-	    }
-	}
-	var notIgnorable = function (node) {
-	    var isComment = node.nodeType === 8;
-	    var isTextAndEmpty = node.nodeType === 3 && !/[^\t\n\r]/.test(node.textContent);
-	    var isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && node.textContent.trim().length === 0;
-	    // const isEmptyParagraph = node.nodeName === 'p' || node.nodeName === 'P' && !/[^\t\n\r ]/.test(node.textContent);
-	    return !(isComment || isTextAndEmpty || isEmptyParagraph);
-	};
-	function parseXML(raw) {
-	    if (typeof window === 'undefined') {
-	        // in nodejs
-	        var DOMParser_1 = __webpack_require__(12).DOMParser;
-	        return new DOMParser_1().parseFromString(raw, 'text/html');
-	    }
-	    else {
-	        // in browser
-	        return new DOMParser().parseFromString(raw, 'text/html');
-	    }
-	}
-	exports.parseXML = parseXML;
-	function parseDocument(doc) {
-	    var contentNode = doc.getElementById('mw-content-text');
-	    removeWhitespace(contentNode);
-	    var nodeList = Array.prototype.slice.call(contentNode.childNodes);
-	    console.log(contentNode);
-	    return buildSection(nodeList, "Entry", 2);
-	}
-	exports.parseDocument = parseDocument;
-	function parse(raw) {
-	    var entry = parseDocument(parseXML(raw));
-	    return entry.subs.map(function (s) { return ({
-	        languageName: s.name,
-	        subs: s.subs
-	    }); });
-	}
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = parse;
-	// removes whitespaces in the tree
-	function removeWhitespace(node) {
-	    if (node && node.childNodes) {
-	        var children = Array.prototype.slice.call(node.childNodes);
-	        children.forEach(function (child) {
-	            if (notIgnorable(child)) {
-	                removeWhitespace(child);
-	            }
-	            else {
-	                node.removeChild(child);
-	            }
-	        });
-	    }
-	}
-	// given a NodeList, build a tree with headers as ineteral nodes
-	function buildSection(list, name, level) {
-	    var intervals = [];
-	    list.forEach(function (node, i) {
-	        if (isHeader(node.nodeName, level))
-	            intervals.push(i);
-	    });
-	    if (intervals.length > 0) {
-	        var body = _.take(list, intervals[0]).map(parseBlockElem);
-	        var subs = intervals.map(function (start, i) {
-	            var name = list[start].childNodes[0].textContent;
-	            var interval;
-	            if (i === intervals.length - 1) {
-	                interval = [start + 1, list.length];
-	            }
-	            else {
-	                interval = [start + 1, intervals[i + 1]];
-	            }
-	            var segment = list.slice(interval[0], interval[1]);
-	            return buildSection(segment, name, level + 1);
-	        });
-	        return {
-	            name: name,
-	            body: body,
-	            subs: subs
-	        };
-	    }
-	    else {
-	        var body = list.map(parseBlockElem);
-	        return {
-	            name: name,
-	            body: body,
-	            subs: []
-	        };
-	    }
-	}
-	function toArray(nodes) {
-	    if (nodes)
-	        return Array.prototype.slice.call(nodes);
-	    else
-	        return [];
-	}
-	function parseBlockElem(node) {
-	    switch (node.nodeName) {
-	        case 'p':
-	        case 'P':
-	            return ({
-	                kind: 'p',
-	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	            });
-	        case 'ol':
-	        case 'OL':
-	            return ({
-	                kind: 'ol',
-	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
-	            });
-	        case 'ul':
-	        case 'UL':
-	            return ({
-	                kind: 'ul',
-	                body: _.flatten(toArray(node.childNodes).map(parseBlockElem))
-	            });
-	        case 'li':
-	        case 'LI':
-	            return ({
-	                kind: 'li',
-	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	            });
-	        default:
-	            return ({
-	                kind: 'p',
-	                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	            });
-	    }
-	}
-	function parseInlineElem(node) {
-	    switch (node.nodeName) {
-	        // base case: plain text node
-	        case '#text':
-	            return [{
-	                    kind: 'plain',
-	                    text: node.textContent
-	                }];
-	        // subtree of inline elements
-	        case 'span':
-	        case 'SPAN':
-	            return _.flatten(toArray(node.childNodes).map(parseInlineElem));
-	        // italic
-	        case 'i':
-	        case 'I':
-	            return [{
-	                    kind: 'i',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // emphasize
-	        case 'em':
-	        case 'EM':
-	            return [{
-	                    kind: 'em',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // bold
-	        case 'b':
-	        case 'B':
-	            return [{
-	                    kind: 'b',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // strong
-	        case 'strong':
-	        case 'STRONG':
-	            return [{
-	                    kind: 'strong',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // superscript
-	        case 'sup':
-	        case 'SUP':
-	            return [{
-	                    kind: 'sup',
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // abbreviation
-	        case 'abbr':
-	        case 'ABBR':
-	            return [{
-	                    kind: 'abbr',
-	                    title: node.getAttribute('title'),
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        // link
-	        case 'a':
-	        case 'A':
-	            var href = node.getAttribute('href');
-	            // if internal
-	            if (_.startsWith(href, '/')) {
-	                var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
-	                if (match) {
-	                    var section = match[2];
-	                    return [{
-	                            kind: 'jump',
-	                            word: node.getAttribute('title'),
-	                            section: section,
-	                            name: node.getAttribute('title'),
-	                            body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                        }];
-	                }
-	            }
-	            // else external
-	            return [{
-	                    kind: 'a',
-	                    href: href,
-	                    title: node.getAttribute('title'),
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
-	        default:
-	            return [{
-	                    kind: 'plain',
-	                    text: "<" + node.nodeName + ">" + node.textContent + "</" + node.nodeName + ">\n"
-	                }];
-	    }
-	}
-	function sectionToText(s) {
-	    return types_1.mapSection(function (blocks) { return blocks.map(types_1.blockToText).join(''); }, s);
-	}
-	exports.sectionToText = sectionToText;
 
 
 /***/ },
@@ -25105,49 +25151,11 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).setImmediate, __webpack_require__(18).clearImmediate))
 
 /***/ },
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */,
-/* 38 */,
-/* 39 */,
-/* 40 */,
-/* 41 */,
-/* 42 */,
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var _ = __webpack_require__(1);
+	var _ = __webpack_require__(9);
 	// upstream  : connetion from devtools panel
 	// downstream: connetion from injected webpage
 	var Operator = (function () {
