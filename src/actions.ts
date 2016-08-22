@@ -111,7 +111,7 @@ export const backward = (dispatch: any, getState: () => State) => {
             dispatch(status.fail());
              dispatch(historyBackward.fail({
                 err: err,
-                current: getState().word
+                current: getState().entry.word
             }));
         }
     )

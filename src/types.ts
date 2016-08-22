@@ -1,14 +1,19 @@
 export type State = {
     // entry
-    word: string,
-    body: LanguageSection[],
+    entry: Entry,
 
-    // navigation
-    status: 'pending' | 'succeed' | 'failed',
+    status: Status,
 
     // history
-    history: string[]
+    history: History
 }
+
+export type Entry = {
+    word: string,
+    body: LanguageSection[]
+}
+export type Status = 'pending' | 'succeed' | 'failed'
+export type History = string[];
 
 export type LanguageSection = {
     languageName: string,

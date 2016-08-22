@@ -5,24 +5,21 @@ import { State, LanguageSection } from '../types'
 
 interface EntryProps extends React.Props<any> {
     word: string;
-    subs: LanguageSection[];
+    body: LanguageSection[];
 };
 
 const mapStateToProps = (state: State) => {
-    return {
-        word: state.word,
-        subs: state.body
-    }
+    return state.entry
 }
 
 class Entry extends React.Component<EntryProps, void> {
     render() {
-        const { word, subs } = this.props;
+        const { word, body } = this.props;
         return (
             <section>
                 <h1>{ word }</h1>
                 <ul>
-                    {subs.map(section =>
+                    {body.map(section =>
                         <LangSect
                             key={section.languageName}
                             languageName={section.languageName}

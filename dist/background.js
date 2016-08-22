@@ -133,7 +133,7 @@
 	        dispatch(status.fail());
 	        dispatch(historyBackward.fail({
 	            err: err,
-	            current: getState().word
+	            current: getState().entry.word
 	        }));
 	    });
 	};

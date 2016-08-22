@@ -1,47 +1,45 @@
 import * as _ from 'lodash';
-import { State } from './types';
+import { State, Entry, Status, History } from './types';
 import { FETCH, STATUS, LOOKUP, BACKWARD, lastTarget } from './actions';
 import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
 const defaultState: State = {
-    word: '',
-    body: [],
+    entry: {
+        word: '',
+        body: []
+    },
     status: 'pending',
     history: []
 }
 
-export default handleActions<State, FETCH | STATUS | LOOKUP | BACKWARD>({
-    [FETCH.INIT]: (state: State, action: Action<FETCH.INIT>) => _.assign({}, state, {
-        word: action.payload
+const entry = handleActions<Entry, FETCH>({
+    [FETCH.INIT]: (state: Entry, action: Action<FETCH.INIT>) => _.assign({}, state, {
+        word: action.payload,
+        body: state.body
     }),
-    [FETCH.SUCC]: (state: State, action: Action<FETCH.SUCC>) => _.assign({}, state, {
+    [FETCH.SUCC]: (state: Entry, action: Action<FETCH.SUCC>) => _.assign({}, state, {
+        word: state.word,
         body: action.payload
-    }),
+    })
+}, defaultState.entry);
 
+const status = handleActions<Status, STATUS>({
+    [STATUS.INIT]: (state: Status, action: Action<STATUS.INIT>) => 'pending',
+    [STATUS.SUCC]: (state: Status, action: Action<STATUS.SUCC>) => 'succeed',
+    [STATUS.FAIL]: (state: Status, action: Action<STATUS.FAIL>) => 'failed'
+}, defaultState.status);
 
-    [STATUS.INIT]: (state: State, action: Action<STATUS.INIT>) => _.assign({}, state, {
-        status: 'pending'
-    }),
-    [STATUS.SUCC]: (state: State, action: Action<STATUS.SUCC>) => _.assign({}, state, {
-        status: 'succeed'
-    }),
-    [STATUS.FAIL]: (state: State, action: Action<STATUS.FAIL>) => _.assign({}, state, {
-        status: 'failed'
-    }),
+const history = handleActions<History, LOOKUP | BACKWARD>({
+    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => _.concat(state, action.payload),
+    [LOOKUP.FAIL]: (state: History, action: Action<LOOKUP.FAIL>) => _.initial(state),
 
+    [BACKWARD.INIT]: (state: History, action: Action<BACKWARD.INIT>) => _.initial(state),
+    [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.concat(state, action.payload.current)
+}, defaultState.history);
 
-    [LOOKUP.INIT]: (state: State, action: Action<LOOKUP.INIT>) => _.assign({}, state, {
-        history: _.concat(state.history, action.payload)
-    }),
-    [LOOKUP.FAIL]: (state: State, action: Action<LOOKUP.FAIL>) => _.assign({}, state, {
-        history: _.initial(state.history)
-    }),
-
-    [BACKWARD.INIT]: (state: State, action: Action<BACKWARD.INIT>) => _.assign({}, state, {
-        history: _.initial(state.history)
-    }),
-    [BACKWARD.FAIL]: (state: State, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
-        history: _.concat(state.history, action.payload.current)
-    }),
-}, defaultState);
+export default combineReducers({
+    entry,
+    status,
+    history
+})
