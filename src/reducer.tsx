@@ -8,7 +8,7 @@ const defaultState: State = {
     word: '',
     body: [],
     nav: {
-        word: null,
+        target: null,
         status: 'pending',
         history: []
     }
@@ -19,23 +19,23 @@ export default handleActions<State, LOOKUP>({
         nav: {
             word: action.payload.word,
             status: 'pending',
-            history: state.nav.history
+            history: _.concat(state.nav.history, [action.payload.word])
         }
     }),
     [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
-        word: state.nav.word,
+        word: state.nav.target,
         body: action.payload.body,
         nav: {
-            word: state.nav.word,
+            target: state.nav.target,
             status: 'succeed',
-            history: _.concat(state.nav.history, [state.nav.word])
+            history: state.nav.history
         }
     }),
     [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
         nav: {
-            word: state.nav.word,
+            target: state.nav.target,
             status: 'failed',
-            history: state.nav.history
+            history: _.initial(state.nav.history)
         }
     })
 }, defaultState);

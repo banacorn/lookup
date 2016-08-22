@@ -8,8 +8,10 @@ export type State = {
 }
 
 export type NavState = {
-    word: string,
+    target: string,
     status: 'pending' | 'succeed' | 'failed',
+
+    // history
     history: string[]
 }
 

@@ -6,7 +6,7 @@ var defaultState = {
     word: '',
     body: [],
     nav: {
-        word: null,
+        target: null,
         status: 'pending',
         history: []
     }
@@ -17,23 +17,23 @@ exports.default = redux_actions_1.handleActions((_a = {},
         nav: {
             word: action.payload.word,
             status: 'pending',
-            history: state.nav.history
+            history: _.concat(state.nav.history, [action.payload.word])
         }
     }); },
     _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
-        word: state.nav.word,
+        word: state.nav.target,
         body: action.payload.body,
         nav: {
-            word: state.nav.word,
+            target: state.nav.target,
             status: 'succeed',
-            history: _.concat(state.nav.history, [state.nav.word])
+            history: state.nav.history
         }
     }); },
     _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
         nav: {
-            word: state.nav.word,
+            target: state.nav.target,
             status: 'failed',
-            history: state.nav.history
+            history: _.initial(state.nav.history)
         }
     }); },
     _a
