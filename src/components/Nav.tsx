@@ -40,7 +40,8 @@ class Nav extends React.Component<NavProps, void> {
             <nav>
                 <button onClick={onBackward}>backward</button>
                 <p>{`${_.last(history.words)}: ${status}`}</p>
-                <p>{ history.toString() }</p>
+                <p>{ history.words.toString() }</p>
+                <p>{ history.cursor }</p>
                 <form onSubmit={onSearch}>
                     <input id='search-box' type='text'/>
                 </form>

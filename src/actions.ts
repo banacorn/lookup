@@ -69,10 +69,7 @@ export namespace historyLookup {
 
 export namespace historyBackward {
     export const init = createAction<string, BACKWARD.INIT>(BACKWARD.INIT);
-    export const fail = createAction<{
-        err: Error,
-        current: string
-    }, BACKWARD.FAIL>(BACKWARD.FAIL);
+    export const fail = createAction<Error, BACKWARD.FAIL>(BACKWARD.FAIL);
 }
 
 export const lookup = (target: string) => (dispatch: any, getState: () => State) => {
@@ -109,17 +106,14 @@ export const backward = (dispatch: any, getState: () => State) => {
         err => {
             dispatch(fetch.fail(err));
             dispatch(status.fail());
-             dispatch(historyBackward.fail({
-                err: err,
-                current: getState().entry.word
-            }));
+            dispatch(historyBackward.fail(err));
         }
     )
 }
 
 export function lastTarget(history: History): string {
-    if (history.words.length >= 2) {
-        return history.words[history.words.length - 2];
+    if (history.cursor >= 1) {
+        return history.words[history.cursor - 1];
     } else {
         return null;
     }

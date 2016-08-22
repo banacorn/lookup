@@ -34,18 +34,33 @@ const status = handleActions<Status, STATUS>({
 }, defaultState.status);
 
 const history = handleActions<History, LOOKUP | BACKWARD>({
-    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => _.assign({}, state, {
-        words: _.concat(state.words, action.payload)
-    }),
+    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => {
+        const nextWord = state.words[state.cursor + 1];
+        // history forked
+        if (nextWord && nextWord !== action.payload) {
+            console.log("forked!", nextWord, action.payload);
+
+            return {
+                words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
+                cursor: state.cursor + 1
+            }
+        } else {
+            return {
+                words: _.concat(state.words, action.payload),
+                cursor: state.words.length
+            }
+        }
+    },
     [LOOKUP.FAIL]: (state: History, action: Action<LOOKUP.FAIL>) => _.assign({}, state, {
-        words: _.initial(state.words)
+        words: _.initial(state.words),
+        cursor: state.cursor - 1
     }),
 
     [BACKWARD.INIT]: (state: History, action: Action<BACKWARD.INIT>) => _.assign({}, state, {
-        words: _.initial(state.words)
+        cursor: state.cursor - 1
     }),
     [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
-        words: _.concat(state.words, action.payload.current)
+        cursor: state.cursor + 1
     })
 }, defaultState.history);
 

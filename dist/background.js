@@ -131,15 +131,12 @@
 	    }, function (err) {
 	        dispatch(fetch.fail(err));
 	        dispatch(status.fail());
-	        dispatch(historyBackward.fail({
-	            err: err,
-	            current: getState().entry.word
-	        }));
+	        dispatch(historyBackward.fail(err));
 	    });
 	};
 	function lastTarget(history) {
-	    if (history.words.length >= 2) {
-	        return history.words[history.words.length - 2];
+	    if (history.cursor >= 1) {
+	        return history.words[history.cursor - 1];
 	    }
 	    else {
 	        return null;

@@ -153,15 +153,12 @@
 	    }, function (err) {
 	        dispatch(fetch.fail(err));
 	        dispatch(status.fail());
-	        dispatch(historyBackward.fail({
-	            err: err,
-	            current: getState().entry.word
-	        }));
+	        dispatch(historyBackward.fail(err));
 	    });
 	};
 	function lastTarget(history) {
-	    if (history.words.length >= 2) {
-	        return history.words[history.words.length - 2];
+	    if (history.cursor >= 1) {
+	        return history.words[history.cursor - 1];
 	    }
 	    else {
 	        return null;
@@ -27265,7 +27262,8 @@
 	        return (React.createElement("nav", null, 
 	            React.createElement("button", {onClick: onBackward}, "backward"), 
 	            React.createElement("p", null, _.last(history.words) + ": " + status), 
-	            React.createElement("p", null, history.toString()), 
+	            React.createElement("p", null, history.words.toString()), 
+	            React.createElement("p", null, history.cursor), 
 	            React.createElement("form", {onSubmit: onSearch}, 
 	                React.createElement("input", {id: 'search-box', type: 'text'})
 	            )));
@@ -27314,17 +27312,32 @@
 	    _b
 	), defaultState.status);
 	var history = redux_actions_1.handleActions((_c = {},
-	    _c[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
-	        words: _.concat(state.words, action.payload)
-	    }); },
+	    _c[actions_1.LOOKUP.INIT] = function (state, action) {
+	        var nextWord = state.words[state.cursor + 1];
+	        // history forked
+	        if (nextWord && nextWord !== action.payload) {
+	            console.log("forked!", nextWord, action.payload);
+	            return {
+	                words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
+	                cursor: state.cursor + 1
+	            };
+	        }
+	        else {
+	            return {
+	                words: _.concat(state.words, action.payload),
+	                cursor: state.words.length
+	            };
+	        }
+	    },
 	    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
-	        words: _.initial(state.words)
+	        words: _.initial(state.words),
+	        cursor: state.cursor - 1
 	    }); },
 	    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
-	        words: _.initial(state.words)
+	        cursor: state.cursor - 1
 	    }); },
 	    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
-	        words: _.concat(state.words, action.payload.current)
+	        cursor: state.cursor + 1
 	    }); },
 	    _c
 	), defaultState.history);
