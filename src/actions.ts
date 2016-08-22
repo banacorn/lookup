@@ -26,11 +26,12 @@ export const lookup = createAction<string, LOOKUP.REQUEST>(LOOKUP.REQUEST, word 
 export const render = createAction<LanguageSection[], LOOKUP.SUCCESS>(LOOKUP.SUCCESS, body => ({ body }));
 export const error = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE, err => ({ err }));
 
-export const search = (word: string) => (dispatch: any) => fetch(word)
-    .then(
+export const search = (word: string) => (dispatch: any) => {
+    dispatch(lookup(word));
+    fetch(word).then(
         res => {
-            dispatch(lookup(word))
             dispatch(render(parse(res)))
         },
         err => dispatch(lookup(word))
-    )
+    );
+}

@@ -1,5 +1,6 @@
 export type State = {
     word: string,
+    lookupStatus: "pending" | "succeed" | "failed",
     body: LanguageSection[]
 }
 

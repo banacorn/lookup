@@ -12,7 +12,8 @@ var actions_1 = require('../actions');
 var mapStateToProps = function (state) {
     return {
         word: state.word,
-        subs: state.body
+        subs: state.body,
+        lookupStatus: state.lookupStatus,
     };
 };
 var mapDispatchToProps = function (dispatch) {
@@ -31,12 +32,13 @@ var Entry = (function (_super) {
         _super.apply(this, arguments);
     }
     Entry.prototype.render = function () {
-        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch;
+        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch, lookupStatus = _a.lookupStatus;
         return (React.createElement("section", null, 
             React.createElement("form", {onSubmit: onSearch}, 
                 React.createElement("input", {id: "search-box", type: "text"})
             ), 
             React.createElement("h1", null, word), 
+            React.createElement("p", null, lookupStatus), 
             React.createElement("ul", null, subs.map(function (section) {
                 return React.createElement(LangSect_1.default, {key: section.languageName, languageName: section.languageName, subs: section.subs});
             }))));

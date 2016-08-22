@@ -7,13 +7,15 @@ import { search } from '../actions'
 interface EntryProps extends React.Props<any> {
     word: string;
     subs: LanguageSection[];
+    lookupStatus: "pending" | "succeed" | "failed",
     onSearch: (e: Event) => void;
 };
 
 const mapStateToProps = (state: State) => {
     return {
         word: state.word,
-        subs: state.body
+        subs: state.body,
+        lookupStatus: state.lookupStatus,
     }
 }
 
@@ -30,13 +32,14 @@ const mapDispatchToProps = (dispatch: any) => {
 
 class Entry extends React.Component<EntryProps, void> {
     render() {
-        const { word, subs, onSearch } = this.props;
+        const { word, subs, onSearch, lookupStatus } = this.props;
         return (
             <section>
                 <form onSubmit={onSearch}>
                     <input id="search-box" type="text"/>
                 </form>
                 <h1>{ word }</h1>
+                <p>{ lookupStatus }</p>
                 <ul>
                     {subs.map(section =>
                         <LangSect

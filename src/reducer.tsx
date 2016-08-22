@@ -5,26 +5,21 @@ import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
 const defaultState: State = {
-    word: ':D',
-    body: []
+    word: '',
+    body: [],
+    lookupStatus: 'pending'
 }
-
-function handleRender(state: State, action: Action<LOOKUP.SUCCESS>): State {
-    return _.assign({}, state, {
-        body: action.payload.body
-    });
-}
-
-
 
 export default handleActions<State, LOOKUP>({
     [LOOKUP.REQUEST]: (state: State, action: Action<LOOKUP.REQUEST>) => _.assign({}, state, {
-        word: action.payload.word
+        word: action.payload.word,
+        lookupStatus: 'pending'
     }),
     [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
-        body: action.payload.body
+        body: action.payload.body,
+        lookupStatus: 'succeed'
+    }),
+    [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
+        lookupStatus: 'failed'
     })
-    // [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
-    //     word: action.payload.word
-    // }),
 }, defaultState);

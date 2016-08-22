@@ -16847,11 +16847,12 @@
 	exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST, function (word) { return ({ word: word }); });
 	exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS, function (body) { return ({ body: body }); });
 	exports.error = redux_actions_1.createAction(LOOKUP.FAILURE, function (err) { return ({ err: err }); });
-	exports.search = function (word) { return function (dispatch) { return util_1.fetch(word)
-	    .then(function (res) {
+	exports.search = function (word) { return function (dispatch) {
 	    dispatch(exports.lookup(word));
-	    dispatch(exports.render(parser_1.default(res)));
-	}, function (err) { return dispatch(exports.lookup(word)); }); }; };
+	    util_1.fetch(word).then(function (res) {
+	        dispatch(exports.render(parser_1.default(res)));
+	    }, function (err) { return dispatch(exports.lookup(word)); });
+	}; };
 
 
 /***/ },
@@ -26892,7 +26893,8 @@
 	var mapStateToProps = function (state) {
 	    return {
 	        word: state.word,
-	        subs: state.body
+	        subs: state.body,
+	        lookupStatus: state.lookupStatus,
 	    };
 	};
 	var mapDispatchToProps = function (dispatch) {
@@ -26911,12 +26913,13 @@
 	        _super.apply(this, arguments);
 	    }
 	    Entry.prototype.render = function () {
-	        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch;
+	        var _a = this.props, word = _a.word, subs = _a.subs, onSearch = _a.onSearch, lookupStatus = _a.lookupStatus;
 	        return (React.createElement("section", null, 
 	            React.createElement("form", {onSubmit: onSearch}, 
 	                React.createElement("input", {id: "search-box", type: "text"})
 	            ), 
 	            React.createElement("h1", null, word), 
+	            React.createElement("p", null, lookupStatus), 
 	            React.createElement("ul", null, subs.map(function (section) {
 	                return React.createElement(LangSect_1.default, {key: section.languageName, languageName: section.languageName, subs: section.subs});
 	            }))));
@@ -27137,21 +27140,22 @@
 	var actions_1 = __webpack_require__(3);
 	var redux_actions_1 = __webpack_require__(4);
 	var defaultState = {
-	    word: ':D',
-	    body: []
+	    word: '',
+	    body: [],
+	    lookupStatus: 'pending'
 	};
-	function handleRender(state, action) {
-	    return _.assign({}, state, {
-	        body: action.payload.body
-	    });
-	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-	        word: action.payload.word
+	        word: action.payload.word,
+	        lookupStatus: 'pending'
 	    }); },
 	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
-	        body: action.payload.body
+	        body: action.payload.body,
+	        lookupStatus: 'succeed'
+	    }); },
+	    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
+	        lookupStatus: 'failed'
 	    }); },
 	    _a
 	), defaultState);
