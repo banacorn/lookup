@@ -61,7 +61,7 @@
 	// detect whether we are in normal webpage or chrome devtools
 	// so that we can develop in both environments
 	if (util_1.inWebpage) {
-	    store.dispatch(actions_1.search("Eisen"));
+	    store.dispatch(actions_1.lookup("Eisen"));
 	}
 	else {
 	    var backgroundConn = chrome.runtime.connect({
@@ -16840,9 +16840,9 @@
 	var util_1 = __webpack_require__(15);
 	var LOOKUP;
 	(function (LOOKUP) {
-	    LOOKUP.REQUEST = 'LOOKUP.REQUEST';
-	    LOOKUP.SUCCESS = 'LOOKUP.SUCCESS';
-	    LOOKUP.FAILURE = 'LOOKUP.FAILURE';
+	    LOOKUP.INIT = 'LOOKUP.INIT';
+	    LOOKUP.SUCC = 'LOOKUP.SUCC';
+	    LOOKUP.FAIL = 'LOOKUP.FAIL';
 	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
 	var NAV;
 	(function (NAV) {
@@ -16850,18 +16850,30 @@
 	    NAV.SEARCH = 'NAV.SEARCH';
 	    NAV.BACKWARD = 'NAV.BACKWARD';
 	})(NAV = exports.NAV || (exports.NAV = {}));
-	// lookup
-	exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST);
-	exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS);
-	exports.error = redux_actions_1.createAction(LOOKUP.FAILURE);
-	// navigation
-	exports.navSearch = redux_actions_1.createAction(NAV.SEARCH);
-	exports.search = function (target) { return function (dispatch) {
-	    dispatch(exports.navSearch(target));
-	    dispatch(exports.lookup(target));
-	    util_1.fetch(target).then(function (res) { return dispatch(exports.render(parser_1.default(res))); }, function (err) { return dispatch(exports.error(err)); });
+	exports.lookup = function (target) { return function (dispatch) {
+	    var init = redux_actions_1.createAction(LOOKUP.INIT);
+	    var succ = redux_actions_1.createAction(LOOKUP.SUCC);
+	    var fail = redux_actions_1.createAction(LOOKUP.FAIL);
+	    dispatch(init(target));
+	    util_1.fetch(target).then(function (res) { return dispatch(succ(parser_1.default(res))); }, function (err) { return dispatch(fail(err)); });
 	}; };
-	// export const backward = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE, err => ({ err }));
+	// // navigation
+	// export const navBackward = createAction<NAV.BACKWARD>(NAV.BACKWARD);
+	//
+	//
+	// export const backward = (dispatch: any, getState: () => State) => {
+	//     const state = getState();
+	//     const target = lastTarget(state.history);
+	//     if (target) {
+	//         dispatch(navBackward);
+	//         dispatch(lookup.init(target));
+	//         fetch(target).then(
+	//             res => dispatch(render(parse(res))),
+	//             err => dispatch(error(err))
+	//         );
+	//     }
+	// }
+	// export const backward = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL, err => ({ err }));
 	// export const backward = (word: string) => (dispatch: any) => {
 	//     dispatch(lookup(word));
 	//     fetch(word).then(
@@ -16871,6 +16883,15 @@
 	//         err => dispatch(lookup(word))
 	//     );
 	// }
+	function lastTarget(history) {
+	    if (history.length >= 2) {
+	        return history[history.length - 2];
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.lastTarget = lastTarget;
 
 
 /***/ },
@@ -27092,7 +27113,7 @@
 	var mapDispatchToProps = function (dispatch) {
 	    return {
 	        onJump: function (elem) { return function (event) {
-	            dispatch(actions_1.search(elem.word));
+	            dispatch(actions_1.lookup(elem.word));
 	            event.preventDefault(); // prevent submit from refreshing the page
 	        }; }
 	    };
@@ -27147,34 +27168,23 @@
 	    status: 'pending',
 	    history: []
 	};
-	function lastTarget(history) {
-	    if (history.length >= 2) {
-	        return history[history.length - 2];
-	    }
-	    else {
-	        return null;
-	    }
-	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
-	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
+	    _a[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
 	        // display the target right away
 	        word: action.payload,
-	        status: 'pending'
+	        status: 'pending',
+	        history: _.concat(state.history, action.payload)
 	    }); },
-	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
+	    _a[actions_1.LOOKUP.SUCC] = function (state, action) { return _.assign({}, state, {
 	        body: action.payload,
 	        status: 'succeed'
 	    }); },
-	    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
+	    _a[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
 	        // rewind
-	        word: lastTarget(state.history),
+	        word: actions_1.lastTarget(state.history),
 	        status: 'failed',
 	        history: _.initial(state.history)
-	    }); },
-	    // navigation
-	    _a[actions_1.NAV.SEARCH] = function (state, action) { return _.assign({}, state, {
-	        history: _.concat(state.history, action.payload)
 	    }); },
 	    _a
 	), defaultState);
@@ -27208,7 +27218,7 @@
 	            e.preventDefault(); // prevent submit from refreshing the page
 	            var searchBox = document.getElementById('search-box');
 	            var word = searchBox.value;
-	            dispatch(actions_1.search(word));
+	            dispatch(actions_1.lookup(word));
 	        }
 	    };
 	};

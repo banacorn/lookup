@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { State, Section, InlineElem, inlineToText, Inline as I } from '../types';
-import { search } from '../actions';
+import { lookup } from '../actions';
 
 interface InlineProps extends React.Props<any> {
     onJump: (elem: I.Jump) => (event: Event) => void;
@@ -10,7 +10,7 @@ interface InlineProps extends React.Props<any> {
 const mapDispatchToProps = (dispatch: any) => {
     return {
         onJump: (elem: I.Jump) => (event: Event) => {
-            dispatch(search(elem.word));
+            dispatch(lookup(elem.word));
             event.preventDefault(); // prevent submit from refreshing the page
         }
     };

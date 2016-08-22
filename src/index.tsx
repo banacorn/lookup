@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 
 import App from './components/App';
 import reducer from './reducer';
-import { search } from './actions';
+import { lookup } from './actions';
 import { inWebpage } from './util';
 
 declare var chrome: any;
@@ -27,7 +27,7 @@ ReactDOM.render(
 // detect whether we are in normal webpage or chrome devtools
 // so that we can develop in both environments
 if (inWebpage) {
-    store.dispatch(search("Eisen"));
+    store.dispatch(lookup("Eisen"));
 } else {
     var backgroundConn = chrome.runtime.connect({
         name: 'woerterbuch-panel'

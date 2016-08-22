@@ -4,16 +4,16 @@ import { State, Section, BlockElem, LanguageSection } from './types';
 import parse from './chrome/parser';
 import { fetch } from './util';
 
-export type LOOKUP = LOOKUP.REQUEST | LOOKUP.SUCCESS | LOOKUP.FAILURE;
+export type LOOKUP = LOOKUP.INIT | LOOKUP.SUCC | LOOKUP.FAIL;
 export namespace LOOKUP {
-    export const REQUEST = 'LOOKUP.REQUEST';
-    export type REQUEST = string;
+    export const INIT = 'LOOKUP.INIT';
+    export type INIT = string;
 
-    export const SUCCESS = 'LOOKUP.SUCCESS';
-    export type SUCCESS = LanguageSection[];
+    export const SUCC = 'LOOKUP.SUCC';
+    export type SUCC = LanguageSection[];
 
-    export const FAILURE = 'LOOKUP.FAILURE';
-    export type FAILURE = Error;
+    export const FAIL = 'LOOKUP.FAIL';
+    export type FAIL = Error;
 }
 
 export type NAV = NAV.BACKWARD | NAV.SEARCH;
@@ -26,25 +26,36 @@ export namespace NAV {
     export type BACKWARD = void;
 }
 
-// lookup
-export const lookup = createAction<string, LOOKUP.REQUEST>(LOOKUP.REQUEST);
-export const render = createAction<LanguageSection[], LOOKUP.SUCCESS>(LOOKUP.SUCCESS);
-export const error = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE);
+export const lookup = (target: string) => (dispatch: any) => {
+    const init = createAction<string, LOOKUP.INIT>(LOOKUP.INIT);
+    const succ = createAction<LanguageSection[], LOOKUP.SUCC>(LOOKUP.SUCC);
+    const fail = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL);
 
-// navigation
-export const navSearch = createAction<string, NAV.SEARCH>(NAV.SEARCH);
-
-export const search = (target: string) => (dispatch: any) => {
-    dispatch(navSearch(target));
-    dispatch(lookup(target));
+    dispatch(init(target));
     fetch(target).then(
-        res => dispatch(render(parse(res))),
-        err => dispatch(error(err))
+        res => dispatch(succ(parse(res))),
+        err => dispatch(fail(err))
     );
 }
 
+// // navigation
+// export const navBackward = createAction<NAV.BACKWARD>(NAV.BACKWARD);
+//
+//
+// export const backward = (dispatch: any, getState: () => State) => {
+//     const state = getState();
+//     const target = lastTarget(state.history);
+//     if (target) {
+//         dispatch(navBackward);
+//         dispatch(lookup.init(target));
+//         fetch(target).then(
+//             res => dispatch(render(parse(res))),
+//             err => dispatch(error(err))
+//         );
+//     }
+// }
 
-// export const backward = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE, err => ({ err }));
+// export const backward = createAction<Error, LOOKUP.FAIL>(LOOKUP.FAIL, err => ({ err }));
 // export const backward = (word: string) => (dispatch: any) => {
 //     dispatch(lookup(word));
 //     fetch(word).then(
@@ -54,3 +65,12 @@ export const search = (target: string) => (dispatch: any) => {
 //         err => dispatch(lookup(word))
 //     );
 // }
+
+
+export function lastTarget(history: string[]): string {
+    if (history.length >= 2) {
+        return history[history.length - 2];
+    } else {
+        return null;
+    }
+}

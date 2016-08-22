@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
 import { State } from '../types'
-import { search } from '../actions'
+import { lookup } from '../actions'
 
 interface NavProps extends React.Props<any> {
     status: 'pending' | 'succeed' | 'failed',
@@ -24,7 +24,7 @@ const mapDispatchToProps = (dispatch: any) => {
             e.preventDefault(); // prevent submit from refreshing the page
             const searchBox = document.getElementById('search-box') as HTMLInputElement;
             const word: string = searchBox.value;
-            dispatch(search(word));
+            dispatch(lookup(word));
         }
     };
 };

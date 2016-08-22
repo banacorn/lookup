@@ -11,7 +11,7 @@ var actions_1 = require('../actions');
 var mapDispatchToProps = function (dispatch) {
     return {
         onJump: function (elem) { return function (event) {
-            dispatch(actions_1.search(elem.word));
+            dispatch(actions_1.lookup(elem.word));
             event.preventDefault();
         }; }
     };

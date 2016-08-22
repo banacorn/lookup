@@ -8,31 +8,21 @@ var defaultState = {
     status: 'pending',
     history: []
 };
-function lastTarget(history) {
-    if (history.length >= 2) {
-        return history[history.length - 2];
-    }
-    else {
-        return null;
-    }
-}
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = redux_actions_1.handleActions((_a = {},
-    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
+    _a[actions_1.LOOKUP.INIT] = function (state, action) { return _.assign({}, state, {
         word: action.payload,
-        status: 'pending'
+        status: 'pending',
+        history: _.concat(state.history, action.payload)
     }); },
-    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
+    _a[actions_1.LOOKUP.SUCC] = function (state, action) { return _.assign({}, state, {
         body: action.payload,
         status: 'succeed'
     }); },
-    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-        word: lastTarget(state.history),
+    _a[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
+        word: actions_1.lastTarget(state.history),
         status: 'failed',
         history: _.initial(state.history)
-    }); },
-    _a[actions_1.NAV.SEARCH] = function (state, action) { return _.assign({}, state, {
-        history: _.concat(state.history, action.payload)
     }); },
     _a
 ), defaultState);

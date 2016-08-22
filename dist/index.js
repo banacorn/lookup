@@ -13,7 +13,7 @@ ReactDOM.render(React.createElement(react_redux_1.Provider, {store: store},
     React.createElement(App_1.default, null)
 ), document.getElementById('app'));
 if (util_1.inWebpage) {
-    store.dispatch(actions_1.search("Eisen"));
+    store.dispatch(actions_1.lookup("Eisen"));
 }
 else {
     var backgroundConn = chrome.runtime.connect({

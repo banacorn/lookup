@@ -20,7 +20,7 @@ var mapDispatchToProps = function (dispatch) {
             e.preventDefault();
             var searchBox = document.getElementById('search-box');
             var word = searchBox.value;
-            dispatch(actions_1.search(word));
+            dispatch(actions_1.lookup(word));
         }
     };
 };
