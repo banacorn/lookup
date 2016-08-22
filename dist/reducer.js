@@ -35,7 +35,6 @@ var history = redux_actions_1.handleActions((_c = {},
     _c[actions_1.LOOKUP.INIT] = function (state, action) {
         var nextWord = state.words[state.cursor + 1];
         if (nextWord && nextWord !== action.payload) {
-            console.log("forked!", nextWord, action.payload);
             return {
                 words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
                 cursor: state.cursor + 1
@@ -57,6 +56,12 @@ var history = redux_actions_1.handleActions((_c = {},
     }); },
     _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
         cursor: state.cursor + 1
+    }); },
+    _c[actions_1.FORWARD.INIT] = function (state, action) { return _.assign({}, state, {
+        cursor: state.cursor + 1
+    }); },
+    _c[actions_1.FORWARD.FAIL] = function (state, action) { return _.assign({}, state, {
+        cursor: state.cursor - 1
     }); },
     _c
 ), defaultState.history);

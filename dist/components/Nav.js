@@ -24,6 +24,9 @@ var mapDispatchToProps = function (dispatch) {
         },
         onBackward: function (e) {
             dispatch(actions_1.backward);
+        },
+        onForward: function (e) {
+            dispatch(actions_1.forward);
         }
     };
 };
@@ -33,9 +36,10 @@ var Nav = (function (_super) {
         _super.apply(this, arguments);
     }
     Nav.prototype.render = function () {
-        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward;
+        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward, onForward = _a.onForward;
         return (React.createElement("nav", null, 
             React.createElement("button", {onClick: onBackward}, "backward"), 
+            React.createElement("button", {onClick: onForward}, "forward"), 
             React.createElement("p", null, _.last(history.words) + ": " + status), 
             React.createElement("p", null, history.words.toString()), 
             React.createElement("p", null, history.cursor), 

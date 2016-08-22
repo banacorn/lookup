@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
 import { State, Status, History } from '../types'
-import { lookup, backward } from '../actions'
+import { lookup, backward, forward } from '../actions'
 
 interface NavProps extends React.Props<any> {
     status: Status,
@@ -10,7 +10,8 @@ interface NavProps extends React.Props<any> {
     history: History,
 
     onSearch: (e: Event) => void,
-    onBackward: (e: Event) => void
+    onBackward: (e: Event) => void,
+    onForward: (e: Event) => void
 };
 
 const mapStateToProps = ({ status, history }: State) => {
@@ -29,16 +30,20 @@ const mapDispatchToProps = (dispatch: any) => {
         },
         onBackward: (e: Event) => {
             dispatch(backward);
+        },
+        onForward: (e: Event) => {
+            dispatch(forward);
         }
     };
 };
 
 class Nav extends React.Component<NavProps, void> {
     render() {
-        const { status, history, onSearch, onBackward } = this.props;
+        const { status, history, onSearch, onBackward, onForward } = this.props;
         return (
             <nav>
                 <button onClick={onBackward}>backward</button>
+                <button onClick={onForward}>forward</button>
                 <p>{`${_.last(history.words)}: ${status}`}</p>
                 <p>{ history.words.toString() }</p>
                 <p>{ history.cursor }</p>

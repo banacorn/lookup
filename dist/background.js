@@ -82,6 +82,11 @@
 	    BACKWARD.INIT = 'BACKWARD.INIT';
 	    BACKWARD.FAIL = 'BACKWARD.FAIL';
 	})(BACKWARD = exports.BACKWARD || (exports.BACKWARD = {}));
+	var FORWARD;
+	(function (FORWARD) {
+	    FORWARD.INIT = 'FORWARD.INIT';
+	    FORWARD.FAIL = 'FORWARD.FAIL';
+	})(FORWARD = exports.FORWARD || (exports.FORWARD = {}));
 	var fetch;
 	(function (fetch) {
 	    fetch.init = redux_actions_1.createAction(FETCH.INIT);
@@ -104,6 +109,11 @@
 	    historyBackward.init = redux_actions_1.createAction(BACKWARD.INIT);
 	    historyBackward.fail = redux_actions_1.createAction(BACKWARD.FAIL);
 	})(historyBackward = exports.historyBackward || (exports.historyBackward = {}));
+	var historyForward;
+	(function (historyForward) {
+	    historyForward.init = redux_actions_1.createAction(FORWARD.INIT);
+	    historyForward.fail = redux_actions_1.createAction(FORWARD.FAIL);
+	})(historyForward = exports.historyForward || (exports.historyForward = {}));
 	exports.lookup = function (target) { return function (dispatch, getState) {
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
@@ -134,6 +144,22 @@
 	        dispatch(historyBackward.fail(err));
 	    });
 	};
+	exports.forward = function (dispatch, getState) {
+	    var history = getState().history;
+	    var target = nextTarget(history);
+	    dispatch(fetch.init(target));
+	    dispatch(status.init());
+	    dispatch(historyForward.init(target));
+	    util_1.fetch(target).then(function (res) {
+	        var result = parser_1.default(res);
+	        dispatch(fetch.succ(result));
+	        dispatch(status.succ());
+	    }, function (err) {
+	        dispatch(fetch.fail(err));
+	        dispatch(status.fail());
+	        dispatch(historyForward.fail(err));
+	    });
+	};
 	function lastTarget(history) {
 	    if (history.cursor >= 1) {
 	        return history.words[history.cursor - 1];
@@ -143,6 +169,15 @@
 	    }
 	}
 	exports.lastTarget = lastTarget;
+	function nextTarget(history) {
+	    if (history.cursor < history.words.length) {
+	        return history.words[history.cursor + 1];
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.nextTarget = nextTarget;
 
 
 /***/ },

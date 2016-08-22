@@ -50,6 +50,18 @@ export namespace BACKWARD {
     };
 }
 
+export type FORWARD = FORWARD.INIT | FORWARD.FAIL;
+export namespace FORWARD {
+    export const INIT = 'FORWARD.INIT';
+    export type INIT = string;
+
+    export const FAIL = 'FORWARD.FAIL';
+    export type FAIL = {
+        err: Error,
+        current: string
+    };
+}
+
 export namespace fetch {
     export const init = createAction<string, FETCH.INIT>(FETCH.INIT);
     export const succ = createAction<LanguageSection[], FETCH.SUCC>(FETCH.SUCC);
@@ -70,6 +82,11 @@ export namespace historyLookup {
 export namespace historyBackward {
     export const init = createAction<string, BACKWARD.INIT>(BACKWARD.INIT);
     export const fail = createAction<Error, BACKWARD.FAIL>(BACKWARD.FAIL);
+}
+
+export namespace historyForward {
+    export const init = createAction<string, FORWARD.INIT>(FORWARD.INIT);
+    export const fail = createAction<Error, FORWARD.FAIL>(FORWARD.FAIL);
 }
 
 export const lookup = (target: string) => (dispatch: any, getState: () => State) => {
@@ -111,9 +128,38 @@ export const backward = (dispatch: any, getState: () => State) => {
     )
 }
 
+export const forward = (dispatch: any, getState: () => State) => {
+    const history = getState().history;
+    const target = nextTarget(history);
+
+    dispatch(fetch.init(target));
+    dispatch(status.init());
+    dispatch(historyForward.init(target));
+    fetchEntry(target).then(
+        res => {
+            const result = parse(res);
+            dispatch(fetch.succ(result));
+            dispatch(status.succ());
+        },
+        err => {
+            dispatch(fetch.fail(err));
+            dispatch(status.fail());
+            dispatch(historyForward.fail(err));
+        }
+    )
+}
+
 export function lastTarget(history: History): string {
     if (history.cursor >= 1) {
         return history.words[history.cursor - 1];
+    } else {
+        return null;
+    }
+}
+
+export function nextTarget(history: History): string {
+    if (history.cursor < history.words.length) {
+        return history.words[history.cursor + 1];
     } else {
         return null;
     }

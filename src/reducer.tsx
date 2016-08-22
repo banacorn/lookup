@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { State, Entry, Status, History } from './types';
-import { FETCH, STATUS, LOOKUP, BACKWARD, lastTarget } from './actions';
+import { FETCH, STATUS, LOOKUP, BACKWARD, FORWARD, lastTarget } from './actions';
 import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
@@ -38,8 +38,6 @@ const history = handleActions<History, LOOKUP | BACKWARD>({
         const nextWord = state.words[state.cursor + 1];
         // history forked
         if (nextWord && nextWord !== action.payload) {
-            console.log("forked!", nextWord, action.payload);
-
             return {
                 words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
                 cursor: state.cursor + 1
@@ -61,6 +59,13 @@ const history = handleActions<History, LOOKUP | BACKWARD>({
     }),
     [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
         cursor: state.cursor + 1
+    }),
+
+    [FORWARD.INIT]: (state: History, action: Action<FORWARD.INIT>) => _.assign({}, state, {
+        cursor: state.cursor + 1
+    }),
+    [FORWARD.FAIL]: (state: History, action: Action<FORWARD.FAIL>) => _.assign({}, state, {
+        cursor: state.cursor - 1
     })
 }, defaultState.history);
 
