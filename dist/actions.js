@@ -8,13 +8,18 @@ var LOOKUP;
     LOOKUP.SUCCESS = 'LOOKUP.SUCCESS';
     LOOKUP.FAILURE = 'LOOKUP.FAILURE';
 })(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
-exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST, function (word) { return ({ word: word }); });
-exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS, function (body) { return ({ body: body }); });
-exports.error = redux_actions_1.createAction(LOOKUP.FAILURE, function (err) { return ({ err: err }); });
-exports.search = function (word) { return function (dispatch) {
-    dispatch(exports.lookup(word));
-    util_1.fetch(word).then(function (res) {
-        dispatch(exports.render(parser_1.default(res)));
-    }, function (err) { return dispatch(exports.lookup(word)); });
+var NAV;
+(function (NAV) {
+    NAV.SEARCH = 'NAV.SEARCH';
+    NAV.BACKWARD = 'NAV.BACKWARD';
+})(NAV = exports.NAV || (exports.NAV = {}));
+exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST);
+exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS);
+exports.error = redux_actions_1.createAction(LOOKUP.FAILURE);
+exports.navSearch = redux_actions_1.createAction(NAV.SEARCH);
+exports.search = function (target) { return function (dispatch) {
+    dispatch(exports.navSearch(target));
+    dispatch(exports.lookup(target));
+    util_1.fetch(target).then(function (res) { return dispatch(exports.render(parser_1.default(res))); }, function (err) { return dispatch(exports.error(err)); });
 }; };
 //# sourceMappingURL=actions.js.map

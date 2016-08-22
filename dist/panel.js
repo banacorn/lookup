@@ -16844,15 +16844,33 @@
 	    LOOKUP.SUCCESS = 'LOOKUP.SUCCESS';
 	    LOOKUP.FAILURE = 'LOOKUP.FAILURE';
 	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
-	exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST, function (word) { return ({ word: word }); });
-	exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS, function (body) { return ({ body: body }); });
-	exports.error = redux_actions_1.createAction(LOOKUP.FAILURE, function (err) { return ({ err: err }); });
-	exports.search = function (word) { return function (dispatch) {
-	    dispatch(exports.lookup(word));
-	    util_1.fetch(word).then(function (res) {
-	        dispatch(exports.render(parser_1.default(res)));
-	    }, function (err) { return dispatch(exports.lookup(word)); });
+	var NAV;
+	(function (NAV) {
+	    // akin to random walk
+	    NAV.SEARCH = 'NAV.SEARCH';
+	    NAV.BACKWARD = 'NAV.BACKWARD';
+	})(NAV = exports.NAV || (exports.NAV = {}));
+	// lookup
+	exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST);
+	exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS);
+	exports.error = redux_actions_1.createAction(LOOKUP.FAILURE);
+	// navigation
+	exports.navSearch = redux_actions_1.createAction(NAV.SEARCH);
+	exports.search = function (target) { return function (dispatch) {
+	    dispatch(exports.navSearch(target));
+	    dispatch(exports.lookup(target));
+	    util_1.fetch(target).then(function (res) { return dispatch(exports.render(parser_1.default(res))); }, function (err) { return dispatch(exports.error(err)); });
 	}; };
+	// export const backward = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE, err => ({ err }));
+	// export const backward = (word: string) => (dispatch: any) => {
+	//     dispatch(lookup(word));
+	//     fetch(word).then(
+	//         res => {
+	//             dispatch(render(parse(res)))
+	//         },
+	//         err => dispatch(lookup(word))
+	//     );
+	// }
 
 
 /***/ },
@@ -27126,36 +27144,37 @@
 	var defaultState = {
 	    word: '',
 	    body: [],
-	    nav: {
-	        target: null,
-	        status: 'pending',
-	        history: []
-	    }
+	    status: 'pending',
+	    history: []
 	};
+	function lastTarget(history) {
+	    if (history.length >= 2) {
+	        return history[history.length - 2];
+	    }
+	    else {
+	        return null;
+	    }
+	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
 	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
-	        nav: {
-	            word: action.payload.word,
-	            status: 'pending',
-	            history: _.concat(state.nav.history, [action.payload.word])
-	        }
+	        // display the target right away
+	        word: action.payload,
+	        status: 'pending'
 	    }); },
 	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
-	        word: state.nav.target,
-	        body: action.payload.body,
-	        nav: {
-	            target: state.nav.target,
-	            status: 'succeed',
-	            history: state.nav.history
-	        }
+	        body: action.payload,
+	        status: 'succeed'
 	    }); },
 	    _a[actions_1.LOOKUP.FAILURE] = function (state, action) { return _.assign({}, state, {
-	        nav: {
-	            target: state.nav.target,
-	            status: 'failed',
-	            history: _.initial(state.nav.history)
-	        }
+	        // rewind
+	        word: lastTarget(state.history),
+	        status: 'failed',
+	        history: _.initial(state.history)
+	    }); },
+	    // navigation
+	    _a[actions_1.NAV.SEARCH] = function (state, action) { return _.assign({}, state, {
+	        history: _.concat(state.history, action.payload)
 	    }); },
 	    _a
 	), defaultState);
@@ -27177,9 +27196,10 @@
 	var react_redux_1 = __webpack_require__(21);
 	var actions_1 = __webpack_require__(3);
 	;
-	var mapStateToProps = function (state) {
+	var mapStateToProps = function (_a) {
+	    var status = _a.status, history = _a.history;
 	    return {
-	        nav: state.nav
+	        status: status, history: history
 	    };
 	};
 	var mapDispatchToProps = function (dispatch) {
@@ -27198,10 +27218,10 @@
 	        _super.apply(this, arguments);
 	    }
 	    Nav.prototype.render = function () {
-	        var _a = this.props, nav = _a.nav, onSearch = _a.onSearch;
+	        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch;
 	        return (React.createElement("nav", null, 
-	            React.createElement("p", null, nav.word + ": " + nav.status), 
-	            React.createElement("p", null, nav.history), 
+	            React.createElement("p", null, _.last(history) + ": " + status), 
+	            React.createElement("p", null, history.toString()), 
 	            React.createElement("form", {onSubmit: onSearch}, 
 	                React.createElement("input", {id: 'search-box', type: 'text'})
 	            )));

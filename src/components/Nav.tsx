@@ -1,16 +1,20 @@
 import * as React from 'react'
 import { connect } from 'react-redux';
-import { State, NavState } from '../types'
+import { State } from '../types'
 import { search } from '../actions'
 
 interface NavProps extends React.Props<any> {
-    nav: NavState,
+    status: 'pending' | 'succeed' | 'failed',
+
+    // history
+    history: string[],
+
     onSearch: (e: Event) => void
 };
 
-const mapStateToProps = (state: State) => {
+const mapStateToProps = ({ status, history }: State) => {
     return {
-        nav: state.nav
+        status, history
     };
 }
 
@@ -27,11 +31,11 @@ const mapDispatchToProps = (dispatch: any) => {
 
 class Nav extends React.Component<NavProps, void> {
     render() {
-        const { nav, onSearch } = this.props;
+        const { status, history, onSearch } = this.props;
         return (
             <nav>
-                <p>{`${nav.word}: ${nav.status}`}</p>
-                <p>{ nav.history }</p>
+                <p>{`${_.last(history)}: ${status}`}</p>
+                <p>{ history.toString() }</p>
                 <form onSubmit={onSearch}>
                     <input id='search-box' type='text'/>
                 </form>

@@ -8,9 +8,10 @@ var React = require('react');
 var react_redux_1 = require('react-redux');
 var actions_1 = require('../actions');
 ;
-var mapStateToProps = function (state) {
+var mapStateToProps = function (_a) {
+    var status = _a.status, history = _a.history;
     return {
-        nav: state.nav
+        status: status, history: history
     };
 };
 var mapDispatchToProps = function (dispatch) {
@@ -29,10 +30,10 @@ var Nav = (function (_super) {
         _super.apply(this, arguments);
     }
     Nav.prototype.render = function () {
-        var _a = this.props, nav = _a.nav, onSearch = _a.onSearch;
+        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch;
         return (React.createElement("nav", null, 
-            React.createElement("p", null, nav.word + ": " + nav.status), 
-            React.createElement("p", null, nav.history), 
+            React.createElement("p", null, _.last(history) + ": " + status), 
+            React.createElement("p", null, history.toString()), 
             React.createElement("form", {onSubmit: onSearch}, 
                 React.createElement("input", {id: 'search-box', type: 'text'})
             )));

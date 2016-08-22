@@ -1,41 +1,44 @@
 import * as _ from 'lodash';
 import { State } from './types';
-import { LOOKUP } from './actions';
+import { LOOKUP, NAV } from './actions';
 import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
 const defaultState: State = {
     word: '',
     body: [],
-    nav: {
-        target: null,
-        status: 'pending',
-        history: []
+
+    status: 'pending',
+    history: []
+}
+
+function lastTarget(history: string[]): string {
+    if (history.length >= 2) {
+        return history[history.length - 2];
+    } else {
+        return null;
     }
 }
 
-export default handleActions<State, LOOKUP>({
+export default handleActions<State, LOOKUP | NAV>({
     [LOOKUP.REQUEST]: (state: State, action: Action<LOOKUP.REQUEST>) => _.assign({}, state, {
-        nav: {
-            word: action.payload.word,
-            status: 'pending',
-            history: _.concat(state.nav.history, [action.payload.word])
-        }
+        // display the target right away
+        word: action.payload,
+        status: 'pending'
     }),
     [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
-        word: state.nav.target,
-        body: action.payload.body,
-        nav: {
-            target: state.nav.target,
-            status: 'succeed',
-            history: state.nav.history
-        }
+        body: action.payload,
+        status: 'succeed'
     }),
     [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
-        nav: {
-            target: state.nav.target,
-            status: 'failed',
-            history: _.initial(state.nav.history)
-        }
+        // rewind
+        word: lastTarget(state.history),
+        status: 'failed',
+        history: _.initial(state.history)
+    }),
+
+    // navigation
+    [NAV.SEARCH]: (state: State, action: Action<NAV.SEARCH>) => _.assign({}, state, {
+        history: _.concat(state.history, action.payload)
     })
 }, defaultState);

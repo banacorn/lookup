@@ -4,11 +4,6 @@ export type State = {
     body: LanguageSection[],
 
     // navigation
-    nav: NavState
-}
-
-export type NavState = {
-    target: string,
     status: 'pending' | 'succeed' | 'failed',
 
     // history
