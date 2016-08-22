@@ -4,34 +4,33 @@ import { State, Section, BlockElem, LanguageSection } from './types';
 import parse from './chrome/parser';
 import { fetch } from './util';
 
-export const JUMP = 'JUMP';
-export type JUMP = {
-    word: string
-};
-export const PARSE_ERROR = 'PARSE_ERROR';
-export type PARSE_ERROR = {
-    error: any
-};
-export const RENDER = 'RENDER';
-export type RENDER = {
-    body: LanguageSection[]
-};
+export type LOOKUP = LOOKUP.REQUEST | LOOKUP.SUCCESS | LOOKUP.FAILURE;
+export namespace LOOKUP {
+    export const REQUEST = 'LOOKUP.REQUEST';
+    export type REQUEST = {
+        word: string
+    };
 
-export const SEARCH_ERROR = 'SEARCH_ERROR';
-export type SEARCH_ERROR = {
-    err: Error
-};
+    export const SUCCESS = 'LOOKUP.SUCCESS';
+    export type SUCCESS = {
+        body: LanguageSection[]
+    };
 
-export const jump = createAction<string, JUMP>(JUMP, word => ({ word }));
-export const parseError = createAction<any, PARSE_ERROR>(PARSE_ERROR, error => ({ error }));
-export const render = createAction<LanguageSection[], RENDER>(RENDER, body => ({ body }));
-export const searchError = createAction<Error, SEARCH_ERROR>(SEARCH_ERROR, err => ({ err }));
+    export const FAILURE = 'LOOKUP.FAILURE';
+    export type FAILURE = {
+        err: Error
+    };
+}
+
+export const lookup = createAction<string, LOOKUP.REQUEST>(LOOKUP.REQUEST, word => ({ word }));
+export const render = createAction<LanguageSection[], LOOKUP.SUCCESS>(LOOKUP.SUCCESS, body => ({ body }));
+export const error = createAction<Error, LOOKUP.FAILURE>(LOOKUP.FAILURE, err => ({ err }));
+
 export const search = (word: string) => (dispatch: any) => fetch(word)
     .then(
         res => {
-            dispatch(jump(word))
-            // const blockSections: Section<BlockElem[]> = parse(res);
+            dispatch(lookup(word))
             dispatch(render(parse(res)))
         },
-        err => dispatch(searchError(err))
+        err => dispatch(lookup(word))
     )

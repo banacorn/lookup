@@ -16838,20 +16838,20 @@
 	var redux_actions_1 = __webpack_require__(4);
 	var parser_1 = __webpack_require__(10);
 	var util_1 = __webpack_require__(15);
-	exports.JUMP = 'JUMP';
-	exports.PARSE_ERROR = 'PARSE_ERROR';
-	exports.RENDER = 'RENDER';
-	exports.SEARCH_ERROR = 'SEARCH_ERROR';
-	exports.jump = redux_actions_1.createAction(exports.JUMP, function (word) { return ({ word: word }); });
-	exports.parseError = redux_actions_1.createAction(exports.PARSE_ERROR, function (error) { return ({ error: error }); });
-	exports.render = redux_actions_1.createAction(exports.RENDER, function (body) { return ({ body: body }); });
-	exports.searchError = redux_actions_1.createAction(exports.SEARCH_ERROR, function (err) { return ({ err: err }); });
+	var LOOKUP;
+	(function (LOOKUP) {
+	    LOOKUP.REQUEST = 'LOOKUP.REQUEST';
+	    LOOKUP.SUCCESS = 'LOOKUP.SUCCESS';
+	    LOOKUP.FAILURE = 'LOOKUP.FAILURE';
+	})(LOOKUP = exports.LOOKUP || (exports.LOOKUP = {}));
+	exports.lookup = redux_actions_1.createAction(LOOKUP.REQUEST, function (word) { return ({ word: word }); });
+	exports.render = redux_actions_1.createAction(LOOKUP.SUCCESS, function (body) { return ({ body: body }); });
+	exports.error = redux_actions_1.createAction(LOOKUP.FAILURE, function (err) { return ({ err: err }); });
 	exports.search = function (word) { return function (dispatch) { return util_1.fetch(word)
 	    .then(function (res) {
-	    dispatch(exports.jump(word));
-	    // const blockSections: Section<BlockElem[]> = parse(res);
+	    dispatch(exports.lookup(word));
 	    dispatch(exports.render(parser_1.default(res)));
-	}, function (err) { return dispatch(exports.searchError(err)); }); }; };
+	}, function (err) { return dispatch(exports.lookup(word)); }); }; };
 
 
 /***/ },
@@ -19353,17 +19353,17 @@
 	            xhr.open('GET', "http://localhost:4000/search/" + word);
 	        else
 	            xhr.open('GET', 'https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes', true);
-	        xhr.onload = function () {
+	        xhr.addEventListener('load', function (e) {
 	            if (xhr.status === 200) {
 	                resolve(xhr.responseText);
 	            }
 	            else {
 	                reject(new Error(xhr.statusText));
 	            }
-	        };
-	        xhr.onerror = function () {
-	            reject(new Error("Network error"));
-	        };
+	        });
+	        xhr.addEventListener('error', function (e) {
+	            reject(new Error("Network Error"));
+	        });
 	        xhr.send();
 	    });
 	}
@@ -27147,10 +27147,12 @@
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = redux_actions_1.handleActions((_a = {},
-	    _a[actions_1.JUMP] = function (state, action) { return _.assign({}, state, {
+	    _a[actions_1.LOOKUP.REQUEST] = function (state, action) { return _.assign({}, state, {
 	        word: action.payload.word
 	    }); },
-	    _a[actions_1.RENDER] = handleRender,
+	    _a[actions_1.LOOKUP.SUCCESS] = function (state, action) { return _.assign({}, state, {
+	        body: action.payload.body
+	    }); },
 	    _a
 	), defaultState);
 	var _a;

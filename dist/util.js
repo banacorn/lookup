@@ -8,17 +8,17 @@ function fetch(word) {
             xhr.open('GET', "http://localhost:4000/search/" + word);
         else
             xhr.open('GET', 'https://en.wiktionary.org/w/index.php?title=' + word + '&printable=yes', true);
-        xhr.onload = function () {
+        xhr.addEventListener('load', function (e) {
             if (xhr.status === 200) {
                 resolve(xhr.responseText);
             }
             else {
                 reject(new Error(xhr.statusText));
             }
-        };
-        xhr.onerror = function () {
-            reject(new Error("Network error"));
-        };
+        });
+        xhr.addEventListener('error', function (e) {
+            reject(new Error("Network Error"));
+        });
         xhr.send();
     });
 }

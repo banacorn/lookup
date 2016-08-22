@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { State } from './types';
-import { JUMP, RENDER } from './actions';
+import { LOOKUP } from './actions';
 import { combineReducers } from 'redux';
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 
@@ -9,7 +9,7 @@ const defaultState: State = {
     body: []
 }
 
-function handleRender(state: State, action: Action<RENDER>): State {
+function handleRender(state: State, action: Action<LOOKUP.SUCCESS>): State {
     return _.assign({}, state, {
         body: action.payload.body
     });
@@ -17,9 +17,14 @@ function handleRender(state: State, action: Action<RENDER>): State {
 
 
 
-export default handleActions<State, JUMP | RENDER>({
-    [JUMP]: (state: State, action: Action<JUMP>) => _.assign({}, state, {
+export default handleActions<State, LOOKUP>({
+    [LOOKUP.REQUEST]: (state: State, action: Action<LOOKUP.REQUEST>) => _.assign({}, state, {
         word: action.payload.word
     }),
-    [RENDER]: handleRender
+    [LOOKUP.SUCCESS]: (state: State, action: Action<LOOKUP.SUCCESS>) => _.assign({}, state, {
+        body: action.payload.body
+    })
+    // [LOOKUP.FAILURE]: (state: State, action: Action<LOOKUP.FAILURE>) => _.assign({}, state, {
+    //     word: action.payload.word
+    // }),
 }, defaultState);
