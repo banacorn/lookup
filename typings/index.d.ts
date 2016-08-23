@@ -1,5 +1,6 @@
 /// <reference path="globals/bluebird/index.d.ts" />
 /// <reference path="globals/colors/index.d.ts" />
+/// <reference path="globals/eventemitter3/index.d.ts" />
 /// <reference path="globals/lodash/index.d.ts" />
 /// <reference path="globals/node/index.d.ts" />
 /// <reference path="globals/react-dom/index.d.ts" />

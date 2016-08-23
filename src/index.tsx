@@ -33,7 +33,8 @@ if (inWebpage) {
         name: 'woerterbuch-panel'
     });
     backgroundConn.postMessage({
-        tabId: chrome.devtools.inspectedWindow.tabId
+        type: 'initialize',
+        id: chrome.devtools.inspectedWindow.tabId
     });
     backgroundConn.onMessage.addListener(store.dispatch);
 }

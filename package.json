@@ -17,13 +17,14 @@
     "url": "https://github.com/banacorn/lookup/issues"
   },
   "scripts": {
-      "watch": "webpack --progress --colors --watch",
-      "server": "node dist/server.js",
-      "test": "node dist/test.js Eisen"
+    "watch": "webpack --progress --colors --watch",
+    "server": "node dist/server.js",
+    "test": "node dist/test.js Eisen"
   },
   "homepage": "https://github.com/banacorn/lookup#readme",
   "dependencies": {
     "bluebird": "^3.4.1",
+    "eventemitter3": "^1.2.0",
     "lodash": "^4.15.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",

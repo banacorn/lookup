@@ -1,10 +1,38 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var _ = require('lodash');
-var Operator = (function () {
+var EventEmitter = require('eventemitter3');
+var EVENT;
+(function (EVENT) {
+    var PANEL;
+    (function (PANEL) {
+        PANEL.CONNECTED = 'PANEL_CONNECTED';
+        PANEL.DISCONNECTED = 'PANEL_DISCONNECTED';
+        PANEL.MESSAGE = 'PANEL_MESSAGE';
+    })(PANEL = EVENT.PANEL || (EVENT.PANEL = {}));
+    var CONTENT;
+    (function (CONTENT) {
+        CONTENT.CONNECTED = 'CONTENT_CONNECTED';
+        CONTENT.INJECTED = 'CONTENT_INJECTED';
+        CONTENT.REINJECTED = 'CONTENT_REINJECTED';
+        CONTENT.DISCONNECTED = 'CONTENT_DISCONNECTED';
+        CONTENT.MESSAGE = 'CONTENT_MESSAGE';
+    })(CONTENT = EVENT.CONTENT || (EVENT.CONTENT = {}));
+    var TAB;
+    (function (TAB) {
+        TAB.CLOSED = 'TAB_CLOSED';
+    })(TAB = EVENT.TAB || (EVENT.TAB = {}));
+})(EVENT = exports.EVENT || (exports.EVENT = {}));
+var Operator = (function (_super) {
+    __extends(Operator, _super);
     function Operator() {
         var _this = this;
+        _super.call(this);
         this.switchboard = [];
-        this.onMessage = function () { };
         chrome.runtime.onConnect.addListener(function (connection) {
             switch (connection.name) {
                 case 'woerterbuch-panel':
@@ -16,40 +44,42 @@ var Operator = (function () {
             }
         });
         chrome.tabs.onRemoved.addListener(function (id) {
-            console.info(id, 'tab X');
+            _this.emit(EVENT.TAB.CLOSED, id);
             _this.markTabClosed(id);
         });
     }
-    Operator.prototype.setListener = function (listener) {
-        this.onMessage = listener;
-    };
     Operator.prototype.inject = function (id) {
         var _this = this;
         chrome.tabs.get(id, function () {
             chrome.tabs.executeScript(id, { file: './dist/injected.js' });
+            _this.emit(EVENT.CONTENT.INJECTED, id);
             _this.injectedID = id;
         });
     };
     Operator.prototype.reinject = function (id) {
-        console.info('attemping to reinject');
         var connection = this.getConnection(id);
         if (connection) {
             if (connection.upstream && !connection.downstream && !connection.tabClosed) {
                 this.inject(id);
-                console.info('reinjected!');
+                this.emit(EVENT.CONTENT.REINJECTED, id);
             }
         }
     };
     Operator.prototype.handleUpstreamConnection = function (connection) {
         var _this = this;
         var onMessage = function (message) {
-            _this.setUpstream(message.tabId, connection, function () {
-                connection.onMessage.removeListener(onMessage);
-                connection.onDisconnect.removeListener(onDisconnect);
-            });
-            connection.id = message.tabId;
-            console.log(connection.id, 'upstream O');
-            _this.inject(message.tabId);
+            if (message.type === 'initialize') {
+                _this.setUpstream(message.id, connection, function () {
+                    connection.onMessage.removeListener(onMessage);
+                    connection.onDisconnect.removeListener(onDisconnect);
+                });
+                connection.id = message.id;
+                _this.emit(EVENT.PANEL.CONNECTED, connection.id);
+                _this.inject(message.id);
+            }
+            else {
+                _this.emit(EVENT.PANEL.MESSAGE, connection.id, message.payload);
+            }
         };
         var onDisconnect = function () {
             _this.killUpstream(connection.id);
@@ -60,7 +90,9 @@ var Operator = (function () {
     Operator.prototype.handleDownstreamConnection = function (connection) {
         var _this = this;
         var id = this.injectedID;
-        var onMessage = function (word) { return _this.onMessage(function (msg) { return _this.messageUpstream(id, msg); }, word); };
+        var onMessage = function (message) {
+            _this.emit(EVENT.CONTENT.MESSAGE, id, message);
+        };
         var onDisconnect = function () {
             _this.killDownstream(id);
             _this.reinject(id);
@@ -69,7 +101,7 @@ var Operator = (function () {
             connection.onMessage.removeListener(onMessage);
             connection.onMessage.removeListener(onDisconnect);
         });
-        console.log(id, 'downstream O');
+        this.emit(EVENT.CONTENT.CONNECTED, id);
         connection.onMessage.addListener(onMessage);
         connection.onDisconnect.addListener(onDisconnect);
     };
@@ -123,24 +155,20 @@ var Operator = (function () {
         }
     };
     Operator.prototype.killUpstream = function (id) {
-        console.info(id, 'removing upstream');
-        this.showConnection(id);
         var existing = _.findIndex(this.switchboard, ['id', id]);
         if (existing !== -1) {
             this.switchboard[existing].upstream.destructor();
             this.switchboard[existing].upstream = null;
-            console.info(id, 'upstream XXX');
+            this.emit(EVENT.PANEL.DISCONNECTED, id);
             this.messageDownstream(id, 'decommission');
         }
     };
     Operator.prototype.killDownstream = function (id) {
-        console.info(id, "removing downstream");
-        this.showConnection(id);
         var existing = _.findIndex(this.switchboard, ['id', id]);
         if (existing !== -1) {
             this.switchboard[existing].downstream.destructor();
             this.switchboard[existing].downstream = null;
-            console.info(id, 'downstream XXX');
+            this.emit(EVENT.CONTENT.DISCONNECTED, id);
         }
     };
     Operator.prototype.messageUpstream = function (id, message) {
@@ -155,45 +183,8 @@ var Operator = (function () {
             connection.downstream.connection.postMessage(message);
         }
     };
-    Operator.prototype.showConnection = function (id) {
-        var existing = _.findIndex(this.switchboard, ['id', id]);
-        var upConn = false;
-        var upDstr = false;
-        var downConn = false;
-        var downDstr = false;
-        if (existing !== -1) {
-            if (this.switchboard[existing].upstream) {
-                if (this.switchboard[existing].upstream.connection)
-                    upConn = true;
-                if (this.switchboard[existing].upstream.destructor)
-                    upDstr = true;
-            }
-            if (this.switchboard[existing].downstream) {
-                if (this.switchboard[existing].downstream.connection)
-                    downConn = true;
-                if (this.switchboard[existing].downstream.destructor)
-                    downDstr = true;
-            }
-        }
-        var message = '';
-        message += 'up: ';
-        if (upConn) {
-            message += '📶 ';
-        }
-        if (upConn) {
-            message += '💣 ';
-        }
-        message += ' down: ';
-        if (downConn) {
-            message += '📶 ';
-        }
-        if (downDstr) {
-            message += '💣 ';
-        }
-        console.info(message);
-    };
     return Operator;
-}());
+}(EventEmitter));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new Operator;
 //# sourceMappingURL=operator.js.map
