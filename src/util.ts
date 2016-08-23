@@ -1,4 +1,6 @@
 import * as Promise from 'bluebird'
+import parse from './chrome/parser';
+import { LanguageSection } from './types';
 
 export const inWebpage = chrome.panels === undefined && chrome.tabs === undefined && chrome.devtools === undefined;
 
@@ -23,4 +25,8 @@ export function fetch(word: string): Promise<string> {
 
         xhr.send();
     });
+}
+
+export function fetchEntry(word: string): Promise<LanguageSection[]> {
+    return fetch(word).then(res => parse(res))
 }

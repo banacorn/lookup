@@ -1,5 +1,6 @@
 "use strict";
 var Promise = require('bluebird');
+var parser_1 = require('./chrome/parser');
 exports.inWebpage = chrome.panels === undefined && chrome.tabs === undefined && chrome.devtools === undefined;
 function fetch(word) {
     return new Promise(function (resolve, reject) {
@@ -23,4 +24,8 @@ function fetch(word) {
     });
 }
 exports.fetch = fetch;
+function fetchEntry(word) {
+    return fetch(word).then(function (res) { return parser_1.default(res); });
+}
+exports.fetchEntry = fetchEntry;
 //# sourceMappingURL=util.js.map

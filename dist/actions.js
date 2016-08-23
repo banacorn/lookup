@@ -1,6 +1,5 @@
 "use strict";
 var redux_actions_1 = require('redux-actions');
-var parser_1 = require('./chrome/parser');
 var util_1 = require('./util');
 var FETCH;
 (function (FETCH) {
@@ -60,9 +59,8 @@ exports.lookup = function (target) { return function (dispatch, getState) {
     dispatch(fetch.init(target));
     dispatch(status.init());
     dispatch(historyLookup.init(target));
-    util_1.fetch(target).then(function (res) {
-        var result = parser_1.default(res);
-        dispatch(fetch.succ(result));
+    util_1.fetchEntry(target).then(function (res) {
+        dispatch(fetch.succ(res));
         dispatch(status.succ());
     }, function (err) {
         dispatch(fetch.fail(err));
@@ -76,9 +74,8 @@ exports.backward = function (dispatch, getState) {
     dispatch(fetch.init(target));
     dispatch(status.init());
     dispatch(historyBackward.init(target));
-    util_1.fetch(target).then(function (res) {
-        var result = parser_1.default(res);
-        dispatch(fetch.succ(result));
+    util_1.fetchEntry(target).then(function (res) {
+        dispatch(fetch.succ(res));
         dispatch(status.succ());
     }, function (err) {
         dispatch(fetch.fail(err));
@@ -92,9 +89,8 @@ exports.forward = function (dispatch, getState) {
     dispatch(fetch.init(target));
     dispatch(status.init());
     dispatch(historyForward.init(target));
-    util_1.fetch(target).then(function (res) {
-        var result = parser_1.default(res);
-        dispatch(fetch.succ(result));
+    util_1.fetchEntry(target).then(function (res) {
+        dispatch(fetch.succ(res));
         dispatch(status.succ());
     }, function (err) {
         dispatch(fetch.fail(err));

@@ -1,8 +1,7 @@
 import * as Promise from 'bluebird'
 import { createAction, handleAction, handleActions, Action } from 'redux-actions';
 import { State, Section, BlockElem, LanguageSection, History } from './types';
-import parse from './chrome/parser';
-import { fetch as fetchEntry } from './util';
+import { fetchEntry } from './util';
 
 
 export type FETCH = FETCH.INIT | FETCH.SUCC | FETCH.FAIL;
@@ -95,8 +94,7 @@ export const lookup = (target: string) => (dispatch: any, getState: () => State)
     dispatch(historyLookup.init(target));
     fetchEntry(target).then(
         res => {
-            const result = parse(res);
-            dispatch(fetch.succ(result));
+            dispatch(fetch.succ(res));
             dispatch(status.succ());
         },
         err => {
@@ -116,8 +114,7 @@ export const backward = (dispatch: any, getState: () => State) => {
     dispatch(historyBackward.init(target));
     fetchEntry(target).then(
         res => {
-            const result = parse(res);
-            dispatch(fetch.succ(result));
+            dispatch(fetch.succ(res));
             dispatch(status.succ());
         },
         err => {
@@ -137,8 +134,7 @@ export const forward = (dispatch: any, getState: () => State) => {
     dispatch(historyForward.init(target));
     fetchEntry(target).then(
         res => {
-            const result = parse(res);
-            dispatch(fetch.succ(result));
+            dispatch(fetch.succ(res));
             dispatch(status.succ());
         },
         err => {

@@ -215,7 +215,7 @@ function parseInlineElem(node: Node): InlineElem[] {
                     }]
                 }
             }
-        
+
             // else external
             return <InlineElem[]>[{
                 kind: 'a',

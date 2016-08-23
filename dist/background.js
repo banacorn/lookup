@@ -58,7 +58,6 @@
 
 	"use strict";
 	var redux_actions_1 = __webpack_require__(2);
-	var parser_1 = __webpack_require__(8);
 	var util_1 = __webpack_require__(15);
 	var FETCH;
 	(function (FETCH) {
@@ -118,9 +117,8 @@
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
 	    dispatch(historyLookup.init(target));
-	    util_1.fetch(target).then(function (res) {
-	        var result = parser_1.default(res);
-	        dispatch(fetch.succ(result));
+	    util_1.fetchEntry(target).then(function (res) {
+	        dispatch(fetch.succ(res));
 	        dispatch(status.succ());
 	    }, function (err) {
 	        dispatch(fetch.fail(err));
@@ -134,9 +132,8 @@
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
 	    dispatch(historyBackward.init(target));
-	    util_1.fetch(target).then(function (res) {
-	        var result = parser_1.default(res);
-	        dispatch(fetch.succ(result));
+	    util_1.fetchEntry(target).then(function (res) {
+	        dispatch(fetch.succ(res));
 	        dispatch(status.succ());
 	    }, function (err) {
 	        dispatch(fetch.fail(err));
@@ -150,9 +147,8 @@
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
 	    dispatch(historyForward.init(target));
-	    util_1.fetch(target).then(function (res) {
-	        var result = parser_1.default(res);
-	        dispatch(fetch.succ(result));
+	    util_1.fetchEntry(target).then(function (res) {
+	        dispatch(fetch.succ(res));
 	        dispatch(status.succ());
 	    }, function (err) {
 	        dispatch(fetch.fail(err));
@@ -19427,6 +19423,7 @@
 
 	"use strict";
 	var Promise = __webpack_require__(16);
+	var parser_1 = __webpack_require__(8);
 	exports.inWebpage = chrome.panels === undefined && chrome.tabs === undefined && chrome.devtools === undefined;
 	function fetch(word) {
 	    return new Promise(function (resolve, reject) {
@@ -19450,6 +19447,10 @@
 	    });
 	}
 	exports.fetch = fetch;
+	function fetchEntry(word) {
+	    return fetch(word).then(function (res) { return parser_1.default(res); });
+	}
+	exports.fetchEntry = fetchEntry;
 
 
 /***/ },
