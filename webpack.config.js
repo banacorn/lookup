@@ -1,6 +1,7 @@
 var path = require("path");
 var webpack = require("webpack");
 var nodeExternals = require('webpack-node-externals');
+// var css = require("!raw!less!./file.less");
 
 module.exports = [{
     name: "browser",
@@ -26,7 +27,13 @@ module.exports = [{
     module: {
         loaders: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
-            { test: /\.tsx?$/, loader: "ts-loader" }
+            { test: /\.tsx?$/, loader: "ts-loader" },
+
+            {
+                test: /\.less$/,
+                loader: "style!css!autoprefixer!less"
+            },
+
         ],
 
         preLoaders: [

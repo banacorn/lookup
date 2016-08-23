@@ -7,12 +7,13 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require('react');
 var react_redux_1 = require('react-redux');
 var actions_1 = require('../actions');
+require('../style/main.less');
 ;
 var mapStateToProps = function (_a) {
-    var status = _a.status, history = _a.history;
+    var status = _a.status, entry = _a.entry;
     return {
-        status: status,
-        history: history.present
+        word: entry.word,
+        status: status
     };
 };
 var mapDispatchToProps = function (dispatch) {
@@ -37,13 +38,15 @@ var Nav = (function (_super) {
         _super.apply(this, arguments);
     }
     Nav.prototype.render = function () {
-        var _a = this.props, status = _a.status, history = _a.history, onSearch = _a.onSearch, onBackward = _a.onBackward, onForward = _a.onForward;
-        return (React.createElement("nav", null, 
-            React.createElement("button", {onClick: onBackward}, "backward"), 
-            React.createElement("button", {onClick: onForward}, "forward"), 
-            React.createElement("p", null, _.last(history.words) + ": " + status), 
-            React.createElement("p", null, history.words.toString()), 
-            React.createElement("p", null, history.cursor), 
+        var _a = this.props, word = _a.word, status = _a.status, onSearch = _a.onSearch, onBackward = _a.onBackward, onForward = _a.onForward;
+        return (React.createElement("nav", {id: 'nav'}, 
+            React.createElement("button", {onClick: onBackward}, 
+                React.createElement("i", {className: "fa fa-chevron-left", "aria-hidden": "true"})
+            ), 
+            React.createElement("button", {onClick: onForward}, 
+                React.createElement("i", {className: "fa fa-chevron-right", "aria-hidden": "true"})
+            ), 
+            React.createElement("h1", null, word), 
             React.createElement("form", {onSubmit: onSearch}, 
                 React.createElement("input", {id: 'search-box', type: 'text'})
             )));
