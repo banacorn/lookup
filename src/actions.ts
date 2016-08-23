@@ -100,14 +100,14 @@ export const lookup = (target: string) => (dispatch: any, getState: () => State)
         err => {
             dispatch(fetch.fail(err));
             dispatch(status.fail());
-             dispatch(historyLookup.fail(err));
+            dispatch(historyLookup.fail(err));
         }
     );
 }
 
 export const backward = (dispatch: any, getState: () => State) => {
     const history = getState().history;
-    const target = lastTarget(history);
+    const target = lastTarget(history.present);
 
     dispatch(fetch.init(target));
     dispatch(status.init());
@@ -127,7 +127,7 @@ export const backward = (dispatch: any, getState: () => State) => {
 
 export const forward = (dispatch: any, getState: () => State) => {
     const history = getState().history;
-    const target = nextTarget(history);
+    const target = nextTarget(history.present);
 
     dispatch(fetch.init(target));
     dispatch(status.init());

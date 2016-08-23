@@ -11,7 +11,8 @@ var actions_1 = require('../actions');
 var mapStateToProps = function (_a) {
     var status = _a.status, history = _a.history;
     return {
-        status: status, history: history
+        status: status,
+        history: history.present
     };
 };
 var mapDispatchToProps = function (dispatch) {

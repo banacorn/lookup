@@ -16,7 +16,8 @@ interface NavProps extends React.Props<any> {
 
 const mapStateToProps = ({ status, history }: State) => {
     return {
-        status, history
+        status,
+        history: history.present
     };
 }
 

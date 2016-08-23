@@ -5,7 +5,10 @@ export type State = {
     status: Status,
 
     // history
-    history: History
+    history: {
+        present: History,
+        past: History
+    }
 }
 
 export type Entry = {

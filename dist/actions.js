@@ -70,7 +70,7 @@ exports.lookup = function (target) { return function (dispatch, getState) {
 }; };
 exports.backward = function (dispatch, getState) {
     var history = getState().history;
-    var target = lastTarget(history);
+    var target = lastTarget(history.present);
     dispatch(fetch.init(target));
     dispatch(status.init());
     dispatch(historyBackward.init(target));
@@ -85,7 +85,7 @@ exports.backward = function (dispatch, getState) {
 };
 exports.forward = function (dispatch, getState) {
     var history = getState().history;
-    var target = nextTarget(history);
+    var target = nextTarget(history.present);
     dispatch(fetch.init(target));
     dispatch(status.init());
     dispatch(historyForward.init(target));

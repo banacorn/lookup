@@ -11,8 +11,14 @@ const defaultState: State = {
     },
     status: 'pending',
     history: {
-        words: [],
-        cursor: null
+        present: {
+            words: [],
+            cursor: null
+        },
+        past: {
+            words: [],
+            cursor: null
+        }
     }
 }
 
@@ -33,39 +39,61 @@ const status = handleActions<Status, STATUS>({
     [STATUS.FAIL]: (state: Status, action: Action<STATUS.FAIL>) => 'failed'
 }, defaultState.status);
 
-const history = handleActions<History, LOOKUP | BACKWARD>({
-    [LOOKUP.INIT]: (state: History, action: Action<LOOKUP.INIT>) => {
-        const nextWord = state.words[state.cursor + 1];
+const history = handleActions<{present: History, past: History}, LOOKUP | BACKWARD>({
+    [LOOKUP.INIT]: (state: {present: History, past: History}, action: Action<LOOKUP.INIT>) => {
+        const backup = state.present;
+
+        const nextWord = state.present.words[state.present.cursor + 1];
         // history forked
         if (nextWord && nextWord !== action.payload) {
             return {
-                words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
-                cursor: state.cursor + 1
+                past: backup,
+                present: {
+                    words: _.concat(_.take(state.present.words, state.present.cursor + 1), action.payload),
+                    cursor: state.present.cursor + 1
+                }
             }
         } else {
             return {
-                words: _.concat(state.words, action.payload),
-                cursor: state.words.length
+                past: backup,
+                present: {
+                    words: _.concat(state.present.words, action.payload),
+                    cursor: state.present.words.length
+                }
+            };
+        }
+    },
+    [LOOKUP.FAIL]: (state: {present: History, past: History}, action: Action<LOOKUP.FAIL>) => _.assign({}, state, {
+        present: state.past
+    }),
+
+    [BACKWARD.INIT]: (state: {present: History, past: History}, action: Action<BACKWARD.INIT>) => {
+        const backup = state.present;
+        return {
+            past: backup,
+            present: {
+                words: state.present.words,
+                cursor: _.max([state.present.cursor - 1, 0])
             }
         }
     },
-    [LOOKUP.FAIL]: (state: History, action: Action<LOOKUP.FAIL>) => _.assign({}, state, {
-        words: _.initial(state.words),
-        cursor: state.cursor - 1
+    [BACKWARD.FAIL]: (state: {present: History, past: History}, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
+        present: state.past
     }),
 
-    [BACKWARD.INIT]: (state: History, action: Action<BACKWARD.INIT>) => _.assign({}, state, {
-        cursor: state.cursor - 1
-    }),
-    [BACKWARD.FAIL]: (state: History, action: Action<BACKWARD.FAIL>) => _.assign({}, state, {
-        cursor: state.cursor + 1
-    }),
 
-    [FORWARD.INIT]: (state: History, action: Action<FORWARD.INIT>) => _.assign({}, state, {
-        cursor: state.cursor + 1
-    }),
-    [FORWARD.FAIL]: (state: History, action: Action<FORWARD.FAIL>) => _.assign({}, state, {
-        cursor: state.cursor - 1
+    [FORWARD.INIT]: (state: {present: History, past: History}, action: Action<FORWARD.INIT>) => {
+        const backup = state.present;
+        return {
+            past: backup,
+            present: {
+                words: state.present.words,
+                cursor: state.present.cursor + 1
+            }
+        }
+    },
+    [FORWARD.FAIL]: (state: {present: History, past: History}, action: Action<FORWARD.FAIL>) => _.assign({}, state, {
+        present: state.past
     })
 }, defaultState.history);
 

@@ -150,7 +150,7 @@
 	}; };
 	exports.backward = function (dispatch, getState) {
 	    var history = getState().history;
-	    var target = lastTarget(history);
+	    var target = lastTarget(history.present);
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
 	    dispatch(historyBackward.init(target));
@@ -165,7 +165,7 @@
 	};
 	exports.forward = function (dispatch, getState) {
 	    var history = getState().history;
-	    var target = nextTarget(history);
+	    var target = nextTarget(history.present);
 	    dispatch(fetch.init(target));
 	    dispatch(status.init());
 	    dispatch(historyForward.init(target));
@@ -27272,7 +27272,8 @@
 	var mapStateToProps = function (_a) {
 	    var status = _a.status, history = _a.history;
 	    return {
-	        status: status, history: history
+	        status: status,
+	        history: history.present
 	    };
 	};
 	var mapDispatchToProps = function (dispatch) {
@@ -27330,8 +27331,14 @@
 	    },
 	    status: 'pending',
 	    history: {
-	        words: [],
-	        cursor: null
+	        present: {
+	            words: [],
+	            cursor: null
+	        },
+	        past: {
+	            words: [],
+	            cursor: null
+	        }
 	    }
 	};
 	var entry = redux_actions_1.handleActions((_a = {},
@@ -27353,36 +27360,56 @@
 	), defaultState.status);
 	var history = redux_actions_1.handleActions((_c = {},
 	    _c[actions_1.LOOKUP.INIT] = function (state, action) {
-	        var nextWord = state.words[state.cursor + 1];
+	        var backup = state.present;
+	        var nextWord = state.present.words[state.present.cursor + 1];
 	        // history forked
 	        if (nextWord && nextWord !== action.payload) {
 	            return {
-	                words: _.concat(_.take(state.words, state.cursor + 1), action.payload),
-	                cursor: state.cursor + 1
+	                past: backup,
+	                present: {
+	                    words: _.concat(_.take(state.present.words, state.present.cursor + 1), action.payload),
+	                    cursor: state.present.cursor + 1
+	                }
 	            };
 	        }
 	        else {
 	            return {
-	                words: _.concat(state.words, action.payload),
-	                cursor: state.words.length
+	                past: backup,
+	                present: {
+	                    words: _.concat(state.present.words, action.payload),
+	                    cursor: state.present.words.length
+	                }
 	            };
 	        }
 	    },
 	    _c[actions_1.LOOKUP.FAIL] = function (state, action) { return _.assign({}, state, {
-	        words: _.initial(state.words),
-	        cursor: state.cursor - 1
+	        present: state.past
 	    }); },
-	    _c[actions_1.BACKWARD.INIT] = function (state, action) { return _.assign({}, state, {
-	        cursor: state.cursor - 1
-	    }); },
+	    _c[actions_1.BACKWARD.INIT] = function (state, action) {
+	        var backup = state.present;
+	        return {
+	            past: backup,
+	            present: {
+	                words: state.present.words,
+	                cursor: _.max([state.present.cursor - 1, 0])
+	            }
+	        };
+	    },
 	    _c[actions_1.BACKWARD.FAIL] = function (state, action) { return _.assign({}, state, {
-	        cursor: state.cursor + 1
+	        present: state.past
 	    }); },
-	    _c[actions_1.FORWARD.INIT] = function (state, action) { return _.assign({}, state, {
-	        cursor: state.cursor + 1
-	    }); },
+	    _c[actions_1.FORWARD.INIT] = function (state, action) {
+	        var backup = state.present;
+	        return {
+	            past: backup,
+	            present: {
+	                words: state.present.words,
+	                cursor: state.present.cursor + 1
+	            }
+	        };
+	    },
 	    _c[actions_1.FORWARD.FAIL] = function (state, action) { return _.assign({}, state, {
-	        cursor: state.cursor - 1
+	        present: state.past
 	    }); },
 	    _c
 	), defaultState.history);
