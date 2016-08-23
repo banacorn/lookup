@@ -356,28 +356,34 @@
 	        // link
 	        case 'a':
 	        case 'A':
-	            var href = node.getAttribute('href');
-	            // if internal
-	            if (_.startsWith(href, '/')) {
-	                var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
-	                if (match) {
-	                    var section = match[2];
-	                    return [{
-	                            kind: 'jump',
-	                            word: node.getAttribute('title'),
-	                            section: section,
-	                            name: node.getAttribute('title'),
-	                            body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                        }];
-	                }
+	            var nonExist = node.getAttribute('class') === 'new';
+	            if (nonExist) {
+	                return _.flatten(toArray(node.childNodes).map(parseInlineElem));
 	            }
-	            // else external
-	            return [{
-	                    kind: 'a',
-	                    href: href,
-	                    title: node.getAttribute('title'),
-	                    body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
-	                }];
+	            else {
+	                var href = node.getAttribute('href');
+	                // if internal
+	                if (_.startsWith(href, '/')) {
+	                    var match = href.match(/\/.+\/([^\#]+)(?:\#(.+))?/);
+	                    if (match) {
+	                        var section = match[2];
+	                        return [{
+	                                kind: 'jump',
+	                                word: node.getAttribute('title'),
+	                                section: section,
+	                                name: node.getAttribute('title'),
+	                                body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                            }];
+	                    }
+	                }
+	                // else external
+	                return [{
+	                        kind: 'a',
+	                        href: href,
+	                        title: node.getAttribute('title'),
+	                        body: _.flatten(toArray(node.childNodes).map(parseInlineElem))
+	                    }];
+	            }
 	        default:
 	            return [{
 	                    kind: 'plain',
