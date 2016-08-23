@@ -7,7 +7,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require('react');
 var react_redux_1 = require('react-redux');
 var actions_1 = require('../actions');
-require('../style/main.less');
+require('../stylesheets/main.less');
 ;
 var mapStateToProps = function (_a) {
     var status = _a.status, entry = _a.entry;

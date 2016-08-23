@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { State, Status, History } from '../types'
 import { lookup, backward, forward } from '../actions'
 // stylesheets
-require('../style/main.less');
+require('../stylesheets/main.less');
 
 interface NavProps extends React.Props<any> {
     word: string,
