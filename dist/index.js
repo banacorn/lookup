@@ -16,13 +16,6 @@ if (util_1.inWebpage) {
     store.dispatch(actions_1.lookup("Eisen"));
 }
 else {
-    var backgroundConn = chrome.runtime.connect({
-        name: 'woerterbuch-panel'
-    });
-    backgroundConn.postMessage({
-        type: 'initialize',
-        id: chrome.devtools.inspectedWindow.tabId
-    });
-    backgroundConn.onMessage.addListener(store.dispatch);
+    util_1.connectBackground(store);
 }
 //# sourceMappingURL=index.js.map

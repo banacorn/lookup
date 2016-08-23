@@ -8,7 +8,7 @@ import thunk from 'redux-thunk';
 import App from './components/App';
 import reducer from './reducer';
 import { lookup } from './actions';
-import { inWebpage } from './util';
+import { inWebpage, connectBackground } from './util';
 
 declare var chrome: any;
 
@@ -29,12 +29,5 @@ ReactDOM.render(
 if (inWebpage) {
     store.dispatch(lookup("Eisen"));
 } else {
-    var backgroundConn = chrome.runtime.connect({
-        name: 'woerterbuch-panel'
-    });
-    backgroundConn.postMessage({
-        type: 'initialize',
-        id: chrome.devtools.inspectedWindow.tabId
-    });
-    backgroundConn.onMessage.addListener(store.dispatch);
+    connectBackground(store);
 }
