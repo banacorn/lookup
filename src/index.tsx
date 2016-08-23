@@ -10,6 +10,7 @@ import reducer from './reducer';
 import { lookup } from './actions';
 import { inWebpage, connectBackground } from './util';
 
+
 declare var chrome: any;
 
 const store = createStore(

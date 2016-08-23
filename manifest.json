@@ -4,7 +4,7 @@
     "name": "Lookup",
     "description": "Lookup articles in wiktionary",
     "version": "1.0",
-    "devtools_page": "chrome/devtools.html",
+    "devtools_page": "dist/devtools.html",
     "permissions": [
         "tabs",
         "http://*/*",

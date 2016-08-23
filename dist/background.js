@@ -45,9 +45,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Promise = __webpack_require__(1);
-	var operator_1 = __webpack_require__(4);
-	var operator_2 = __webpack_require__(4);
+	var Promise = __webpack_require__(15);
+	var operator_1 = __webpack_require__(18);
+	var operator_2 = __webpack_require__(18);
 	var DEBUG_MODE = false;
 	if (DEBUG_MODE) {
 	    // tab
@@ -125,7 +125,21 @@
 
 
 /***/ },
-/* 1 */
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */,
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -5604,10 +5618,10 @@
 	
 	},{"./es5":13}]},{},[4])(4)
 	});                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), (function() { return this; }()), __webpack_require__(3).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), (function() { return this; }()), __webpack_require__(17).setImmediate))
 
 /***/ },
-/* 2 */
+/* 16 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -5773,10 +5787,10 @@
 
 
 /***/ },
-/* 3 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(2).nextTick;
+	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(16).nextTick;
 	var apply = Function.prototype.apply;
 	var slice = Array.prototype.slice;
 	var immediateIds = {};
@@ -5852,10 +5866,10 @@
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).setImmediate, __webpack_require__(3).clearImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17).setImmediate, __webpack_require__(17).clearImmediate))
 
 /***/ },
-/* 4 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5864,8 +5878,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var _ = __webpack_require__(5);
-	var EventEmitter = __webpack_require__(7);
+	var _ = __webpack_require__(19);
+	var EventEmitter = __webpack_require__(21);
 	var EVENT;
 	(function (EVENT) {
 	    var PANEL;
@@ -6061,7 +6075,7 @@
 
 
 /***/ },
-/* 5 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -22798,10 +22812,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(20)(module)))
 
 /***/ },
-/* 6 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -22817,7 +22831,7 @@
 
 
 /***/ },
-/* 7 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

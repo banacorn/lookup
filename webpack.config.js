@@ -1,7 +1,7 @@
 var path = require("path");
 var webpack = require("webpack");
 var nodeExternals = require('webpack-node-externals');
-// var css = require("!raw!less!./file.less");
+// require('style!css!less!font-awesome-webpack/font-awesome-styles.loader!font-awesome-webpack/font-awesome.config.js');
 
 module.exports = [{
     name: "browser",
@@ -29,10 +29,16 @@ module.exports = [{
             // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
             { test: /\.tsx?$/, loader: "ts-loader" },
 
+            // Less CSS
             {
                 test: /\.less$/,
                 loader: "style!css!autoprefixer!less"
             },
+
+            // the url-loader uses DataUrls.
+            // the file-loader emits files.
+            { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
+            { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
 
         ],
 
