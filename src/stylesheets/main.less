@@ -1,25 +1,63 @@
 @import "font-awesome/font-awesome";
 @import "config/ress.min.css";
+@import "config/colors";
 
 // Global
 // font-family: 'Roboto', sans-serif;
 // font-family: 'Roboto Slab', serif;
-
-button {
-    border: none;
-    background: none;
+* {
+    font-family: 'Roboto', sans-serif;
 }
+
+*:focus {
+    outline: none;
+}
+
+.hidden { display: none }
+
 
 // Nav
 #nav {
     display: flex;
+    justify-content: space-between;
 
     button {
         width: 40px;
         height: 40px;
+
+        &:hover {
+            color: @alizarin;
+        }
+
     }
 
-    button:hover  {
-        color: rgb(150, 180, 210)
+    h1 {
+        padding: 0 20px;
+        height: 40px;
+        line-height: 40px;
+
+        &:hover {
+            cursor: pointer;
+            color: @basalt;
+        }
     }
+
+    input {
+        height: 40px;
+        line-height: 40px;
+        margin: 0 20px;
+    }
+}
+
+article {
+    padding: 20px;
+}
+
+h2, h3, h4, h5, h6 {
+    color: @asbestos;
+    margin: 40px 0 20px 0;
+}
+
+li {
+    margin-left: 20px;
 }
