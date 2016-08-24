@@ -1,4 +1,5 @@
 /// <reference path="globals/bluebird/index.d.ts" />
+/// <reference path="globals/classnames/index.d.ts" />
 /// <reference path="globals/colors/index.d.ts" />
 /// <reference path="globals/eventemitter3/index.d.ts" />
 /// <reference path="globals/lodash/index.d.ts" />

@@ -24,6 +24,7 @@
   "homepage": "https://github.com/banacorn/lookup#readme",
   "dependencies": {
     "bluebird": "^3.4.1",
+    "classnames": "^2.2.5",
     "eventemitter3": "^1.2.0",
     "lodash": "^4.15.0",
     "react": "^15.3.0",

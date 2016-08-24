@@ -2,15 +2,14 @@ import * as React from 'react'
 import { connect } from 'react-redux';
 import { State, Status, History } from '../types'
 import { lookup, backward, forward } from '../actions'
+import * as classNames from 'classnames';
+
 // stylesheets
 require('../stylesheets/main.less');
 
 interface NavProps extends React.Props<any> {
     word: string,
     status: Status,
-
-    // history
-    // history: History,
 
     onSearch: (word: string) => void,
     onBackward: (e: Event) => void,
@@ -56,7 +55,12 @@ class Nav extends React.Component<NavProps, NavState> {
             toggleSearch: true
         });
         const searchBox = document.getElementById('search') as HTMLInputElement;
-        setTimeout(() => searchBox.focus(), 0);
+        setTimeout(() => {
+            searchBox.value = this.props.word;
+            searchBox.focus();
+            searchBox.select();
+        }, 0);
+
     }
 
     handleSearch(e: any) {
@@ -78,19 +82,26 @@ class Nav extends React.Component<NavProps, NavState> {
     render() {
         const { word, status, onSearch, onBackward, onForward } = this.props;
 
+        const formClass = classNames({ 'hidden': !this.state.toggleSearch});
+        const headerClass = classNames({
+            'hidden': this.state.toggleSearch
+        }, this.props.status);
+
         return (
             <nav id="nav">
             <button onClick={onBackward}><i className="fa fa-chevron-left" aria-hidden="true"></i></button>
             <form
-                className={this.state.toggleSearch ? '' : 'hidden'}
+                className={formClass}
                 onSubmit={e => this.handleSearch(e)}
                 onBlur={e => this.handleQuitSearch()}
             >
-                <label htmlFor="search"><i className="fa fa-search" aria-hidden="true"></i></label>
-                <input id="search" type="text" />
+                <input
+                    id="search"
+                    type="text"
+                />
             </form>
             <h1
-                className={this.state.toggleSearch ? 'hidden' : ''}
+                className={headerClass}
                 onClick={e => this.handleClick()}
             >{ word }</h1>
             <button onClick={onForward}><i className="fa fa-chevron-right" aria-hidden="true"></i></button>

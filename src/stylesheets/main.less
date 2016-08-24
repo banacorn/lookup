@@ -26,7 +26,7 @@
         height: 40px;
 
         &:hover {
-            color: @alizarin;
+            color: @peterriver;
         }
 
     }
@@ -35,17 +35,40 @@
         padding: 0 20px;
         height: 40px;
         line-height: 40px;
+        flex-grow: 100;
 
-        &:hover {
-            cursor: pointer;
-            color: @basalt;
-        }
+        text-align: center;
+        font-size: 2ex;
+        font-weight: bold;
     }
 
-    input {
+    h1.pending { color: @silver }
+    h1.succeed { color: black }
+    h1.failed { color: @pomegranate }
+    h1:hover {
+        cursor: pointer;
+        color: @silver;
+    }
+
+    form {
         height: 40px;
         line-height: 40px;
         margin: 0 20px;
+        flex-grow: 100;
+    }
+    input {
+        height: 40px;
+        line-height: 40px;
+        width: 100%;
+
+        font-size: 2ex;
+        text-align: center;
+        font-weight: bold;
+
+        &::selection {
+            background: @belizehole;
+            color: white;
+        }
     }
 }
 
@@ -60,4 +83,15 @@ h2, h3, h4, h5, h6 {
 
 li {
     margin-left: 20px;
+}
+
+a {
+    &:link, &:visited {
+        color: @belizehole;
+        text-decoration: none;
+    }
+
+    &:hover {
+        color: @peterriver;
+    }
 }

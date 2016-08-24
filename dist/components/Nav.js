@@ -7,6 +7,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var React = require('react');
 var react_redux_1 = require('react-redux');
 var actions_1 = require('../actions');
+var classNames = require('classnames');
 require('../stylesheets/main.less');
 ;
 var mapStateToProps = function (_a) {
@@ -38,11 +39,16 @@ var Nav = (function (_super) {
         };
     }
     Nav.prototype.handleClick = function () {
+        var _this = this;
         this.setState({
             toggleSearch: true
         });
         var searchBox = document.getElementById('search');
-        setTimeout(function () { return searchBox.focus(); }, 0);
+        setTimeout(function () {
+            searchBox.value = _this.props.word;
+            searchBox.focus();
+            searchBox.select();
+        }, 0);
     };
     Nav.prototype.handleSearch = function (e) {
         e.preventDefault();
@@ -59,16 +65,18 @@ var Nav = (function (_super) {
     Nav.prototype.render = function () {
         var _this = this;
         var _a = this.props, word = _a.word, status = _a.status, onSearch = _a.onSearch, onBackward = _a.onBackward, onForward = _a.onForward;
+        var formClass = classNames({ 'hidden': !this.state.toggleSearch });
+        var headerClass = classNames({
+            'hidden': this.state.toggleSearch
+        }, this.props.status);
         return (React.createElement("nav", {id: "nav"}, 
             React.createElement("button", {onClick: onBackward}, 
                 React.createElement("i", {className: "fa fa-chevron-left", "aria-hidden": "true"})
             ), 
-            React.createElement("form", {className: this.state.toggleSearch ? '' : 'hidden', onSubmit: function (e) { return _this.handleSearch(e); }, onBlur: function (e) { return _this.handleQuitSearch(); }}, 
-                React.createElement("label", {htmlFor: "search"}, 
-                    React.createElement("i", {className: "fa fa-search", "aria-hidden": "true"})
-                ), 
-                React.createElement("input", {id: "search", type: "text"})), 
-            React.createElement("h1", {className: this.state.toggleSearch ? 'hidden' : '', onClick: function (e) { return _this.handleClick(); }}, word), 
+            React.createElement("form", {className: formClass, onSubmit: function (e) { return _this.handleSearch(e); }, onBlur: function (e) { return _this.handleQuitSearch(); }}, 
+                React.createElement("input", {id: "search", type: "text"})
+            ), 
+            React.createElement("h1", {className: headerClass, onClick: function (e) { return _this.handleClick(); }}, word), 
             React.createElement("button", {onClick: onForward}, 
                 React.createElement("i", {className: "fa fa-chevron-right", "aria-hidden": "true"})
             )));
